@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 pci_config = { git = "https://github.com/toku-sa-n/pci_config.git" }
+x86_64 = "0.12.0"

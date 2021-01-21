@@ -17,27 +17,27 @@ pub struct Capability {
     runtime_register_space_offset: RuntimeRegisterSpaceOffset,
 }
 impl Capability {
-    /// Returns the accessor to the Capability Registers Length.
+    /// Returns the reference to the Capability Registers Length.
     pub fn capability_registers_length(&self) -> &CapabilityRegistersLength {
         &self.capability_registers_length
     }
 
-    /// Returns the accessor to the Structural Parameters 1.
+    /// Returns the reference to the Structural Parameters 1.
     pub fn structural_parameters_1(&self) -> &StructuralParameters1 {
         &self.structural_parameters_1
     }
 
-    /// Returns the accessor to the Structural Parameters 2.
+    /// Returns the reference to the Structural Parameters 2.
     pub fn structural_parameters_2(&self) -> &StructuralParameters2 {
         &self.structural_parameters_2
     }
 
-    /// Returns the accessor to the Capability Parameters 1.
+    /// Returns the reference to the Capability Parameters 1.
     pub fn capability_parameters_1(&self) -> &CapabilityParameters1 {
         &self.capability_parameters_1
     }
 
-    /// Returns the accessor to the Doorbell Offset.
+    /// Returns the reference to the Doorbell Offset.
     pub fn doorbell_offset(&self) -> &DoorbellOffset {
         &self.doorbell_offset
     }

@@ -1,0 +1,3 @@
+too-many-arguments-threshold = 3
+too-many-lines-threshold = 20
+doc-valid-idents = ["xHCI"]

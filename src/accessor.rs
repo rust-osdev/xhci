@@ -136,3 +136,15 @@ where
         self.bytes.as_usize() / mem::size_of::<T>()
     }
 }
+impl<T, M> Drop for Accessor<T, M>
+where
+    T: ?Sized,
+    M: Mapper,
+{
+    fn drop(&mut self) {
+        self.mapper.unmap_pages(
+            self.virt.as_u64().try_into().unwrap(),
+            self.bytes.as_usize(),
+        )
+    }
+}

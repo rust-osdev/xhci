@@ -13,9 +13,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use nightly
-      run: rustup override set nightly
+
+    - uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: nightly
+        components: clippy, rustfmt
+        override: true
+
+    - name: Run rustfmt with check mode
+      run: |
+        shopt -s globstar
+        rustfmt **/*.rs --check
+
+    - uses: actions-rs/clippy-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: -- -D clippy::pedantic -D clippy::all
+
     - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo build

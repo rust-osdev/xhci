@@ -1,4 +1,4 @@
-//! xHCI register
+//! xHCI registers
 
 pub mod capability;
 pub mod doorbell;

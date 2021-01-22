@@ -3,6 +3,8 @@
 <!-- next-header -->
 
 ## [Unreleased] - ReleaseDate
+### Added
+- Implement `Debug` for the register types.
 
 ## [0.2.0] - 2021-01-22
 

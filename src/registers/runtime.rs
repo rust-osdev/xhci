@@ -1,9 +1,12 @@
 //! Host Controller Runtime Registers.
 
+use core::fmt;
+
 use crate::error::Error;
 
 /// Event Ring Segment Table Size Register.
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
     /// Sets the number of segments the Event Ring Segment Table supports.
@@ -14,6 +17,7 @@ impl EventRingSegmentTableSizeRegister {
 
 /// Event Ring Segment Table Base Address Register.
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
@@ -38,6 +42,12 @@ impl EventRingSegmentTableBaseAddressRegister {
 #[repr(transparent)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
+    /// Returns the address of the current Event Ring Dequeue Pointer.
+    #[must_use]
+    pub fn event_ring_dequeue_pointer(&self) -> u64 {
+        self.0 & 0b1111
+    }
+
     /// Sets the address of the current Event Ring Dequeue Pointer. It must be 16 byte aligned.
     ///
     /// # Errors
@@ -53,5 +63,15 @@ impl EventRingDequeuePointerRegister {
                 address: p,
             })
         }
+    }
+}
+impl fmt::Debug for EventRingDequeuePointerRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("EventRingDequeuePointerRegister")
+            .field(
+                "event_ring_dequeue_pointer",
+                &self.event_ring_dequeue_pointer(),
+            )
+            .finish()
     }
 }

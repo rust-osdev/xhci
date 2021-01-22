@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.2.1 - 2021-01-22
 ### Added
 - Implement `Debug` for the register types.
 

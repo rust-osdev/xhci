@@ -4,9 +4,6 @@ use crate::error::Error;
 use bit_field::BitField;
 use core::convert::TryInto;
 
-/// Host Controller Operational Registers
-pub struct Operational {}
-
 /// USB Command Register.
 #[repr(transparent)]
 pub struct UsbCommandRegister(u32);

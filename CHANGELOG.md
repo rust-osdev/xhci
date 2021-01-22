@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.2.3 - 2021-01-22
 ### Fixed
 - `registers::operational::UsbCommandRegister::set_host_controller_reset` updated the wrong bit.
 

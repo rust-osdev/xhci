@@ -2,7 +2,9 @@
 
 <!-- next-header -->
 
-## [Unreleased] - ReleaseData
+## [Unreleased] - ReleaseDate
+
+- Rename `EventRingDequeuePointerRegister::set` to `EventRingDequeuePointerRegister::set_event_ring_dequeue_pointer`
 
 ## 0.1.0 - 2021-01-22
 

@@ -130,6 +130,7 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
     /// Sets the value of the MaxDevice Slots Enabled field.
+    #[must_use]
     pub fn set_max_device_slots_enabled(&mut self, s: u8) {
         self.0.set_bits(0..=7, s.into());
     }
@@ -140,11 +141,13 @@ impl ConfigureRegister {
 pub struct PortStatusAndControlRegister(u32);
 impl PortStatusAndControlRegister {
     /// Returns the value of the Current Connect Status bit.
+    #[must_use]
     pub fn current_connect_status(&self) -> bool {
         self.0.get_bit(0)
     }
 
     /// Returns the value of the Port Reset bit.
+    #[must_use]
     pub fn port_reset(&self) -> bool {
         self.0.get_bit(4)
     }
@@ -155,11 +158,13 @@ impl PortStatusAndControlRegister {
     }
 
     /// Returns the value of the Port Speed field.
+    #[must_use]
     pub fn port_speed(&self) -> u8 {
         self.0.get_bits(10..=13).try_into().unwrap()
     }
 
     /// Returns the value of the Port Reset Changed bit.
+    #[must_use]
     pub fn port_reset_changed(&self) -> bool {
         self.0.get_bit(21)
     }

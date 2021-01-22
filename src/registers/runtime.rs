@@ -43,7 +43,7 @@ impl EventRingDequeuePointerRegister {
     /// # Errors
     ///
     /// This method may return an [`Error::NotAligned`] error if the address is not 16 byte aligned.
-    pub fn set(&mut self, p: u64) -> Result<(), Error> {
+    pub fn set_event_ring_dequeue_pointer(&mut self, p: u64) -> Result<(), Error> {
         if p.trailing_zeros() >= 4 {
             self.0 = p;
             Ok(())

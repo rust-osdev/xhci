@@ -27,7 +27,7 @@ impl UsbCommandRegister {
 
     /// Sets the value of the Host Controller Reset bit.
     pub fn set_host_controller_reset(&mut self, b: bool) {
-        self.0.set_bit(0, b);
+        self.0.set_bit(1, b);
     }
 }
 impl fmt::Debug for UsbCommandRegister {

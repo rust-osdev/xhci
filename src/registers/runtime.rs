@@ -18,7 +18,7 @@ pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
     ///
-    /// # Error
+    /// # Errors
     ///
     /// This method may return an [`Error::NotAligned`] error if the address is not 64 byte aligned.
     pub fn set(&mut self, a: u64) -> Result<(), Error> {
@@ -40,7 +40,7 @@ pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
     /// Sets the address of the current Event Ring Dequeue Pointer. It must be 16 byte aligned.
     ///
-    /// # Error
+    /// # Errors
     ///
     /// This method may return an [`Error::NotAligned`] error if the address is not 16 byte aligned.
     pub fn set(&mut self, p: u64) -> Result<(), Error> {

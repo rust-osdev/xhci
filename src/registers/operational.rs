@@ -79,6 +79,7 @@ impl CommandRingControlRegister {
     }
 
     /// Returns the bit of the Command Ring Running bit.
+    #[must_use]
     pub fn command_ring_running(&self) -> bool {
         self.0.get_bit(3)
     }

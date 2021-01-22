@@ -113,7 +113,7 @@ impl DeviceContextBaseAddressArrayPointerRegister {
     ///
     /// This method may return a `NotAligned` error if the given pointer is not 64 byte aligned.
     pub fn set(&mut self, p: u64) -> Result<(), Error> {
-        if p & 0b11_1111 == 0 {
+        if p.trailing_zeros() >= 6 {
             self.0 = p;
             Ok(())
         } else {

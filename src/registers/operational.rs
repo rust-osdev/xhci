@@ -161,6 +161,7 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
     /// Returns the value of the Max Device Slots Enabled field.
+    #[must_use]
     pub fn max_device_slots_enabled(&self) -> u8 {
         self.0.get_bits(0..=7).try_into().unwrap()
     }

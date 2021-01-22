@@ -2,7 +2,5 @@
 
 #![no_std]
 
-mod accessor;
 pub mod error;
-pub mod mapper;
 pub mod registers;

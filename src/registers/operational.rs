@@ -14,6 +14,7 @@ pub struct Operational {}
 pub struct UsbCommandRegister(u32);
 impl UsbCommandRegister {
     /// Returns the value of the Run/Stop bit.
+    #[must_use]
     pub fn run_stop(&self) -> bool {
         self.0.get_bit(0)
     }
@@ -24,6 +25,7 @@ impl UsbCommandRegister {
     }
 
     /// Returns the value of the Host Controller Reset bit.
+    #[must_use]
     pub fn host_controller_reset(&self) -> bool {
         self.0.get_bit(1)
     }
@@ -39,21 +41,25 @@ impl UsbCommandRegister {
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
     /// Returns the value of the HCHalted bit.
+    #[must_use]
     pub fn hc_halted(&self) -> bool {
         self.0.get_bit(0)
     }
 
     /// Returns the value of the Host System Error bit.
+    #[must_use]
     pub fn host_system_error(&self) -> bool {
         self.0.get_bit(2)
     }
 
     /// Returns the value of the Controller Not Ready bit.
+    #[must_use]
     pub fn controller_not_ready(&self) -> bool {
         self.0.get_bit(11)
     }
 
     /// Returns the value of the Host Controller Error bit.
+    #[must_use]
     pub fn host_controller_error(&self) -> bool {
         self.0.get_bit(12)
     }
@@ -64,6 +70,7 @@ impl UsbStatusRegister {
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
     /// Returns the value of the page size supported by xHC.
+    #[must_use]
     pub fn get(&self) -> u16 {
         self.0.try_into().unwrap()
     }

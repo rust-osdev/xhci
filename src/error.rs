@@ -1,6 +1,7 @@
 //! A module containing things representing errors
 
 /// An enum representing errors
+#[derive(Debug)]
 pub enum Error {
     /// The passed address is not aligned correctly.
     NotAligned {

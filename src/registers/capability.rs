@@ -3,8 +3,9 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 
-#[repr(transparent)]
 /// Capability Registers Length
+#[repr(transparent)]
+#[allow(clippy::module_name_repetitions)]
 pub struct CapabilityRegistersLength(u8);
 impl CapabilityRegistersLength {
     /// Returns the length of the Capability Registers.
@@ -63,6 +64,7 @@ impl StructuralParameters2 {
 
 /// Capability Parameters 1
 #[repr(transparent)]
+#[allow(clippy::module_name_repetitions)]
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
     /// Returns `true` if the xHC uses 64 byte Context data structures, and `false` if the xHC uses

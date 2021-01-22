@@ -3,46 +3,6 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 
-/// Host Controller Capability Registers.
-#[repr(C, packed)]
-pub struct Capability {
-    capability_registers_length: CapabilityRegistersLength,
-    rsvd: u8,
-    host_controller_interface_version_number: u16,
-    structural_parameters_1: StructuralParameters1,
-    structural_parameters_2: StructuralParameters2,
-    structural_parameters_3: u32,
-    capability_parameters_1: CapabilityParameters1,
-    doorbell_offset: DoorbellOffset,
-    runtime_register_space_offset: RuntimeRegisterSpaceOffset,
-}
-impl Capability {
-    /// Returns the reference to the Capability Registers Length.
-    pub fn capability_registers_length(&self) -> &CapabilityRegistersLength {
-        &self.capability_registers_length
-    }
-
-    /// Returns the reference to the Structural Parameters 1.
-    pub fn structural_parameters_1(&self) -> &StructuralParameters1 {
-        &self.structural_parameters_1
-    }
-
-    /// Returns the reference to the Structural Parameters 2.
-    pub fn structural_parameters_2(&self) -> &StructuralParameters2 {
-        &self.structural_parameters_2
-    }
-
-    /// Returns the reference to the Capability Parameters 1.
-    pub fn capability_parameters_1(&self) -> &CapabilityParameters1 {
-        &self.capability_parameters_1
-    }
-
-    /// Returns the reference to the Doorbell Offset.
-    pub fn doorbell_offset(&self) -> &DoorbellOffset {
-        &self.doorbell_offset
-    }
-}
-
 #[repr(transparent)]
 /// Capability Registers Length
 pub struct CapabilityRegistersLength(u8);

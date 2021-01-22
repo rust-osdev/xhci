@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 description = "A library to handle xHCI"
 repository = "https://github.com/toku-sa-n/xhch"
 readme = "README.md"
-categories = ["No standard library", "Operating System"]
+categories = ["no-std", "os"]
 keywords = ["no_std", "OS"]
 
 [badges]

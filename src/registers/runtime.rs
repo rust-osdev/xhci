@@ -43,6 +43,7 @@ impl EventRingSegmentTableBaseAddressRegister {
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
     /// Returns the address of the current Event Ring Dequeue Pointer.
+    #[must_use]
     pub fn event_ring_dequeue_pointer(&self) -> u64 {
         self.0 & 0b1111
     }

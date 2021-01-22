@@ -2,7 +2,7 @@
 
 use crate::error::Error;
 use bit_field::BitField;
-use core::convert::TryInto;
+use core::{convert::TryInto, fmt};
 
 /// USB Command Register
 #[repr(transparent)]
@@ -28,6 +28,14 @@ impl UsbCommandRegister {
     /// Sets the value of the Host Controller Reset bit.
     pub fn set_host_controller_reset(&mut self, b: bool) {
         self.0.set_bit(0, b);
+    }
+}
+impl fmt::Debug for UsbCommandRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UsbCommandRegister")
+            .field("run_stop", &self.run_stop())
+            .field("host_controller_reset", &self.host_controller_reset())
+            .finish()
     }
 }
 
@@ -60,9 +68,20 @@ impl UsbStatusRegister {
         self.0.get_bit(12)
     }
 }
+impl fmt::Debug for UsbStatusRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UsbStatusRegister")
+            .field("hc_halted", &self.hc_halted())
+            .field("host_system_error", &self.host_system_error())
+            .field("controller_not_ready", &self.controller_not_ready())
+            .field("host_controller_error", &self.host_controller_error())
+            .finish()
+    }
+}
 
 /// Page Size Register
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
     /// Returns the value of the page size supported by xHC.
@@ -106,9 +125,17 @@ impl CommandRingControlRegister {
         }
     }
 }
+impl fmt::Debug for CommandRingControlRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("CommandRingControlRegister")
+            .field("command_ring_running", &self.command_ring_running())
+            .finish()
+    }
+}
 
 /// Device Context Base Address Array Pointer Register
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.

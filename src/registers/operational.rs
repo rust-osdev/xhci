@@ -85,7 +85,7 @@ impl CommandRingControlRegister {
 
     /// Sets the value of the Command Ring Pointer field. It must be 64 byte aligned.
     ///
-    /// # Error
+    /// # Errors
     ///
     /// This method may return a `NotAligned` error if the given pointer is not 64
     /// byte aligned.

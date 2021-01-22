@@ -40,6 +40,7 @@ impl UsbCommandRegister {
 #[repr(transparent)]
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
+    #[allow(clippy::doc_markdown)]
     /// Returns the value of the HCHalted bit.
     #[must_use]
     pub fn hc_halted(&self) -> bool {

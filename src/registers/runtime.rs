@@ -1,5 +1,7 @@
 //! Host Controller Runtime Registers.
 
+use core::fmt;
+
 use crate::error::Error;
 
 /// Event Ring Segment Table Size Register.
@@ -60,5 +62,15 @@ impl EventRingDequeuePointerRegister {
                 address: p,
             })
         }
+    }
+}
+impl fmt::Debug for EventRingDequeuePointerRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("EventRingDequeuePointerRegister")
+            .field(
+                "event_ring_dequeue_pointer",
+                &self.event_ring_dequeue_pointer(),
+            )
+            .finish()
     }
 }

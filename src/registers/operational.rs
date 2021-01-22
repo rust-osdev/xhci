@@ -4,6 +4,8 @@ use core::convert::TryInto;
 
 use bit_field::BitField;
 
+use crate::error::Error;
+
 /// Host Controller Operational Registers
 pub struct Operational {}
 
@@ -87,15 +89,15 @@ impl CommandRingControlRegister {
     ///
     /// This method may return a `NotAligned` error if the given pointer is not 64
     /// byte aligned.
-    pub fn set_command_ring_pointer(&mut self, p: u64) -> Result<(), NotAligned> {
+    pub fn set_command_ring_pointer(&mut self, p: u64) -> Result<(), Error> {
         if p & 0b11_1111 == 0 {
             let p = p >> 6;
             self.0.set_bits(6..=63, p);
             Ok(())
         } else {
-            Err(NotAligned {
+            Err(Error::NotAligned {
                 alignment: 64,
-                addr: p,
+                address: p,
             })
         }
     }
@@ -110,14 +112,14 @@ impl DeviceContextBaseAddressArrayPointerRegister {
     /// # Error
     ///
     /// This method may return a `NotAligned` error if the given pointer is not 64 byte aligned.
-    pub fn set(&mut self, p: u64) -> Result<(), NotAligned> {
+    pub fn set(&mut self, p: u64) -> Result<(), Error> {
         if p & 0b11_1111 == 0 {
             self.0 = p;
             Ok(())
         } else {
-            Err(NotAligned {
+            Err(Error::NotAligned {
                 alignment: 64,
-                addr: p,
+                address: p,
             })
         }
     }
@@ -161,13 +163,4 @@ impl PortStatusAndControlRegister {
     pub fn port_reset_changed(&self) -> bool {
         self.0.get_bit(21)
     }
-}
-
-/// A struct representing that the given address is not aligned properly.
-#[derive(Debug)]
-pub struct NotAligned {
-    /// Address must be `alignment` byte aligned.
-    pub alignment: u64,
-    /// Address passed as an argument.
-    pub addr: u64,
 }

@@ -22,7 +22,7 @@ impl EventRingSegmentTableBaseAddressRegister {
     ///
     /// This method may return an [`Error::NotAligned`] error if the address is not 64 byte aligned.
     pub fn set(&mut self, a: u64) -> Result<(), Error> {
-        if a & 0b11_1111 == 0 {
+        if a.trailing_zeros() >= 6 {
             self.0 = a;
             Ok(())
         } else {
@@ -44,7 +44,7 @@ impl EventRingDequeuePointerRegister {
     ///
     /// This method may return an [`Error::NotAligned`] error if the address is not 16 byte aligned.
     pub fn set(&mut self, p: u64) -> Result<(), Error> {
-        if p & 0b1111 == 0 {
+        if p.trailing_zeros() >= 4 {
             self.0 = p;
             Ok(())
         } else {

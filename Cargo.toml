@@ -9,6 +9,3 @@ edition = "2018"
 
 [dependencies]
 bit_field = "0.10.1"
-os_units = "0.2.7"
-pci_config = { git = "https://github.com/toku-sa-n/pci_config.git" }
-x86_64 = "0.13.1"

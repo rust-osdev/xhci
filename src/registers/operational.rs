@@ -1,10 +1,8 @@
 //! Host Controller Operational Registers
 
-use core::convert::TryInto;
-
-use bit_field::BitField;
-
 use crate::error::Error;
+use bit_field::BitField;
+use core::convert::TryInto;
 
 /// Host Controller Operational Registers
 pub struct Operational {}

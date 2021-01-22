@@ -1,4 +1,4 @@
-//! Doorbell Register.
+//! Doorbell Register
 
 use bit_field::BitField;
 use core::convert::TryInto;

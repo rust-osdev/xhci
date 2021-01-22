@@ -170,6 +170,13 @@ impl ConfigureRegister {
         self.0.set_bits(0..=7, s.into());
     }
 }
+impl fmt::Debug for ConfigureRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ConfigureRegister")
+            .field("max_device_slots_enabled", &self.max_device_slots_enabled())
+            .finish()
+    }
+}
 
 /// Port Status and Control Register
 #[repr(transparent)]
@@ -202,5 +209,15 @@ impl PortStatusAndControlRegister {
     #[must_use]
     pub fn port_reset_changed(&self) -> bool {
         self.0.get_bit(21)
+    }
+}
+impl fmt::Debug for PortStatusAndControlRegister {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("PortStatusAndControlRegister")
+            .field("current_connect_status", &self.current_connect_status())
+            .field("port_reset", &self.port_reset())
+            .field("port_speed", &self.port_speed())
+            .field("port_reset_changed", &self.port_reset_changed())
+            .finish()
     }
 }

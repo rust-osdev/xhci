@@ -1,6 +1,6 @@
-//! A module containing things representing errors.
+//! A module containing things representing errors
 
-/// An enum representing errors.
+/// An enum representing errors
 pub enum Error {
     /// The passed address is not aligned correctly.
     NotAligned {

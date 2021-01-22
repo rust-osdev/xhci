@@ -4,7 +4,7 @@ use crate::error::Error;
 use bit_field::BitField;
 use core::convert::TryInto;
 
-/// USB Command Register.
+/// USB Command Register
 #[repr(transparent)]
 pub struct UsbCommandRegister(u32);
 impl UsbCommandRegister {
@@ -31,7 +31,7 @@ impl UsbCommandRegister {
     }
 }
 
-/// USB Status Register.
+/// USB Status Register
 #[repr(transparent)]
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
@@ -61,7 +61,7 @@ impl UsbStatusRegister {
     }
 }
 
-/// Page Size Register.
+/// Page Size Register
 #[repr(transparent)]
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
@@ -72,7 +72,7 @@ impl PageSizeRegister {
     }
 }
 
-/// Command Ring Controller Register.
+/// Command Ring Controller Register
 #[repr(transparent)]
 pub struct CommandRingControlRegister(u64);
 impl CommandRingControlRegister {
@@ -107,7 +107,7 @@ impl CommandRingControlRegister {
     }
 }
 
-/// Device Context Base Address Array Pointer Register.
+/// Device Context Base Address Array Pointer Register
 #[repr(transparent)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
@@ -129,7 +129,7 @@ impl DeviceContextBaseAddressArrayPointerRegister {
     }
 }
 
-/// Configure Register.
+/// Configure Register
 #[repr(transparent)]
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
@@ -139,7 +139,7 @@ impl ConfigureRegister {
     }
 }
 
-/// Port Status and Control Register.
+/// Port Status and Control Register
 #[repr(transparent)]
 pub struct PortStatusAndControlRegister(u32);
 impl PortStatusAndControlRegister {

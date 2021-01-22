@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.2.4 - 2021-01-22
 ### Added
 - `extended_capabilities::usb_legacy_support_capability::UsbLegacySupportCapability`
 

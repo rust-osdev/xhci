@@ -109,7 +109,7 @@ pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
     ///
-    /// # Error
+    /// # Errors
     ///
     /// This method may return a `NotAligned` error if the given pointer is not 64 byte aligned.
     pub fn set(&mut self, p: u64) -> Result<(), Error> {

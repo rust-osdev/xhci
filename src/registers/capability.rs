@@ -1,11 +1,12 @@
 //! Host Controller Capability Registers
 
 use bit_field::BitField;
-use core::convert::TryInto;
+use core::{convert::TryInto, fmt};
 
 /// Capability Registers Length
 #[repr(transparent)]
 #[allow(clippy::module_name_repetitions)]
+#[derive(Debug)]
 pub struct CapabilityRegistersLength(u8);
 impl CapabilityRegistersLength {
     /// Returns the length of the Capability Registers.
@@ -29,6 +30,14 @@ impl StructuralParameters1 {
     #[must_use]
     pub fn number_of_ports(&self) -> u8 {
         self.0.get_bits(24..=31).try_into().unwrap()
+    }
+}
+impl fmt::Debug for StructuralParameters1 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("StructuralParameters1")
+            .field("number_of_device_slots", &self.number_of_device_slots())
+            .field("number_of_ports", &self.number_of_ports())
+            .finish()
     }
 }
 
@@ -66,6 +75,17 @@ impl StructuralParameters2 {
         self.0.get_bits(27..=31)
     }
 }
+impl fmt::Debug for StructuralParameters2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("StructuralParameters2")
+            .field(
+                "event_ring_segment_table_max",
+                &self.event_ring_segment_table_max(),
+            )
+            .field("max_scratchpad_buffers", &self.max_scratchpad_buffers())
+            .finish()
+    }
+}
 
 /// Capability Parameters 1
 #[repr(transparent)]
@@ -87,9 +107,18 @@ impl CapabilityParameters1 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }
 }
+impl fmt::Debug for CapabilityParameters1 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("CapabilityParameters1")
+            .field("context_size", &self.context_size())
+            .field("xhci_extended_capabilities_pointer", &self.context_size())
+            .finish()
+    }
+}
 
 /// Doorbell Offset
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct DoorbellOffset(u32);
 impl DoorbellOffset {
     /// Returns the offset of the Doorbell Array from the MMIO base.
@@ -101,6 +130,7 @@ impl DoorbellOffset {
 
 /// Runtime Register Space Offset
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct RuntimeRegisterSpaceOffset(u32);
 impl RuntimeRegisterSpaceOffset {
     /// Returns the offset of the Runtime Registers from the MMIO base.

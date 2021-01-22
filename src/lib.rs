@@ -1,8 +1,6 @@
-#![no_std]
-
 //! A library which is useful to handle xHCI.
 
-pub mod accessor;
+#![no_std]
 
-/// A struct which initializes the host controller.
-pub struct HcInitializer;
+pub mod error;
+pub mod registers;

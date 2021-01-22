@@ -96,6 +96,7 @@ impl DoorbellOffset {
 pub struct RuntimeRegisterSpaceOffset(u32);
 impl RuntimeRegisterSpaceOffset {
     /// Returns the offset of the Runtime Registers from the MMIO base.
+    #[must_use]
     pub fn get(&self) -> u32 {
         self.0
     }

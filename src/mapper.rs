@@ -10,8 +10,8 @@ pub trait Mapper {
     /// Caller must ensure that no more than one virtual address points to the same address,
     /// otherwise it may cause undefined behaviors such as creating multiple `&mut` references to
     /// the same object.
-    unsafe fn map(phys_start: usize, bytes: usize) -> usize;
+    unsafe fn map(&mut self, phys_start: usize, bytes: usize) -> usize;
 
     /// Unmaps `bytes` bytes of virtual memory region starting from `virt_start`.
-    fn unmap(virt_start: usize, bytes: usize);
+    fn unmap(&mut self, virt_start: usize, bytes: usize);
 }

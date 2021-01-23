@@ -1,8 +1,51 @@
 //! Host Controller Operational Registers
 
-use crate::error::Error;
+use super::capability::CapabilityRegistersLength;
+use crate::{accessor::Accessor, error::Error, mapper::Mapper};
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
+
+/// Host Controller Operational Registers
+///
+/// This struct does not contain the Port Register set.
+#[repr(C)]
+pub struct Operational {
+    /// USB Command Register
+    pub usbcmd: UsbCommandRegister,
+    /// USB Status Register
+    pub usbsts: UsbStatusRegister,
+    /// Page Size Register
+    pub pagesize: PageSizeRegister,
+    _rsvd: [u8; 8],
+    _dnctrl: u32,
+    _rsvd2: [u8; 16],
+    /// Device Context Base Address Array Pointer Register
+    pub dcbaap: DeviceContextBaseAddressArrayPointerRegister,
+    /// Configure Register
+    pub config: ConfigureRegister,
+}
+impl Operational {
+    /// Creates a new accessor to the Host Controller Operational Registers.
+    ///
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor is created, otherwise undefined behaviors such as
+    /// data race may occur.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Error::NotAligned`] error if `mmio_base` is not aligned.
+    pub unsafe fn new<M>(
+        mmio_base: usize,
+        caplength: &CapabilityRegistersLength,
+        mapper: M,
+    ) -> Result<Accessor<Self, M>, Error>
+    where
+        M: Mapper,
+    {
+        Accessor::new(mmio_base, caplength.get().into(), mapper)
+    }
+}
 
 /// USB Command Register
 #[repr(transparent)]

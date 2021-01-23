@@ -6,11 +6,12 @@ use core::{convert::TryInto, fmt};
 
 /// USB Command Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbCommandRegister(u32);
 impl UsbCommandRegister {
     /// Returns the value of the Run/Stop bit.
     #[must_use]
-    pub fn run_stop(&self) -> bool {
+    pub fn run_stop(self) -> bool {
         self.0.get_bit(0)
     }
 
@@ -21,7 +22,7 @@ impl UsbCommandRegister {
 
     /// Returns the value of the Host Controller Reset bit.
     #[must_use]
-    pub fn host_controller_reset(&self) -> bool {
+    pub fn host_controller_reset(self) -> bool {
         self.0.get_bit(1)
     }
 
@@ -41,30 +42,31 @@ impl fmt::Debug for UsbCommandRegister {
 
 /// USB Status Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
     #[allow(clippy::doc_markdown)]
     /// Returns the value of the HCHalted bit.
     #[must_use]
-    pub fn hc_halted(&self) -> bool {
+    pub fn hc_halted(self) -> bool {
         self.0.get_bit(0)
     }
 
     /// Returns the value of the Host System Error bit.
     #[must_use]
-    pub fn host_system_error(&self) -> bool {
+    pub fn host_system_error(self) -> bool {
         self.0.get_bit(2)
     }
 
     /// Returns the value of the Controller Not Ready bit.
     #[must_use]
-    pub fn controller_not_ready(&self) -> bool {
+    pub fn controller_not_ready(self) -> bool {
         self.0.get_bit(11)
     }
 
     /// Returns the value of the Host Controller Error bit.
     #[must_use]
-    pub fn host_controller_error(&self) -> bool {
+    pub fn host_controller_error(self) -> bool {
         self.0.get_bit(12)
     }
 }
@@ -81,18 +83,19 @@ impl fmt::Debug for UsbStatusRegister {
 
 /// Page Size Register
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
     /// Returns the value of the page size supported by xHC.
     #[must_use]
-    pub fn get(&self) -> u16 {
+    pub fn get(self) -> u16 {
         self.0.try_into().unwrap()
     }
 }
 
 /// Command Ring Controller Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct CommandRingControlRegister(u64);
 impl CommandRingControlRegister {
     /// Sets the value of the Ring Cycle State bit.
@@ -102,7 +105,7 @@ impl CommandRingControlRegister {
 
     /// Returns the bit of the Command Ring Running bit.
     #[must_use]
-    pub fn command_ring_running(&self) -> bool {
+    pub fn command_ring_running(self) -> bool {
         self.0.get_bit(3)
     }
 
@@ -135,7 +138,7 @@ impl fmt::Debug for CommandRingControlRegister {
 
 /// Device Context Base Address Array Pointer Register
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
@@ -158,11 +161,12 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 
 /// Configure Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
     /// Returns the value of the Max Device Slots Enabled field.
     #[must_use]
-    pub fn max_device_slots_enabled(&self) -> u8 {
+    pub fn max_device_slots_enabled(self) -> u8 {
         self.0.get_bits(0..=7).try_into().unwrap()
     }
 
@@ -181,17 +185,18 @@ impl fmt::Debug for ConfigureRegister {
 
 /// Port Status and Control Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct PortStatusAndControlRegister(u32);
 impl PortStatusAndControlRegister {
     /// Returns the value of the Current Connect Status bit.
     #[must_use]
-    pub fn current_connect_status(&self) -> bool {
+    pub fn current_connect_status(self) -> bool {
         self.0.get_bit(0)
     }
 
     /// Returns the value of the Port Reset bit.
     #[must_use]
-    pub fn port_reset(&self) -> bool {
+    pub fn port_reset(self) -> bool {
         self.0.get_bit(4)
     }
 
@@ -202,13 +207,13 @@ impl PortStatusAndControlRegister {
 
     /// Returns the value of the Port Speed field.
     #[must_use]
-    pub fn port_speed(&self) -> u8 {
+    pub fn port_speed(self) -> u8 {
         self.0.get_bits(10..=13).try_into().unwrap()
     }
 
     /// Returns the value of the Port Reset Changed bit.
     #[must_use]
-    pub fn port_reset_changed(&self) -> bool {
+    pub fn port_reset_changed(self) -> bool {
         self.0.get_bit(21)
     }
 }

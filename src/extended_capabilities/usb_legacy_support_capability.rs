@@ -4,11 +4,12 @@ use bit_field::BitField;
 
 /// USB Legacy Support Capability
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbLegacySupportCapability(u32);
 impl UsbLegacySupportCapability {
     /// Returns the value of the HC BIOS Owned Semaphore bit.
     #[must_use]
-    pub fn hc_bios_owned_semaphore(&self) -> bool {
+    pub fn hc_bios_owned_semaphore(self) -> bool {
         self.0.get_bit(16)
     }
 
@@ -19,7 +20,7 @@ impl UsbLegacySupportCapability {
 
     /// Returns the value of the HC OS Owned Semaphore bit.
     #[must_use]
-    pub fn hc_os_owned_semaphore(&self) -> bool {
+    pub fn hc_os_owned_semaphore(self) -> bool {
         self.0.get_bit(24)
     }
 

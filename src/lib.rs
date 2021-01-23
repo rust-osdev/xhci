@@ -4,4 +4,5 @@
 
 pub mod error;
 pub mod extended_capabilities;
+pub mod mapper;
 pub mod registers;

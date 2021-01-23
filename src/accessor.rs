@@ -1,6 +1,7 @@
 //! An accessor to read, modify, and write the values of memory.
 
 use crate::{error::Error, mapper::Mapper};
+use core::fmt;
 use core::{convert::TryInto, mem};
 use core::{marker::PhantomData, ptr};
 
@@ -79,6 +80,15 @@ where
             _marker: PhantomData,
             mapper,
         }
+    }
+}
+impl<T, M> fmt::Debug for Accessor<T, M>
+where
+    T: fmt::Debug,
+    M: Mapper,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.read())
     }
 }
 
@@ -161,6 +171,59 @@ where
 
     fn addr(&self, i: usize) -> usize {
         self.virt + mem::size_of::<T>() * i
+    }
+}
+impl<T, M> fmt::Debug for Accessor<[T], M>
+where
+    T: fmt::Debug,
+    M: Mapper,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self).finish()
+    }
+}
+impl<'a, T, M> IntoIterator for &'a Accessor<[T], M>
+where
+    M: Mapper,
+{
+    type Item = T;
+    type IntoIter = Iter<'a, T, M>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Iter::new(self)
+    }
+}
+
+/// An iterator over a value of `T`.
+pub struct Iter<'a, T, M>
+where
+    M: Mapper,
+{
+    a: &'a Accessor<[T], M>,
+    i: usize,
+}
+impl<'a, T, M> Iter<'a, T, M>
+where
+    M: Mapper,
+{
+    fn new(a: &'a Accessor<[T], M>) -> Self {
+        Self { a, i: 0 }
+    }
+}
+impl<'a, T, M> Iterator for Iter<'a, T, M>
+where
+    M: Mapper,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.i < self.a.len() {
+            let t = self.a.read_at(self.i);
+            self.i += 1;
+            Some(t)
+        } else {
+            None
+        }
     }
 }
 

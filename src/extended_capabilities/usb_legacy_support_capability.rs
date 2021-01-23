@@ -4,6 +4,7 @@ use bit_field::BitField;
 
 /// USB Legacy Support Capability
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbLegacySupportCapability(u32);
 impl UsbLegacySupportCapability {
     /// Returns the value of the HC BIOS Owned Semaphore bit.

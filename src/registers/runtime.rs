@@ -6,7 +6,7 @@ use crate::error::Error;
 
 /// Event Ring Segment Table Size Register.
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
     /// Sets the number of segments the Event Ring Segment Table supports.
@@ -17,7 +17,7 @@ impl EventRingSegmentTableSizeRegister {
 
 /// Event Ring Segment Table Base Address Register.
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
@@ -40,6 +40,7 @@ impl EventRingSegmentTableBaseAddressRegister {
 
 /// Event Ring Dequeue Pointer Register.
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
     /// Returns the address of the current Event Ring Dequeue Pointer.

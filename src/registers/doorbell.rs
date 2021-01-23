@@ -5,6 +5,7 @@ use core::{convert::TryInto, fmt};
 
 /// The element of the Doorbell Array.
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct Register(u32);
 impl Register {
     /// Get a doorbell target.

@@ -6,6 +6,7 @@ use core::{convert::TryInto, fmt};
 
 /// USB Command Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbCommandRegister(u32);
 impl UsbCommandRegister {
     /// Returns the value of the Run/Stop bit.
@@ -41,6 +42,7 @@ impl fmt::Debug for UsbCommandRegister {
 
 /// USB Status Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
     #[allow(clippy::doc_markdown)]
@@ -81,7 +83,7 @@ impl fmt::Debug for UsbStatusRegister {
 
 /// Page Size Register
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
     /// Returns the value of the page size supported by xHC.
@@ -93,6 +95,7 @@ impl PageSizeRegister {
 
 /// Command Ring Controller Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct CommandRingControlRegister(u64);
 impl CommandRingControlRegister {
     /// Sets the value of the Ring Cycle State bit.
@@ -135,7 +138,7 @@ impl fmt::Debug for CommandRingControlRegister {
 
 /// Device Context Base Address Array Pointer Register
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
@@ -158,6 +161,7 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 
 /// Configure Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
     /// Returns the value of the Max Device Slots Enabled field.
@@ -181,6 +185,7 @@ impl fmt::Debug for ConfigureRegister {
 
 /// Port Status and Control Register
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct PortStatusAndControlRegister(u32);
 impl PortStatusAndControlRegister {
     /// Returns the value of the Current Connect Status bit.

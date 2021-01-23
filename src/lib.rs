@@ -2,6 +2,7 @@
 
 #![no_std]
 
+pub mod accessor;
 pub mod error;
 pub mod extended_capabilities;
 pub mod mapper;

@@ -49,7 +49,7 @@ where
 
     /// # Safety
     ///
-    /// Caller must ensure that no more than one accessor to the same region is created, otherwise
+    /// Caller must ensure that only one accessor to the same region is created, otherwise
     /// it may cause undefined behaviors such as data race.
     pub(crate) unsafe fn new(phys_base: usize, offset: usize, mapper: M) -> Result<Self, Error> {
         if Self::is_aligned(phys_base) {
@@ -64,7 +64,7 @@ where
 
     /// # Safety
     ///
-    /// Caller must ensure that no more than one accessor to the same region is created, otherwise
+    /// Caller must ensure that only one accessor to the same region is created, otherwise
     /// it may cause undefined behaviors such as data race.
     unsafe fn new_aligned(phys_base: usize, offset: usize, mut mapper: M) -> Self {
         assert!(Self::is_aligned(phys_base));

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- Implement `Copy` and `Clone` for register types.
 
 ## 0.2.4 - 2021-01-22
 ### Added

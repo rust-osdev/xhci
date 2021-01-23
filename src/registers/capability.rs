@@ -1,7 +1,48 @@
 //! Host Controller Capability Registers
 
+use crate::{accessor::Accessor, error::Error, mapper::Mapper};
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
+
+/// Host Controller Capability Registers
+#[repr(C)]
+pub struct Capability {
+    /// Capability Registers Length
+    pub caplength: CapabilityRegistersLength,
+    _rsvd: u8,
+    _hciversion: u16,
+    /// Structural Parameters 1
+    pub hcsparams1: StructuralParameters1,
+    /// Structural Parameters 2
+    pub hcsparams2: StructuralParameters2,
+    _hcsparams3: u32,
+    /// Capability Parameters 1
+    pub hccparams1: CapabilityParameters1,
+    /// Doorbell Offset
+    pub dboff: DoorbellOffset,
+    /// Runtime Register Space Offset
+    pub rtsoff: RuntimeRegisterSpaceOffset,
+    _hccparams2: u32,
+}
+impl Capability {
+    /// Creates a new accessor to the Host Controller Capability Registers.
+    ///
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor is created, otherwise undefined behaviors such as
+    /// data race may occur.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Error::NotAligned`] error if `mmio_base` is not aligned
+    /// properly.
+    pub unsafe fn new<M>(mmio_base: usize, mapper: M) -> Result<Accessor<Self, M>, Error>
+    where
+        M: Mapper,
+    {
+        Accessor::new(mmio_base, 0, mapper)
+    }
+}
 
 /// Capability Registers Length
 #[repr(transparent)]

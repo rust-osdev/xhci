@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.2.5 - 2021-01-23
 ### Added
 - Implement `Copy` and `Clone` for register types.
 

@@ -1,11 +1,12 @@
 //! Host Controller Capability Registers
 
-use crate::{accessor::Accessor, error::Error, mapper::Mapper};
+use crate::{accessor, error::Error, mapper::Mapper};
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
 
 /// Host Controller Capability Registers
 #[repr(C)]
+#[derive(Copy, Clone)]
 pub struct Capability {
     /// Capability Registers Length
     pub caplength: CapabilityRegistersLength,
@@ -36,18 +37,18 @@ impl Capability {
     ///
     /// This method may return an [`Error::NotAligned`] error if `mmio_base` is not aligned
     /// properly.
-    pub unsafe fn new<M>(mmio_base: usize, mapper: M) -> Result<Accessor<Self, M>, Error>
+    pub unsafe fn new<M>(mmio_base: usize, mapper: M) -> Result<accessor::Single<Self, M>, Error>
     where
         M: Mapper,
     {
-        Accessor::new(mmio_base, 0, mapper)
+        accessor::Single::new(mmio_base, 0, mapper)
     }
 }
 
 /// Capability Registers Length
 #[repr(transparent)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct CapabilityRegistersLength(u8);
 impl CapabilityRegistersLength {
     /// Returns the length of the Capability Registers.
@@ -59,6 +60,7 @@ impl CapabilityRegistersLength {
 
 /// Structural Parameters 1
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct StructuralParameters1(u32);
 impl StructuralParameters1 {
     /// Returns the number of available device slots.
@@ -84,6 +86,7 @@ impl fmt::Debug for StructuralParameters1 {
 
 /// Structural Parameters 2
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct StructuralParameters2(u32);
 impl StructuralParameters2 {
     /// Returns the maximum number of the elements the Event Ring Segment Table can contain.
@@ -130,6 +133,7 @@ impl fmt::Debug for StructuralParameters2 {
 
 /// Capability Parameters 1
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 #[allow(clippy::module_name_repetitions)]
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
@@ -159,7 +163,7 @@ impl fmt::Debug for CapabilityParameters1 {
 
 /// Doorbell Offset
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct DoorbellOffset(u32);
 impl DoorbellOffset {
     /// Returns the offset of the Doorbell Array from the MMIO base.
@@ -171,7 +175,7 @@ impl DoorbellOffset {
 
 /// Runtime Register Space Offset
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct RuntimeRegisterSpaceOffset(u32);
 impl RuntimeRegisterSpaceOffset {
     /// Returns the offset of the Runtime Registers from the MMIO base.

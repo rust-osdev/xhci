@@ -52,12 +52,12 @@ where
     /// Caller must ensure that only one accessor to the same region is created, otherwise
     /// it may cause undefined behaviors such as data race.
     pub(crate) unsafe fn new(phys_base: usize, offset: usize, mapper: M) -> Result<Self, Error> {
-        if Self::is_aligned(phys_base) {
+        if is_aligned::<T>(phys_base) {
             Ok(Self::new_aligned(phys_base, offset, mapper))
         } else {
             Err(Error::NotAligned {
                 alignment: mem::align_of::<T>().try_into().unwrap(),
-                address: phys_base.try_into().unwrap(),
+                address: (phys_base + offset).try_into().unwrap(),
             })
         }
     }
@@ -67,7 +67,7 @@ where
     /// Caller must ensure that only one accessor to the same region is created, otherwise
     /// it may cause undefined behaviors such as data race.
     unsafe fn new_aligned(phys_base: usize, offset: usize, mut mapper: M) -> Self {
-        assert!(Self::is_aligned(phys_base));
+        assert!(is_aligned::<T>(phys_base));
 
         let phys_base = phys_base + offset;
         let bytes = mem::size_of::<T>();
@@ -80,9 +80,87 @@ where
             mapper,
         }
     }
+}
 
-    fn is_aligned(phys_base: usize) -> bool {
-        phys_base % mem::align_of::<T>() == 0
+impl<T, M> Accessor<[T], M>
+where
+    M: Mapper,
+{
+    /// Reads the `i`th element from where the accessor points.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if `i >= self.len()`
+    pub fn read_at(&self, i: usize) -> T {
+        assert!(i < self.len());
+
+        // SAFETY: `Accessor::new_array` ensures that `self.addr(i)` is aligned properly.
+        unsafe { ptr::read_volatile(self.addr(i) as *const _) }
+    }
+
+    /// Writes `v` to which the accessor points as the `i`th element.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if `i >= self.len()`
+    pub fn write_at(&mut self, i: usize, v: T) {
+        assert!(i < self.len());
+
+        // SAFETY: `Accessor::new_array` ensures that `self.addr(i)` is aligned properly.
+        unsafe { ptr::write_volatile(self.addr(i) as *mut _, v) }
+    }
+
+    /// Returns the length of the element which this accessor points.
+    pub fn len(&self) -> usize {
+        self.bytes / mem::size_of::<T>()
+    }
+
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor to the same region is created, otherwise
+    /// undefined behaviors such as data race may occur.
+    pub(crate) unsafe fn new_array(
+        phys_base: usize,
+        offset: usize,
+        len: usize,
+        mapper: M,
+    ) -> Result<Self, Error> {
+        if is_aligned::<T>(phys_base) {
+            Ok(Self::new_array_aligned(phys_base, offset, len, mapper))
+        } else {
+            Err(Error::NotAligned {
+                alignment: (mem::align_of::<T>()).try_into().unwrap(),
+                address: (phys_base + offset).try_into().unwrap(),
+            })
+        }
+    }
+
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor to the same region is created, otherwise
+    /// undefined behaviors such as data race may occur.
+    unsafe fn new_array_aligned(
+        phys_base: usize,
+        offset: usize,
+        len: usize,
+        mut mapper: M,
+    ) -> Self {
+        assert!(is_aligned::<T>(phys_base));
+
+        let phys_base = phys_base + offset;
+        let bytes = mem::size_of::<T>() * len;
+        let virt = mapper.map(phys_base, bytes);
+
+        Self {
+            virt,
+            bytes,
+            _marker: PhantomData,
+            mapper,
+        }
+    }
+
+    fn addr(&self, i: usize) -> usize {
+        self.virt + mem::size_of::<T>() * i
     }
 }
 
@@ -94,4 +172,8 @@ where
     fn drop(&mut self) {
         self.mapper.unmap(self.virt, self.bytes);
     }
+}
+
+fn is_aligned<T>(phys_base: usize) -> bool {
+    phys_base % mem::align_of::<T>() == 0
 }

@@ -29,6 +29,7 @@ where
 
     /// Writes a value to where the accessor points.
     pub fn write(&mut self, v: T) {
+        // SAFETY: `Accessor::new` ensures that `self.virt` is aligned properly.
         unsafe { ptr::write_volatile(self.virt as *mut _, v) }
     }
 

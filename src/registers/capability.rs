@@ -1,6 +1,6 @@
 //! Host Controller Capability Registers
 
-use crate::{accessor, error::Error, mapper::Mapper};
+use accessor::Mapper;
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
 
@@ -35,13 +35,16 @@ impl Capability {
     ///
     /// # Errors
     ///
-    /// This method may return an [`Error::NotAligned`] error if `mmio_base` is not aligned
+    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned
     /// properly.
-    pub unsafe fn new<M>(mmio_base: usize, mapper: M) -> Result<accessor::Single<Self, M>, Error>
+    pub unsafe fn new<M>(
+        mmio_base: usize,
+        mapper: M,
+    ) -> Result<accessor::Single<Self, M>, accessor::Error>
     where
         M: Mapper,
     {
-        accessor::Single::new(mmio_base, 0, mapper)
+        accessor::Single::new(mmio_base, mapper)
     }
 }
 

@@ -1,7 +1,8 @@
 //! Host Controller Operational Registers
 
 use super::capability::CapabilityRegistersLength;
-use crate::{accessor, error::Error, mapper::Mapper};
+use crate::error::Error;
+use accessor::Mapper;
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
 
@@ -35,16 +36,16 @@ impl Operational {
     ///
     /// # Errors
     ///
-    /// This method may return an [`Error::NotAligned`] error if `mmio_base` is not aligned.
+    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned.
     pub unsafe fn new<M>(
         mmio_base: usize,
         caplength: &CapabilityRegistersLength,
         mapper: M,
-    ) -> Result<accessor::Single<Self, M>, Error>
+    ) -> Result<accessor::Single<Self, M>, accessor::Error>
     where
         M: Mapper,
     {
-        accessor::Single::new(mmio_base, caplength.get().into(), mapper)
+        accessor::Single::new(mmio_base + usize::from(caplength.get()), mapper)
     }
 }
 

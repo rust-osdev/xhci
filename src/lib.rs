@@ -2,8 +2,9 @@
 
 #![no_std]
 
-pub mod accessor;
+/// This crate is used to access MMIO space.
+pub use accessor;
+
 pub mod error;
 pub mod extended_capabilities;
-pub mod mapper;
 pub mod registers;

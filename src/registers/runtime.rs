@@ -1,8 +1,7 @@
 //! Host Controller Runtime Registers.
 
-use core::fmt;
-
 use crate::error::Error;
+use core::fmt;
 
 /// Event Ring Segment Table Size Register.
 #[repr(transparent)]

@@ -245,6 +245,11 @@ impl PortRegisterSet {
     ///
     /// Caller must ensure that only one accessor is created, otherwise it may cause undefined
     /// behavior such as data race.
+    ///
+    /// # Errors
+    ///
+    /// This method may return a [`accessor::Error::NotAligned`] error if `mmio_base` is not
+    /// aligned properly.
     pub unsafe fn new<M>(
         mmio_base: usize,
         capability: &Capability,

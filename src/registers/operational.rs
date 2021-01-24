@@ -1,5 +1,6 @@
 //! Host Controller Operational Registers
 
+use super::capability::Capability;
 use super::capability::CapabilityRegistersLength;
 use crate::error::Error;
 use accessor::Mapper;
@@ -225,6 +226,35 @@ impl fmt::Debug for ConfigureRegister {
         f.debug_struct("ConfigureRegister")
             .field("max_device_slots_enabled", &self.max_device_slots_enabled())
             .finish()
+    }
+}
+
+/// Port Register Set
+#[repr(C)]
+#[derive(Copy, Clone, Debug)]
+pub struct PortRegisterSet {
+    pub portsc: PortStatusAndControlRegister,
+    _portpmsc: u32,
+    portli: u32,
+    porthlpmc: u32,
+}
+impl PortRegisterSet {
+    /// Creates a new accessor to the array of the Port Register Set.
+    ///
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor is created, otherwise it may cause undefined
+    /// behavior such as data race.
+    pub unsafe fn new<M>(
+        mmio_base: usize,
+        capability: &Capability,
+        mapper: M,
+    ) -> Result<accessor::Array<Self, M>, accessor::Error>
+    where
+        M: Mapper,
+    {
+        let base = mmio_base + usize::from(capability.caplength.get()) + 0x400;
+        accessor::Array::new(base, capability.hcsparams1.number_of_ports().into(), mapper)
     }
 }
 

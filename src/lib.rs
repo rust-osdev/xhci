@@ -2,7 +2,6 @@
 
 #![no_std]
 
-/// This crate is used to access MMIO space.
 pub use accessor;
 
 pub mod error;

@@ -13,12 +13,12 @@ pub struct InterruptRegisterSet {
     _iman: u32,
     _imod: u32,
     /// Event Ring Segment Table Size Register
-    erstsz: EventRingSegmentTableSizeRegister,
+    pub erstsz: EventRingSegmentTableSizeRegister,
     _rsvd: u32,
     /// Event Ring Segment Table Base Address Register
-    erstba: EventRingSegmentTableBaseAddressRegister,
+    pub erstba: EventRingSegmentTableBaseAddressRegister,
     /// Event Ring Dequeue Pointer Register
-    erdp: EventRingDequeuePointerRegister,
+    pub erdp: EventRingDequeuePointerRegister,
 }
 impl InterruptRegisterSet {
     /// Creates an accessor to the Interrupt Register Set.

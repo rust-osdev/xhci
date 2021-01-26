@@ -25,8 +25,8 @@ impl InterruptRegisterSet {
     ///
     /// # Safety
     ///
-    /// Caller must ensure that only one accessor is created, otherwise it may cause undefined
-    /// behavior such as data race.
+    /// The caller must ensure that the Host Controller Runtime Registers are accessed only through
+    /// this struct.
     ///
     /// # Errors
     ///

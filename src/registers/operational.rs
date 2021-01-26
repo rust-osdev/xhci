@@ -32,8 +32,8 @@ impl Operational {
     ///
     /// # Safety
     ///
-    /// Caller must ensure that only one accessor is created, otherwise undefined behaviors such as
-    /// data race may occur.
+    /// The caller must ensure that the Host Controller Operational Registers are accessed only
+    /// through this struct.
     ///
     /// # Errors
     ///

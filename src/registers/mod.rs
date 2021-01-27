@@ -42,9 +42,9 @@ where
     /// This method may return a [`accessor::Error::NotAligned`] error if a base address of a
     /// register is not aligned properly.
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error> {
-        let capability = Capability::new(mmio_base, mapper.clone())?;
+        let capability = Capability::new(mmio_base, &mapper)?;
         let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone())?;
-        let operational = Operational::new(mmio_base, capability.caplength.read(), mapper.clone())?;
+        let operational = Operational::new(mmio_base, capability.caplength.read(), &mapper)?;
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone())?;
         let interrupt_register_set =
             InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper)?;

@@ -43,7 +43,7 @@ where
     pub unsafe fn new(
         mmio_base: usize,
         caplength: CapabilityRegistersLength,
-        mapper: M,
+        mapper: &M,
     ) -> Result<Self, accessor::Error>
     where
         M: Mapper,

@@ -37,7 +37,7 @@ where
     ///
     /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned
     /// properly.
-    pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error>
+    pub unsafe fn new(mmio_base: usize, mapper: &M) -> Result<Self, accessor::Error>
     where
         M: Mapper,
     {

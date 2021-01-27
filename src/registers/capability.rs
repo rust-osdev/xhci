@@ -5,27 +5,27 @@ use bit_field::BitField;
 use core::{convert::TryInto, fmt};
 
 /// Host Controller Capability Registers
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct Capability {
+pub struct Capability<M>
+where
+    M: Mapper + Clone,
+{
     /// Capability Registers Length
-    pub caplength: CapabilityRegistersLength,
-    _rsvd: u8,
-    _hciversion: u16,
+    pub caplength: accessor::Single<CapabilityRegistersLength, M>,
     /// Structural Parameters 1
-    pub hcsparams1: StructuralParameters1,
+    pub hcsparams1: accessor::Single<StructuralParameters1, M>,
     /// Structural Parameters 2
-    pub hcsparams2: StructuralParameters2,
-    _hcsparams3: u32,
+    pub hcsparams2: accessor::Single<StructuralParameters2, M>,
     /// Capability Parameters 1
-    pub hccparams1: CapabilityParameters1,
+    pub hccparams1: accessor::Single<CapabilityParameters1, M>,
     /// Doorbell Offset
-    pub dboff: DoorbellOffset,
+    pub dboff: accessor::Single<DoorbellOffset, M>,
     /// Runtime Register Space Offset
-    pub rtsoff: RuntimeRegisterSpaceOffset,
-    _hccparams2: u32,
+    pub rtsoff: accessor::Single<RuntimeRegisterSpaceOffset, M>,
 }
-impl Capability {
+impl<M> Capability<M>
+where
+    M: Mapper + Clone,
+{
     /// Creates a new accessor to the Host Controller Capability Registers.
     ///
     /// # Safety
@@ -37,14 +37,24 @@ impl Capability {
     ///
     /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned
     /// properly.
-    pub unsafe fn new<M>(
-        mmio_base: usize,
-        mapper: M,
-    ) -> Result<accessor::Single<Self, M>, accessor::Error>
+    pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error>
     where
         M: Mapper,
     {
-        accessor::Single::new(mmio_base, mapper)
+        macro_rules! m {
+            ($offset:expr) => {
+                accessor::Single::new(mmio_base + $offset, mapper.clone())?
+            };
+        }
+
+        Ok(Self {
+            caplength: m!(0x00),
+            hcsparams1: m!(0x04),
+            hcsparams2: m!(0x08),
+            hccparams1: m!(0x10),
+            dboff: m!(0x14),
+            rtsoff: m!(0x18),
+        })
     }
 }
 

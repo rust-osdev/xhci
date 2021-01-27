@@ -9,26 +9,27 @@ use core::{convert::TryInto, fmt};
 /// Host Controller Operational Registers
 ///
 /// This struct does not contain the Port Register set.
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct Operational {
+pub struct Operational<M>
+where
+    M: Mapper + Clone,
+{
     /// USB Command Register
-    pub usbcmd: UsbCommandRegister,
+    pub usbcmd: accessor::Single<UsbCommandRegister, M>,
     /// USB Status Register
-    pub usbsts: UsbStatusRegister,
+    pub usbsts: accessor::Single<UsbStatusRegister, M>,
     /// Page Size Register
-    pub pagesize: PageSizeRegister,
-    _rsvd: [u8; 8],
-    _dnctrl: u32,
+    pub pagesize: accessor::Single<PageSizeRegister, M>,
     /// Command Ring Control Register
-    pub crcr: CommandRingControlRegister,
-    _rsvd2: [u8; 16],
+    pub crcr: accessor::Single<CommandRingControlRegister, M>,
     /// Device Context Base Address Array Pointer Register
-    pub dcbaap: DeviceContextBaseAddressArrayPointerRegister,
+    pub dcbaap: accessor::Single<DeviceContextBaseAddressArrayPointerRegister, M>,
     /// Configure Register
-    pub config: ConfigureRegister,
+    pub config: accessor::Single<ConfigureRegister, M>,
 }
-impl Operational {
+impl<M> Operational<M>
+where
+    M: Mapper + Clone,
+{
     /// Creates a new accessor to the Host Controller Operational Registers.
     ///
     /// # Safety
@@ -39,15 +40,30 @@ impl Operational {
     /// # Errors
     ///
     /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned.
-    pub unsafe fn new<M>(
+    pub unsafe fn new(
         mmio_base: usize,
         caplength: CapabilityRegistersLength,
         mapper: M,
-    ) -> Result<accessor::Single<Self, M>, accessor::Error>
+    ) -> Result<Self, accessor::Error>
     where
         M: Mapper,
     {
-        accessor::Single::new(mmio_base + usize::from(caplength.get()), mapper)
+        let base = mmio_base + usize::from(caplength.get());
+
+        macro_rules! m {
+            ($offset:expr) => {
+                accessor::Single::new(base + $offset, mapper.clone())?
+            };
+        }
+
+        Ok(Self {
+            usbcmd: m!(0x00),
+            usbsts: m!(0x04),
+            pagesize: m!(0x08),
+            crcr: m!(0x18),
+            dcbaap: m!(0x30),
+            config: m!(0x38),
+        })
     }
 }
 
@@ -251,16 +267,21 @@ impl PortRegisterSet {
     ///
     /// This method may return a [`accessor::Error::NotAligned`] error if `mmio_base` is not
     /// aligned properly.
-    pub unsafe fn new<M>(
+    pub unsafe fn new<M1, M2>(
         mmio_base: usize,
-        capability: &Capability,
-        mapper: M,
-    ) -> Result<accessor::Array<Self, M>, accessor::Error>
+        capability: &Capability<M2>,
+        mapper: M1,
+    ) -> Result<accessor::Array<Self, M1>, accessor::Error>
     where
-        M: Mapper,
+        M1: Mapper,
+        M2: Mapper + Clone,
     {
-        let base = mmio_base + usize::from(capability.caplength.get()) + 0x400;
-        accessor::Array::new(base, capability.hcsparams1.number_of_ports().into(), mapper)
+        let base = mmio_base + usize::from(capability.caplength.read().get()) + 0x400;
+        accessor::Array::new(
+            base,
+            capability.hcsparams1.read().number_of_ports().into(),
+            mapper,
+        )
     }
 }
 

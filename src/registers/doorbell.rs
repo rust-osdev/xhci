@@ -22,18 +22,19 @@ impl Register {
     ///
     /// This method may return a [`accessor::Error::NotAligned`] error if the start of the Doorbell
     /// Array is not aligned.
-    pub unsafe fn new<M>(
+    pub unsafe fn new<M1, M2>(
         mmio_base: usize,
-        capability: &Capability,
-        mapper: M,
-    ) -> Result<accessor::Array<Self, M>, accessor::Error>
+        capability: &Capability<M2>,
+        mapper: M1,
+    ) -> Result<accessor::Array<Self, M1>, accessor::Error>
     where
-        M: Mapper,
+        M1: Mapper,
+        M2: Mapper + Clone,
     {
-        let base = mmio_base + usize::try_from(capability.dboff.get()).unwrap();
+        let base = mmio_base + usize::try_from(capability.dboff.read().get()).unwrap();
         accessor::Array::new(
             base,
-            capability.hcsparams1.number_of_device_slots().into(),
+            capability.hcsparams1.read().number_of_device_slots().into(),
             mapper,
         )
     }

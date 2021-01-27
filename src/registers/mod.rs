@@ -21,11 +21,11 @@ where
     M: Mapper + Clone,
 {
     /// Host Controller Capability Register
-    pub capability: accessor::Single<Capability, M>,
+    pub capability: Capability<M>,
     /// Doorbell Array
     pub doorbell: accessor::Array<doorbell::Register, M>,
     /// Host Controller Operational Register
-    pub operational: accessor::Single<Operational, M>,
+    pub operational: Operational<M>,
     /// Port Register Set Array
     pub port_register_set: accessor::Array<PortRegisterSet, M>,
     /// Interrupt Register Set Array
@@ -47,12 +47,11 @@ where
     /// register is not aligned properly.
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error> {
         let capability = Capability::new(mmio_base, mapper.clone())?;
-        let doorbell = doorbell::Register::new(mmio_base, &capability.read(), mapper.clone())?;
-        let operational = Operational::new(mmio_base, capability.read().caplength, mapper.clone())?;
-        let port_register_set =
-            PortRegisterSet::new(mmio_base, &capability.read(), mapper.clone())?;
+        let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone())?;
+        let operational = Operational::new(mmio_base, capability.caplength.read(), mapper.clone())?;
+        let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone())?;
         let interrupt_register_set =
-            InterruptRegisterSet::new(mmio_base, capability.read().rtsoff, mapper)?;
+            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper)?;
 
         Ok(Self {
             capability,

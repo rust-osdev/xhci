@@ -12,10 +12,6 @@ pub mod operational;
 pub mod runtime;
 
 /// The access point to xHCI registers.
-///
-/// If your [`accessor::Mapper`] does not implement [`Clone`], you can generate each accessor by
-/// [`Capability::new`] first, then create other accessors with the accessor to the Capability
-/// Register.
 pub struct Registers<M>
 where
     M: Mapper + Clone,

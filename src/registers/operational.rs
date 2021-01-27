@@ -1,7 +1,6 @@
 //! Host Controller Operational Registers
 
-use super::capability::Capability;
-use super::capability::CapabilityRegistersLength;
+use super::capability::{Capability, CapabilityRegistersLength};
 use crate::error::Error;
 use accessor::Mapper;
 use bit_field::BitField;
@@ -21,6 +20,8 @@ pub struct Operational {
     pub pagesize: PageSizeRegister,
     _rsvd: [u8; 8],
     _dnctrl: u32,
+    /// Command Ring Control Register
+    pub crcr: CommandRingControlRegister,
     _rsvd2: [u8; 16],
     /// Device Context Base Address Array Pointer Register
     pub dcbaap: DeviceContextBaseAddressArrayPointerRegister,

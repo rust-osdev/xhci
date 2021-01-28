@@ -57,7 +57,8 @@ use super::registers::capability::CapabilityParameters1;
 use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryInto;
-use usb_legacy_support_capability::UsbLegacySupportCapability;
+
+pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 
 pub mod usb_legacy_support_capability;
 

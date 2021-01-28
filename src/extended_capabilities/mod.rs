@@ -162,6 +162,7 @@ where
 
 /// The xHCI Extended Capability.
 #[non_exhaustive]
+#[derive(Debug)]
 pub enum ExtendedCapability<M>
 where
     M: Mapper,

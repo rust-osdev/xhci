@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Fixed
+- Add a missing document.
 
 ## 0.2.6 - 2021-01-28
 ### Added

@@ -1,4 +1,55 @@
 //! The xHCI Extended Capabilities
+//!
+//! The mutable reference of this struct implements `IntoIterator` and it iterates over the xHCI Extended Capabilities.
+//!
+//! ```no_run
+//! use core::num::NonZeroUsize;
+//! use xhci::{
+//!     accessor::Mapper, extended_capabilities, extended_capabilities::ExtendedCapability,
+//! };
+//!
+//! // The value of this constant is for showing an example. The user must get the correct base
+//! // address of the MMIO space from the PCI Configuration Space.
+//! const MMIO_BASE: usize = 0x1000;
+//!
+//! #[derive(Clone)]
+//! struct MemoryMapper;
+//! impl Mapper for MemoryMapper {
+//!     unsafe fn map(&mut self, phys_start: usize, bytes: usize) -> NonZeroUsize {
+//!         unimplemented!()
+//!     }
+//!
+//!     fn unmap(&mut self, virt_start: usize, bytes: usize) {
+//!         unimplemented!()
+//!     }
+//! }
+//!
+//! let mapper = MemoryMapper;
+//! let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper.clone()) }
+//!     .expect("The base address of the MMIO space is not aligned");
+//! let mut l = unsafe {
+//!     extended_capabilities::List::new(MMIO_BASE, r.capability.hccparams1.read(), mapper)
+//! };
+//!
+//! match l {
+//!     Some(mut l) => {
+//!         for e in &mut l {
+//!             match e {
+//!                 Ok(e) => match e {
+//!                     ExtendedCapability::UsbLegacySupportCapability(u) => {}
+//!                     _ => {}
+//!                 },
+//!                 Err(e) => {
+//!                     // Currently this crate does not support this Extended Capability.
+//!                 }
+//!             }
+//!         }
+//!     }
+//!     None => {
+//!         // The xHC does not support the xHCI Extended Capability.
+//!     }
+//! }
+//! ```
 
 use super::registers::capability::CapabilityParameters1;
 use accessor::Mapper;

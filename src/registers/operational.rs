@@ -250,6 +250,7 @@ impl fmt::Debug for ConfigureRegister {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct PortRegisterSet {
+    /// Port Status and Control Register
     pub portsc: PortStatusAndControlRegister,
     _portpmsc: u32,
     portli: u32,

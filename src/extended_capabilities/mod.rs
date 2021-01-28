@@ -2,6 +2,8 @@
 //!
 //! The mutable reference of this struct implements `IntoIterator` and it iterates over the xHCI Extended Capabilities.
 //!
+//! # Examples
+//!
 //! ```no_run
 //! use core::num::NonZeroUsize;
 //! use xhci::{

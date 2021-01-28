@@ -1,12 +1,55 @@
 //! Host Controller Runtime Registers.
 
-use core::fmt;
-
+use super::capability::RuntimeRegisterSpaceOffset;
 use crate::error::Error;
+use accessor::Mapper;
+use core::{convert::TryFrom, fmt};
+
+/// Interrupt Register Set
+#[repr(C)]
+#[derive(Copy, Clone, Debug)]
+pub struct InterruptRegisterSet {
+    _iman: u32,
+    _imod: u32,
+    /// Event Ring Segment Table Size Register
+    pub erstsz: EventRingSegmentTableSizeRegister,
+    _rsvd: u32,
+    /// Event Ring Segment Table Base Address Register
+    pub erstba: EventRingSegmentTableBaseAddressRegister,
+    /// Event Ring Dequeue Pointer Register
+    pub erdp: EventRingDequeuePointerRegister,
+}
+impl InterruptRegisterSet {
+    /// Creates an accessor to the Interrupt Register Set.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Runtime Registers are accessed only through
+    /// this struct.
+    ///
+    /// # Errors
+    ///
+    /// This method may return a [`accessor::Error::NotAligned`] error if the base address of the
+    /// Interrupt Register Set is not aligned.
+    pub unsafe fn new<M>(
+        mmio_base: usize,
+        rtoff: RuntimeRegisterSpaceOffset,
+        mapper: M,
+    ) -> Result<accessor::Array<Self, M>, accessor::Error>
+    where
+        M: Mapper,
+    {
+        const NUM_INTERRUPT_REGISTER_SET: usize = 1024;
+
+        let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
+
+        accessor::Array::new(base, NUM_INTERRUPT_REGISTER_SET, mapper)
+    }
+}
 
 /// Event Ring Segment Table Size Register.
 #[repr(transparent)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
     /// Sets the number of segments the Event Ring Segment Table supports.
@@ -17,7 +60,7 @@ impl EventRingSegmentTableSizeRegister {
 
 /// Event Ring Segment Table Base Address Register.
 #[repr(transparent)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.

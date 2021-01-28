@@ -14,4 +14,5 @@ keywords = ["no_std", "OS"]
 github = { repository = "toku-sa-n/xhci", workflow = "Rust" }
 
 [dependencies]
+accessor = "0.2.0"
 bit_field = "0.10.1"

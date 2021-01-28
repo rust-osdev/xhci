@@ -1,7 +1,62 @@
 //! Host Controller Capability Registers
 
+use accessor::Mapper;
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
+
+/// Host Controller Capability Registers
+pub struct Capability<M>
+where
+    M: Mapper + Clone,
+{
+    /// Capability Registers Length
+    pub caplength: accessor::Single<CapabilityRegistersLength, M>,
+    /// Structural Parameters 1
+    pub hcsparams1: accessor::Single<StructuralParameters1, M>,
+    /// Structural Parameters 2
+    pub hcsparams2: accessor::Single<StructuralParameters2, M>,
+    /// Capability Parameters 1
+    pub hccparams1: accessor::Single<CapabilityParameters1, M>,
+    /// Doorbell Offset
+    pub dboff: accessor::Single<DoorbellOffset, M>,
+    /// Runtime Register Space Offset
+    pub rtsoff: accessor::Single<RuntimeRegisterSpaceOffset, M>,
+}
+impl<M> Capability<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates a new accessor to the Host Controller Capability Registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Capability Registers are accessed only
+    /// through this struct.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned
+    /// properly.
+    pub unsafe fn new(mmio_base: usize, mapper: &M) -> Result<Self, accessor::Error>
+    where
+        M: Mapper,
+    {
+        macro_rules! m {
+            ($offset:expr) => {
+                accessor::Single::new(mmio_base + $offset, mapper.clone())?
+            };
+        }
+
+        Ok(Self {
+            caplength: m!(0x00),
+            hcsparams1: m!(0x04),
+            hcsparams2: m!(0x08),
+            hccparams1: m!(0x10),
+            dboff: m!(0x14),
+            rtsoff: m!(0x18),
+        })
+    }
+}
 
 /// Capability Registers Length
 #[repr(transparent)]

@@ -1,8 +1,71 @@
 //! Host Controller Operational Registers
 
+use super::capability::{Capability, CapabilityRegistersLength};
 use crate::error::Error;
+use accessor::Mapper;
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
+
+/// Host Controller Operational Registers
+///
+/// This struct does not contain the Port Register set.
+pub struct Operational<M>
+where
+    M: Mapper + Clone,
+{
+    /// USB Command Register
+    pub usbcmd: accessor::Single<UsbCommandRegister, M>,
+    /// USB Status Register
+    pub usbsts: accessor::Single<UsbStatusRegister, M>,
+    /// Page Size Register
+    pub pagesize: accessor::Single<PageSizeRegister, M>,
+    /// Command Ring Control Register
+    pub crcr: accessor::Single<CommandRingControlRegister, M>,
+    /// Device Context Base Address Array Pointer Register
+    pub dcbaap: accessor::Single<DeviceContextBaseAddressArrayPointerRegister, M>,
+    /// Configure Register
+    pub config: accessor::Single<ConfigureRegister, M>,
+}
+impl<M> Operational<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates a new accessor to the Host Controller Operational Registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Operational Registers are accessed only
+    /// through this struct.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned.
+    pub unsafe fn new(
+        mmio_base: usize,
+        caplength: CapabilityRegistersLength,
+        mapper: &M,
+    ) -> Result<Self, accessor::Error>
+    where
+        M: Mapper,
+    {
+        let base = mmio_base + usize::from(caplength.get());
+
+        macro_rules! m {
+            ($offset:expr) => {
+                accessor::Single::new(base + $offset, mapper.clone())?
+            };
+        }
+
+        Ok(Self {
+            usbcmd: m!(0x00),
+            usbsts: m!(0x04),
+            pagesize: m!(0x08),
+            crcr: m!(0x18),
+            dcbaap: m!(0x30),
+            config: m!(0x38),
+        })
+    }
+}
 
 /// USB Command Register
 #[repr(transparent)]
@@ -83,7 +146,7 @@ impl fmt::Debug for UsbStatusRegister {
 
 /// Page Size Register
 #[repr(transparent)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct PageSizeRegister(u32);
 impl PageSizeRegister {
     /// Returns the value of the page size supported by xHC.
@@ -180,6 +243,45 @@ impl fmt::Debug for ConfigureRegister {
         f.debug_struct("ConfigureRegister")
             .field("max_device_slots_enabled", &self.max_device_slots_enabled())
             .finish()
+    }
+}
+
+/// Port Register Set
+#[repr(C)]
+#[derive(Copy, Clone, Debug)]
+pub struct PortRegisterSet {
+    pub portsc: PortStatusAndControlRegister,
+    _portpmsc: u32,
+    portli: u32,
+    porthlpmc: u32,
+}
+impl PortRegisterSet {
+    /// Creates a new accessor to the array of the Port Register Set.
+    ///
+    /// # Safety
+    ///
+    /// Caller must ensure that only one accessor is created, otherwise it may cause undefined
+    /// behavior such as data race.
+    ///
+    /// # Errors
+    ///
+    /// This method may return a [`accessor::Error::NotAligned`] error if `mmio_base` is not
+    /// aligned properly.
+    pub unsafe fn new<M1, M2>(
+        mmio_base: usize,
+        capability: &Capability<M2>,
+        mapper: M1,
+    ) -> Result<accessor::Array<Self, M1>, accessor::Error>
+    where
+        M1: Mapper,
+        M2: Mapper + Clone,
+    {
+        let base = mmio_base + usize::from(capability.caplength.read().get()) + 0x400;
+        accessor::Array::new(
+            base,
+            capability.hcsparams1.read().number_of_ports().into(),
+            mapper,
+        )
     }
 }
 

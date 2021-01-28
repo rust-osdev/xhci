@@ -3,6 +3,7 @@
 #![no_std]
 
 pub use accessor;
+pub use error::Error;
 pub use extended_capabilities::ExtendedCapability;
 pub use registers::Registers;
 

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- Reexport `error::Error` as `Error`.
 
 ## 0.2.5 - 2021-01-23
 ### Added

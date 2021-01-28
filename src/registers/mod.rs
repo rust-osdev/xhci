@@ -1,11 +1,10 @@
 //! xHCI registers
 
 use accessor::Mapper;
-use operational::PortRegisterSet;
-use runtime::InterruptRegisterSet;
 
 pub use capability::Capability;
-pub use operational::Operational;
+pub use operational::{Operational, PortRegisterSet};
+pub use runtime::InterruptRegisterSet;
 
 pub mod capability;
 pub mod doorbell;

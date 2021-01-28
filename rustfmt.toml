@@ -2,3 +2,4 @@
 
 edition = "2018"
 merge_imports = true
+format_code_in_doc_comments = true

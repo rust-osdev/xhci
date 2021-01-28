@@ -3,8 +3,7 @@
 use super::capability::RuntimeRegisterSpaceOffset;
 use crate::error::Error;
 use accessor::Mapper;
-use core::convert::TryFrom;
-use core::fmt;
+use core::{convert::TryFrom, fmt};
 
 /// Interrupt Register Set
 #[repr(C)]

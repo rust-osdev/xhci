@@ -3,8 +3,10 @@
 use super::capability::Capability;
 use accessor::Mapper;
 use bit_field::BitField;
-use core::convert::TryFrom;
-use core::{convert::TryInto, fmt};
+use core::{
+    convert::{TryFrom, TryInto},
+    fmt,
+};
 
 /// The element of the Doorbell Array.
 #[repr(transparent)]

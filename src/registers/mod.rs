@@ -2,8 +2,7 @@
 
 use accessor::Mapper;
 use capability::Capability;
-use operational::Operational;
-use operational::PortRegisterSet;
+use operational::{Operational, PortRegisterSet};
 use runtime::InterruptRegisterSet;
 
 pub mod capability;

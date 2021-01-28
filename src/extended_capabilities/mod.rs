@@ -43,27 +43,27 @@ where
         }
     }
 }
-impl<'a, M> IntoIterator for &'a List<M>
+impl<'a, M> IntoIterator for &'a mut List<M>
 where
     M: Mapper + Clone,
 {
     type Item = Result<ExtendedCapability<M>, NotSupportedId>;
-    type IntoIter = Iter<M>;
+    type IntoIter = IterMut<M>;
 
     fn into_iter(self) -> Self::IntoIter {
-        Iter::new(self)
+        IterMut::new(self)
     }
 }
 
 /// An iterator over the xHCI Extended Capability.
-pub struct Iter<M>
+pub struct IterMut<M>
 where
     M: Mapper + Clone,
 {
     current: Option<usize>,
     m: M,
 }
-impl<M> Iter<M>
+impl<M> IterMut<M>
 where
     M: Mapper + Clone,
 {
@@ -74,7 +74,7 @@ where
         }
     }
 }
-impl<M> Iterator for Iter<M>
+impl<M> Iterator for IterMut<M>
 where
     M: Mapper + Clone,
 {

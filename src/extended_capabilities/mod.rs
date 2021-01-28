@@ -170,7 +170,7 @@ where
     UsbLegacySupportCapability(accessor::Single<UsbLegacySupportCapability, M>),
 }
 
-/// A struct representing that the Extended Capability with the ID is not supported.
+/// A struct representing that the Extended Capability with the ID is not supported by this crate.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Default, Debug)]
 pub struct NotSupportedId(pub u8);
 

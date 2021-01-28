@@ -41,6 +41,35 @@ where
     ///
     /// This method may return a [`accessor::Error::NotAligned`] error if a base address of a
     /// register is not aligned properly.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use core::num::NonZeroUsize;
+    /// use xhci::accessor::Mapper;
+    ///
+    /// // This MMIO base address is for showing an example. The user must get the correct MMIO
+    /// // address from the PCI configuration space.
+    /// const MMIO_BASE: usize = 0x1000;
+    ///
+    /// #[derive(Clone)]
+    /// struct MemoryMapper;
+    /// impl Mapper for MemoryMapper {
+    ///     unsafe fn map(&mut self, phys_base: usize, bytes: usize) -> NonZeroUsize {
+    ///         unimplemented!()
+    ///     }
+    ///
+    ///     fn unmap(&mut self, virt_base: usize, bytes: usize) {
+    ///         unimplemented!()
+    ///     }
+    /// }
+    ///
+    /// let mapper = MemoryMapper;
+    /// let r = unsafe {
+    ///     xhci::Registers::new(MMIO_BASE, mapper)
+    ///         .expect("The base address of the MMIO space is not aligned correctly.")
+    /// };
+    /// ```
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error> {
         let capability = Capability::new(mmio_base, &mapper)?;
         let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone())?;

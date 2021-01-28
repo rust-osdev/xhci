@@ -28,7 +28,7 @@ where
     /// # Safety
     ///
     /// The caller must ensure that each of the xHCI Extended Capabilities is accessed only through
-    /// this accessor.
+    /// the returned accessor.
     pub unsafe fn new(
         mmio_base: usize,
         hccparams1: CapabilityParameters1,

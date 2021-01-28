@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.2.6 - 2021-01-28
 ### Added
 - Reexport `error::Error` as `Error`.
 - Define accessors to xHCI registers and xHCI Extended Capabilities.

@@ -1,6 +1,7 @@
 //! USB Legacy Support Capability
 
 use bit_field::BitField;
+use core::fmt;
 
 /// USB Legacy Support Capability
 #[repr(transparent)]
@@ -27,5 +28,13 @@ impl UsbLegacySupportCapability {
     /// Gets the value of the HC OS Owned Semaphore bit.
     pub fn set_hc_os_owned_semaphore(&mut self, b: bool) {
         self.0.set_bit(24, b);
+    }
+}
+impl fmt::Debug for UsbLegacySupportCapability {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UsbLegacySupportCapability")
+            .field("hc_bios_owned_semaphore", &self.hc_bios_owned_semaphore())
+            .field("hc_os_owned_semaphore", &self.hc_os_owned_semaphore())
+            .finish()
     }
 }

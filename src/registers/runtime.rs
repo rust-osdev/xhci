@@ -1,7 +1,6 @@
 //! Host Controller Runtime Registers.
 
 use super::capability::RuntimeRegisterSpaceOffset;
-use crate::error::Error;
 use accessor::Mapper;
 use core::{convert::TryFrom, fmt};
 
@@ -67,17 +66,10 @@ impl EventRingSegmentTableBaseAddressRegister {
     ///
     /// # Errors
     ///
-    /// This method may return an [`Error::NotAligned`] error if the address is not 64 byte aligned.
-    pub fn set(&mut self, a: u64) -> Result<(), Error> {
-        if a.trailing_zeros() >= 6 {
-            self.0 = a;
-            Ok(())
-        } else {
-            Err(Error::NotAligned {
-                alignment: 64,
-                address: a,
-            })
-        }
+    /// This method panics if the address is not 64 byte aligned.
+    pub fn set(&mut self, a: u64) {
+        assert!(a.trailing_zeros() >= 6);
+        self.0 = a;
     }
 }
 
@@ -94,19 +86,12 @@ impl EventRingDequeuePointerRegister {
 
     /// Sets the address of the current Event Ring Dequeue Pointer. It must be 16 byte aligned.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return an [`Error::NotAligned`] error if the address is not 16 byte aligned.
-    pub fn set_event_ring_dequeue_pointer(&mut self, p: u64) -> Result<(), Error> {
-        if p.trailing_zeros() >= 4 {
-            self.0 = p;
-            Ok(())
-        } else {
-            Err(Error::NotAligned {
-                alignment: 16,
-                address: p,
-            })
-        }
+    /// This method panics if the address is not 16 byte aligned.
+    pub fn set_event_ring_dequeue_pointer(&mut self, p: u64) {
+        assert!(p.trailing_zeros() >= 4);
+        self.0 = p;
     }
 }
 impl fmt::Debug for EventRingDequeuePointerRegister {

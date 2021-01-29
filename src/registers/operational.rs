@@ -1,7 +1,6 @@
 //! Host Controller Operational Registers
 
 use super::capability::{Capability, CapabilityRegistersLength};
-use crate::error::Error;
 use accessor::Mapper;
 use bit_field::BitField;
 use core::{convert::TryInto, fmt};
@@ -174,21 +173,14 @@ impl CommandRingControlRegister {
 
     /// Sets the value of the Command Ring Pointer field. It must be 64 byte aligned.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a `NotAligned` error if the given pointer is not 64
-    /// byte aligned.
-    pub fn set_command_ring_pointer(&mut self, p: u64) -> Result<(), Error> {
-        if p.trailing_zeros() >= 6 {
-            let p = p >> 6;
-            self.0.set_bits(6..=63, p);
-            Ok(())
-        } else {
-            Err(Error::NotAligned {
-                alignment: 64,
-                address: p,
-            })
-        }
+    /// This method panics if the given pointer is not 64 byte aligned.
+    pub fn set_command_ring_pointer(&mut self, p: u64) {
+        assert!(p.trailing_zeros() >= 6);
+
+        let p = p >> 6;
+        self.0.set_bits(6..=63, p);
     }
 }
 impl fmt::Debug for CommandRingControlRegister {
@@ -206,19 +198,12 @@ pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a `NotAligned` error if the given pointer is not 64 byte aligned.
-    pub fn set(&mut self, p: u64) -> Result<(), Error> {
-        if p.trailing_zeros() >= 6 {
-            self.0 = p;
-            Ok(())
-        } else {
-            Err(Error::NotAligned {
-                alignment: 64,
-                address: p,
-            })
-        }
+    /// This method panics if the given pointer is not 64 byte aligned.
+    pub fn set(&mut self, p: u64) {
+        assert!(p.trailing_zeros() >= 6);
+        self.0 = p;
     }
 }
 

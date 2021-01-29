@@ -1,6 +1,12 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Changed
+- Methods now panic if an error occurs.
+
+### Removed
+- `error::Error`
+
 ### Fixed
 - Add a missing document.
 

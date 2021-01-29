@@ -3,11 +3,9 @@
 #![no_std]
 
 pub use accessor;
-pub use error::Error;
 pub use extended_capabilities::ExtendedCapability;
 pub use registers::Registers;
 
 pub mod context;
-pub mod error;
 pub mod extended_capabilities;
 pub mod registers;

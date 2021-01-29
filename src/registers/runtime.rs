@@ -64,7 +64,7 @@ pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
     ///
-    /// # Errors
+    /// # Panics
     ///
     /// This method panics if the address is not 64 byte aligned.
     pub fn set(&mut self, a: u64) {

@@ -13,6 +13,23 @@ impl Endpoint {
         Self([0; 8])
     }
 
+    /// Converts [`Endpoint`] into an array.
+    ///
+    /// Use this method if the Context Size bit of the `HCCPARAMS1` register is 0.
+    pub const fn into_32bytes(self) -> [u32; 8] {
+        self.0
+    }
+
+    /// Converts [`Endpoint`] into an array.
+    ///
+    /// Use this method if the Context Size bit of the `HCCPARAMS` register is 1.
+    pub const fn into_64bytes(self) -> [u32; 16] {
+        [
+            self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5], self.0[6], self.0[7],
+            0, 0, 0, 0, 0, 0, 0, 0,
+        ]
+    }
+
     /// Sets the value of the Mult field.
     ///
     /// # Panics
@@ -92,19 +109,16 @@ impl Endpoint {
         self
     }
 }
-impl AsRef<[u32]> for Endpoint {
-    fn as_ref(&self) -> &[u32] {
-        &self.0
-    }
-}
-impl AsMut<[u32]> for Endpoint {
-    fn as_mut(&mut self) -> &mut [u32] {
-        &mut self.0
-    }
-}
 impl From<[u32; 8]> for Endpoint {
     fn from(raw: [u32; 8]) -> Self {
         Self(raw)
+    }
+}
+impl From<[u32; 16]> for Endpoint {
+    fn from(raw: [u32; 16]) -> Self {
+        Self([
+            raw[0], raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7],
+        ])
     }
 }
 

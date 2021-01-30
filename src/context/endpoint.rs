@@ -13,11 +13,13 @@ macro_rules! cx {
             pub struct [<Byte $bytes>]([u32; $len]);
             impl [<Byte $bytes>] {
                 /// Creates a null Endpoint Context.
+                #[must_use]
                 pub const fn new() -> Self {
                     Self([0; $len])
                 }
 
                 /// Converts the Endpoint Context into an array.
+                #[must_use]
                 pub const fn [<into_ $bytes byte>](self) -> [u32; $len] {
                     self.0
                 }

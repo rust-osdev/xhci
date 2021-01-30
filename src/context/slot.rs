@@ -16,7 +16,7 @@ macro_rules! cx {
                     Self([0;$len])
                 }
 
-                #[doc = "Converts [`Byte" $bytes "`] to an array."]
+                /// Converts the Slot Context into an array.
                 pub fn [<into_ $bytes byte>](self)->[u32;$len]{
                     self.0
                 }

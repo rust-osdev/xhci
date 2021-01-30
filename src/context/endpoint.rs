@@ -1,7 +1,7 @@
 //! Endpoint Context.
 
 use bit_field::BitField;
-use core::convert::{TryFrom, TryInto};
+use core::convert::TryInto;
 
 /// Endpoint Context.
 #[repr(transparent)]
@@ -102,22 +102,9 @@ impl AsMut<[u32]> for Endpoint {
         &mut self.0
     }
 }
-impl TryFrom<[u32; 8]> for Endpoint {
-    type Error = RsvdZFieldIsNotZero;
-
-    fn try_from(raw: [u32; 8]) -> Result<Self, Self::Error> {
-        if raw[0].get_bits(3..=7) != 0
-            || raw[1].get_bit(0)
-            || raw[1].get_bit(6)
-            || raw[2].get_bits(1..=3) != 0
-            || raw[5] != 0
-            || raw[6] != 0
-            || raw[7] != 0
-        {
-            Err(RsvdZFieldIsNotZero)
-        } else {
-            Ok(Self(raw))
-        }
+impl From<[u32; 8]> for Endpoint {
+    fn from(raw: [u32; 8]) -> Self {
+        Self(raw)
     }
 }
 
@@ -141,7 +128,3 @@ pub enum Type {
     /// Interrupt In.
     InterruptIn = 7,
 }
-
-/// A struct representing that a reserved field is not zero.
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
-pub struct RsvdZFieldIsNotZero;

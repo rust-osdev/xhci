@@ -1,7 +1,7 @@
 //! The xHC Contexts.
 //!
 //! The xHC supports either 32-byte or 64-byte Contexts. You must check the Context Size bit of the
-//! HCCPARAMS register. If the bit is 0, use [`byte32`] module. If the bit is 1, use [`byte64`]
+//! HCCPARAMS1 register. If the bit is 0, use [`byte32`] module. If the bit is 1, use [`byte64`]
 //! module.
 
 use paste::paste;

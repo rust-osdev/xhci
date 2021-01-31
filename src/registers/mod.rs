@@ -37,10 +37,9 @@ where
     ///
     /// The caller must ensure that the xHCI registers are accessed only through this struct.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a [`accessor::Error::NotAligned`] error if a base address of a
-    /// register is not aligned properly.
+    /// This method panics if `mmio_base` is not aligned correctly.
     ///
     /// # Examples
     ///
@@ -70,20 +69,20 @@ where
     ///         .expect("The base address of the MMIO space is not aligned correctly.")
     /// };
     /// ```
-    pub unsafe fn new(mmio_base: usize, mapper: M) -> Result<Self, accessor::Error> {
-        let capability = Capability::new(mmio_base, &mapper)?;
-        let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone())?;
-        let operational = Operational::new(mmio_base, capability.caplength.read(), &mapper)?;
-        let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone())?;
+    pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
+        let capability = Capability::new(mmio_base, &mapper);
+        let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone());
+        let operational = Operational::new(mmio_base, capability.caplength.read(), &mapper);
+        let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
         let interrupt_register_set =
-            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper)?;
+            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper);
 
-        Ok(Self {
+        Self {
             capability,
             doorbell,
             operational,
             port_register_set,
             interrupt_register_set,
-        })
+        }
     }
 }

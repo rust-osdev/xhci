@@ -26,15 +26,15 @@ impl InterruptRegisterSet {
     /// The caller must ensure that the Host Controller Runtime Registers are accessed only through
     /// this struct.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a [`accessor::Error::NotAligned`] error if the base address of the
-    /// Interrupt Register Set is not aligned.
+    /// This method panics if the base address of the Interrupt Register Sets is not aligned
+    /// correctly.
     pub unsafe fn new<M>(
         mmio_base: usize,
         rtoff: RuntimeRegisterSpaceOffset,
         mapper: M,
-    ) -> Result<accessor::Array<Self, M>, accessor::Error>
+    ) -> accessor::Array<Self, M>
     where
         M: Mapper,
     {

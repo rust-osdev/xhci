@@ -20,15 +20,14 @@ impl Register {
     /// Caller must ensure that the only one accessor is created, otherwise it may cause undefined
     /// behavior such as data race.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a [`accessor::Error::NotAligned`] error if the start of the Doorbell
-    /// Array is not aligned.
+    /// This method panics if the base address of the Doorbell Array is not aligned correctly.
     pub unsafe fn new<M1, M2>(
         mmio_base: usize,
         capability: &Capability<M2>,
         mapper: M1,
-    ) -> Result<accessor::Array<Self, M1>, accessor::Error>
+    ) -> accessor::Array<Self, M1>
     where
         M1: Mapper,
         M2: Mapper + Clone,

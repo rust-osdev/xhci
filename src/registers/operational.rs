@@ -36,14 +36,11 @@ where
     /// The caller must ensure that the Host Controller Operational Registers are accessed only
     /// through this struct.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned.
-    pub unsafe fn new(
-        mmio_base: usize,
-        caplength: CapabilityRegistersLength,
-        mapper: &M,
-    ) -> Result<Self, accessor::Error>
+    /// This method panics if the base address of the Host Controller Operational Registers are not
+    /// aligned correctly.
+    pub unsafe fn new(mmio_base: usize, caplength: CapabilityRegistersLength, mapper: &M) -> Self
     where
         M: Mapper,
     {
@@ -51,18 +48,18 @@ where
 
         macro_rules! m {
             ($offset:expr) => {
-                accessor::Single::new(base + $offset, mapper.clone())?
+                accessor::Single::new(base + $offset, mapper.clone())
             };
         }
 
-        Ok(Self {
+        Self {
             usbcmd: m!(0x00),
             usbsts: m!(0x04),
             pagesize: m!(0x08),
             crcr: m!(0x18),
             dcbaap: m!(0x30),
             config: m!(0x38),
-        })
+        }
     }
 }
 
@@ -249,15 +246,14 @@ impl PortRegisterSet {
     /// Caller must ensure that only one accessor is created, otherwise it may cause undefined
     /// behavior such as data race.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return a [`accessor::Error::NotAligned`] error if `mmio_base` is not
-    /// aligned properly.
+    /// This method panics if the base address of the Port Register Sets is not aligned correctly.
     pub unsafe fn new<M1, M2>(
         mmio_base: usize,
         capability: &Capability<M2>,
         mapper: M1,
-    ) -> Result<accessor::Array<Self, M1>, accessor::Error>
+    ) -> accessor::Array<Self, M1>
     where
         M1: Mapper,
         M2: Mapper + Clone,

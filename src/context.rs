@@ -25,6 +25,8 @@ macro_rules! cx {
 
 
                 /// Input Context.
+                ///
+                /// See the documentation of the [`InputHandler`] for the provided methods.
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Input{
@@ -51,10 +53,9 @@ macro_rules! cx {
                     }
                 }
 
-                /// Input Control Context.
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-                pub struct InputControl([u32;ARRAY_LEN]);
+                struct InputControl([u32;ARRAY_LEN]);
                 impl InputControl{
                     #[must_use]
                     const fn new()->Self{
@@ -74,6 +75,8 @@ macro_rules! cx {
                 impl InputControlHandler for InputControl{}
 
                 /// Device Context.
+                ///
+                /// See the documentation of the [`DeviceHandler`] for the provided methods.
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Device{
@@ -109,10 +112,9 @@ macro_rules! cx {
                     }
                 }
 
-                /// A struct containing the pair of the Endpoint Context.
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-                pub struct EndpointPair{
+                struct EndpointPair{
                     out:Endpoint,
                     input:Endpoint,
                 }
@@ -135,10 +137,9 @@ macro_rules! cx {
                     }
                 }
 
-                /// Endpoint Context.
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-                pub struct Endpoint([u32; ARRAY_LEN]);
+                struct Endpoint([u32; ARRAY_LEN]);
                 impl Endpoint {
                     #[must_use]
                     const fn new() -> Self {
@@ -166,8 +167,7 @@ macro_rules! cx {
 
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-                /// Slot Context.
-                pub struct Slot([u32;ARRAY_LEN]);
+                struct Slot([u32;ARRAY_LEN]);
                 impl Slot{
                     #[must_use]
                     const fn new()->Self{

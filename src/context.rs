@@ -9,7 +9,7 @@ use paste::paste;
 macro_rules! cx {
     ($bytes:expr) => {
         paste! {
-            #[doc = $bytes " byte Contexts."]
+            #[doc = $bytes "-byte Contexts."]
             pub mod [<byte $bytes>]{
                 use bit_field::BitField;
                 use crate::context::EndpointType;

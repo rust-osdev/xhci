@@ -1,4 +1,8 @@
 //! The xHC Contexts.
+//!
+//! The xHC supports either 32-byte or 64-byte Contexts. You must check the Context Size bit of the
+//! HCCPARAMS register. If the bit is 0, use [`byte32`] module. If the bit is 1, use [`byte64`]
+//! module.
 
 use paste::paste;
 
@@ -54,7 +58,7 @@ macro_rules! cx {
                     }
                 }
 
-                #[doc = $bytes " byte version of the Endpoint Context."]
+                /// Endpoint Context.
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Endpoint([u32; $len]);
@@ -63,12 +67,6 @@ macro_rules! cx {
                     #[must_use]
                     pub const fn new() -> Self {
                         Self([0; $len])
-                    }
-
-                    /// Converts the Endpoint Context into an array.
-                    #[must_use]
-                    pub const fn [<into_ $bytes byte>](self) -> [u32; $len] {
-                        self.0
                     }
 
                     /// Sets the value of the Mult field.
@@ -155,32 +153,16 @@ macro_rules! cx {
                         Self(raw)
                     }
                 }
-                impl AsRef<[u32]> for Endpoint{
-                    fn as_ref(&self)->&[u32]{
-                        &self.0
-                    }
-                }
-                impl AsMut<[u32]> for Endpoint{
-                    fn as_mut(&mut self)->&mut [u32]{
-                        &mut self.0
-                    }
-                }
 
-                #[doc = $bytes " byte version of the Slot Context."]
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+                /// Slot Context.
                 pub struct Slot([u32;$len]);
                 impl Slot{
                     /// Creates a null Slot Context.
                     #[must_use]
                     pub const fn new()->Self{
                         Self([0;$len])
-                    }
-
-                    /// Converts the Slot Context into an array.
-                    #[must_use]
-                    pub fn [<into_ $bytes byte>](self)->[u32;$len]{
-                        self.0
                     }
 
                     /// Sets the value of the Root Hub Port Number field.
@@ -192,16 +174,6 @@ macro_rules! cx {
                 impl From<[u32;$len]> for Slot{
                     fn from(raw:[u32;$len])->Self{
                         Self(raw)
-                    }
-                }
-                impl AsRef<[u32]> for Slot{
-                    fn as_ref(&self)->&[u32]{
-                        &self.0
-                    }
-                }
-                impl AsMut<[u32]> for Slot{
-                    fn as_mut(&mut self)->&mut [u32]{
-                        &mut self.0
                     }
                 }
             }

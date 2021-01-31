@@ -234,12 +234,8 @@ pub trait EndpointPairHandler {
 /// A trait to handle the Slot Context.
 pub trait SlotHandler: AsMut<[u32]> {
     /// Sets the value of the Root Hub Port Number field.
-    fn set_root_hub_port_number(&mut self, n: u8) -> &mut dyn SlotHandler
-    where
-        Self: Sized,
-    {
+    fn set_root_hub_port_number(&mut self, n: u8) {
         self.as_mut()[0].set_bits(16..=23, n.into());
-        self
     }
 }
 
@@ -250,13 +246,9 @@ pub trait InputControlHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `i >= 32`.
-    fn set_aflag(&mut self, i: usize) -> &mut dyn InputControlHandler
-    where
-        Self: Sized,
-    {
+    fn set_aflag(&mut self, i: usize) {
         assert!(i < 32, "There exists only 0..=31 Add Context flags.");
         self.as_mut()[1].set_bit(i, true);
-        self
     }
 
     /// Clears the `i`th Add Context flag.
@@ -264,13 +256,9 @@ pub trait InputControlHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `i >= 32`.
-    fn clear_aflag(&mut self, i: usize) -> &mut dyn InputControlHandler
-    where
-        Self: Sized,
-    {
+    fn clear_aflag(&mut self, i: usize) {
         assert!(i < 32, "There exists only 0..=31 Add Context flags.");
         self.as_mut()[1].set_bit(i, false);
-        self
     }
 }
 
@@ -281,50 +269,30 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `m >= 4`.
-    fn set_mult(&mut self, m: u8) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_mult(&mut self, m: u8) {
         assert!(m < 4, "Mult must be less than 4.");
 
         self.as_mut()[0].set_bits(8..=9, m.into());
-        self
     }
 
     /// Sets the value of the Max Primary Streams field.
-    fn set_max_primary_streams(&mut self, s: u8) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_max_primary_streams(&mut self, s: u8) {
         self.as_mut()[0].set_bits(10..=14, s.into());
-        self
     }
 
     /// Sets the value of the Interval field.
-    fn set_interval(&mut self, i: u8) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_interval(&mut self, i: u8) {
         self.as_mut()[0].set_bits(16..=23, i.into());
-        self
     }
 
     /// Sets the value of the Error Count field.
-    fn set_error_count(&mut self, c: u8) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_error_count(&mut self, c: u8) {
         self.as_mut()[1].set_bits(1..=2, c.into());
-        self
     }
 
     /// Sets the type of the Endpoint.
-    fn set_endpoint_type(&mut self, t: EndpointType) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_endpoint_type(&mut self, t: EndpointType) {
         self.as_mut()[1].set_bits(3..=5, t as _);
-        self
     }
 
     /// Sets the value of the Max Burst Size field.
@@ -332,35 +300,23 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `s > 15`.
-    fn set_max_burst_size(&mut self, s: u8) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_max_burst_size(&mut self, s: u8) {
         assert!(
             s <= 15,
             "The valid values of the Max Burst Size field is 0..=15."
         );
 
         self.as_mut()[1].set_bits(8..=15, s.into());
-        self
     }
 
     /// Sets the value of the Max Packet Size field.
-    fn set_max_packet_size(&mut self, s: u16) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_max_packet_size(&mut self, s: u16) {
         self.as_mut()[1].set_bits(16..=31, s.into());
-        self
     }
 
     /// Sets the value of the Dequeue Cycle State field.
-    fn set_dequeue_cycle_state(&mut self, c: bool) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_dequeue_cycle_state(&mut self, c: bool) {
         self.as_mut()[2].set_bit(0, c);
-        self
     }
 
     /// Sets the value of the Transfer Ring Dequeue pointer field.
@@ -368,10 +324,7 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `p` is not 16 byte aligned.
-    fn set_transfer_ring_dequeue_pointer(&mut self, p: u64) -> &mut dyn EndpointHandler
-    where
-        Self: Sized,
-    {
+    fn set_transfer_ring_dequeue_pointer(&mut self, p: u64) {
         assert_eq!(p % 16, 0);
 
         let l: u32 = (p & 0xffff_ffff).try_into().unwrap();
@@ -379,7 +332,6 @@ pub trait EndpointHandler: AsMut<[u32]> {
 
         self.as_mut()[2] = l | self.as_mut()[2].get_bit(0) as u32;
         self.as_mut()[3] = u;
-        self
     }
 }
 

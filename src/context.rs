@@ -31,6 +31,7 @@ macro_rules! cx {
                 }
                 impl Device{
                     /// Creates a null Device Context.
+                    #[must_use]
                     pub const fn new()->Self{
                         Self{
                             slot:Slot::new(),
@@ -51,6 +52,7 @@ macro_rules! cx {
                 }
                 impl EndpointPair{
                     /// Creates a null instance of the Endpoint Pair.
+                    #[must_use]
                     pub const fn new()->Self{
                         Self{
                             out:Endpoint::new(),

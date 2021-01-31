@@ -6,6 +6,7 @@
 
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_derive::FromPrimitive;
 use paste::paste;
 
 macro_rules! cx {
@@ -341,7 +342,7 @@ pub trait EndpointHandler: AsMut<[u32]> {
 }
 
 /// Endpoint Type.
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum EndpointType {
     /// Not Valid N/A
     NotValid = 0,

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.4.0 - 2021-01-31
 ### Changed
 - Methods of the `register` module now panic if it fails to create an accessor.
 

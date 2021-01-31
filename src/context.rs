@@ -18,6 +18,39 @@ macro_rules! cx {
                 const ARRAY_LEN: usize = $bytes / 4;
                 const EP_PAIR_NUM:usize=15;
 
+                /// Input Control Context.
+                #[repr(transparent)]
+                #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+                pub struct InputControl([u32;ARRAY_LEN]);
+                impl InputControl{
+                    /// Creates a null Input Control Context.
+                    pub const fn new()->Self{
+                        Self([0;ARRAY_LEN])
+                    }
+
+                    /// Sets the `i`th Add Context flag.
+                    ///
+                    /// # Panics
+                    ///
+                    /// This method panics if `i >= 32`.
+                    pub fn set_aflag(&mut self,i:usize)->&mut Self{
+                        assert!(i<32,"There exists only 0..=31 Add Context flags.");
+                        self.0[1].set_bit(i,true);
+                        self
+                    }
+
+                    /// Clears the `i`th Add Context flag.
+                    ///
+                    /// # Panics
+                    ///
+                    /// This method panics if `i >= 32`.
+                    pub fn clear_aflag(&mut self,i:usize)->&mut Self{
+                        assert!(i<32,"There exists only 0..=31 Add Context flags.");
+                        self.0[1].set_bit(i,false);
+                        self
+                    }
+                }
+
                 /// Device Context.
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]

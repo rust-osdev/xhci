@@ -33,28 +33,27 @@ where
     /// The caller must ensure that the Host Controller Capability Registers are accessed only
     /// through this struct.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// This method may return an [`accessor::Error::NotAligned`] error if `mmio_base` is not aligned
-    /// properly.
-    pub unsafe fn new(mmio_base: usize, mapper: &M) -> Result<Self, accessor::Error>
+    /// This method panics if `mmio_base` is not aligned correctly.
+    pub unsafe fn new(mmio_base: usize, mapper: &M) -> Self
     where
         M: Mapper,
     {
         macro_rules! m {
             ($offset:expr) => {
-                accessor::Single::new(mmio_base + $offset, mapper.clone())?
+                accessor::Single::new(mmio_base + $offset, mapper.clone())
             };
         }
 
-        Ok(Self {
+        Self {
             caplength: m!(0x00),
             hcsparams1: m!(0x04),
             hcsparams2: m!(0x08),
             hccparams1: m!(0x10),
             dboff: m!(0x14),
             rtsoff: m!(0x18),
-        })
+        }
     }
 }
 

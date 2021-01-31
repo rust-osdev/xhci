@@ -138,9 +138,7 @@ where
         let current = self.current?;
 
         // SAFETY: `Iter::new` guarantees that `self.current` is the correct address.
-        let h: Header = unsafe { accessor::Single::new(current, self.m.clone()) }
-            .expect("The base address of the xHCI Extended Capability must be aligned correctly.")
-            .read();
+        let h: Header = unsafe { accessor::Single::new(current, self.m.clone()) }.read();
 
         self.current = if h.next() == 0 {
             None
@@ -151,9 +149,7 @@ where
         Some(match h.id() {
             // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
             1 => Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
-                accessor::Single::new(current, self.m.clone()).expect(
-                    "The base address of the xHCI Extended Capability must be aligned correctly.",
-                )
+                accessor::Single::new(current, self.m.clone())
             })),
             e => Err(NotSupportedId(e)),
         })

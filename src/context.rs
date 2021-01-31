@@ -18,6 +18,26 @@ macro_rules! cx {
                 const ARRAY_LEN: usize = $bytes / 4;
                 const EP_PAIR_NUM:usize=15;
 
+
+                /// Input Context.
+                #[repr(C)]
+                #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+                pub struct Input{
+                    /// Input Control Context.
+                    pub control:InputControl,
+                    /// Device Context.
+                    pub device:Device,
+                }
+                impl Input{
+                    /// Creates a null Input Context.
+                    pub const fn new()->Self{
+                        Self{
+                            control:InputControl::new(),
+                            device:Device::new(),
+                        }
+                    }
+                }
+
                 /// Input Control Context.
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]

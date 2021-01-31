@@ -234,14 +234,14 @@ pub trait EndpointPairHandler {
 
 /// A trait to handle the Slot Context.
 pub trait SlotHandler: AsMut<[u32]> {
-    /// Sets the value of the Root Hub Port Number field.
-    fn set_root_hub_port_number(&mut self, n: u8) {
-        self.as_mut()[0].set_bits(16..=23, n.into());
-    }
-
     /// Sets the value of the Context Entries field.
     fn set_context_entries(&mut self, e: u8) {
         self.as_mut()[0].set_bits(27..=31, e.into());
+    }
+
+    /// Sets the value of the Root Hub Port Number field.
+    fn set_root_hub_port_number(&mut self, n: u8) {
+        self.as_mut()[1].set_bits(16..=23, n.into());
     }
 }
 

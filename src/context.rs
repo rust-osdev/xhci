@@ -11,6 +11,49 @@ macro_rules! cx {
                 use crate::context::EndpointType;
                 use core::convert::TryInto;
 
+                const EP_PAIR_NUM:usize=15;
+
+                /// Device Context.
+                #[repr(C)]
+                #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+                pub struct Device{
+                    /// Slot Context.
+                    pub slot:Slot,
+                    /// Endpoint Context 0.
+                    pub endpoint_0:Endpoint,
+                    /// Endpoint Context 1..=15.
+                    pub endpoints:[EndpointPair;EP_PAIR_NUM],
+                }
+                impl Device{
+                    /// Creates a null Device Context.
+                    pub const fn new()->Self{
+                        Self{
+                            slot:Slot::new(),
+                            endpoint_0:Endpoint::new(),
+                            endpoints:[EndpointPair::new();EP_PAIR_NUM],
+                        }
+                    }
+                }
+
+                /// A struct containing the pair of the Endpoint Context.
+                #[repr(C)]
+                #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+                pub struct EndpointPair{
+                    /// Output.
+                    pub out:Endpoint,
+                    /// Input.
+                    pub input:Endpoint,
+                }
+                impl EndpointPair{
+                    /// Creates a null instance of the Endpoint Pair.
+                    pub const fn new()->Self{
+                        Self{
+                            out:Endpoint::new(),
+                            input:Endpoint::new(),
+                        }
+                    }
+                }
+
                 #[doc = $bytes " byte version of the Endpoint Context."]
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]

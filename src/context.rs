@@ -30,6 +30,7 @@ macro_rules! cx {
                 }
                 impl Input{
                     /// Creates a null Input Context.
+                    #[must_use]
                     pub const fn new()->Self{
                         Self{
                             control:InputControl::new(),
@@ -44,6 +45,7 @@ macro_rules! cx {
                 pub struct InputControl([u32;ARRAY_LEN]);
                 impl InputControl{
                     /// Creates a null Input Control Context.
+                    #[must_use]
                     pub const fn new()->Self{
                         Self([0;ARRAY_LEN])
                     }

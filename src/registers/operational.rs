@@ -38,7 +38,7 @@ where
     ///
     /// # Panics
     ///
-    /// This method panics if the base address of the Host Controller Operational Registers are not
+    /// This method panics if the base address of the Host Controller Operational Registers is not
     /// aligned correctly.
     pub unsafe fn new(mmio_base: usize, caplength: CapabilityRegistersLength, mapper: &M) -> Self
     where

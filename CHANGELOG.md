@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- `context` module.
+
 ### Changed
 - Methods now panic if an error occurs.
 

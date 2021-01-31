@@ -7,7 +7,7 @@
 use paste::paste;
 
 macro_rules! cx {
-    ($bytes:expr, $len:expr) => {
+    ($bytes:expr) => {
         paste! {
             #[doc = $bytes " byte Contexts."]
             pub mod [<byte $bytes>]{
@@ -15,6 +15,7 @@ macro_rules! cx {
                 use crate::context::EndpointType;
                 use core::convert::TryInto;
 
+                const ARRAY_LEN: usize = $bytes / 4;
                 const EP_PAIR_NUM:usize=15;
 
                 /// Device Context.
@@ -61,12 +62,12 @@ macro_rules! cx {
                 /// Endpoint Context.
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-                pub struct Endpoint([u32; $len]);
+                pub struct Endpoint([u32; ARRAY_LEN]);
                 impl Endpoint {
                     /// Creates a null Endpoint Context.
                     #[must_use]
                     pub const fn new() -> Self {
-                        Self([0; $len])
+                        Self([0; ARRAY_LEN])
                     }
 
                     /// Sets the value of the Mult field.
@@ -148,8 +149,8 @@ macro_rules! cx {
                         self
                     }
                 }
-                impl From<[u32; $len]> for Endpoint {
-                    fn from(raw: [u32; $len]) -> Self {
+                impl From<[u32; ARRAY_LEN]> for Endpoint {
+                    fn from(raw: [u32; ARRAY_LEN]) -> Self {
                         Self(raw)
                     }
                 }
@@ -157,12 +158,12 @@ macro_rules! cx {
                 #[repr(transparent)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 /// Slot Context.
-                pub struct Slot([u32;$len]);
+                pub struct Slot([u32;ARRAY_LEN]);
                 impl Slot{
                     /// Creates a null Slot Context.
                     #[must_use]
                     pub const fn new()->Self{
-                        Self([0;$len])
+                        Self([0;ARRAY_LEN])
                     }
 
                     /// Sets the value of the Root Hub Port Number field.
@@ -171,8 +172,8 @@ macro_rules! cx {
                         self
                     }
                 }
-                impl From<[u32;$len]> for Slot{
-                    fn from(raw:[u32;$len])->Self{
+                impl From<[u32;ARRAY_LEN]> for Slot{
+                    fn from(raw:[u32;ARRAY_LEN])->Self{
                         Self(raw)
                     }
                 }
@@ -181,8 +182,8 @@ macro_rules! cx {
     };
 }
 
-cx!(32, 8);
-cx!(64, 16);
+cx!(32);
+cx!(64);
 
 /// Endpoint Type.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

@@ -56,9 +56,8 @@ macro_rules! cx {
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct InputControl([u32;ARRAY_LEN]);
                 impl InputControl{
-                    /// Creates a null Input Control Context.
                     #[must_use]
-                    pub const fn new()->Self{
+                    const fn new()->Self{
                         Self([0;ARRAY_LEN])
                     }
                 }
@@ -118,9 +117,8 @@ macro_rules! cx {
                     input:Endpoint,
                 }
                 impl EndpointPair{
-                    /// Creates a null instance of the Endpoint Pair.
                     #[must_use]
-                    pub const fn new()->Self{
+                    const fn new()->Self{
                         Self{
                             out:Endpoint::new(),
                             input:Endpoint::new(),
@@ -142,9 +140,8 @@ macro_rules! cx {
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Endpoint([u32; ARRAY_LEN]);
                 impl Endpoint {
-                    /// Creates a null Endpoint Context.
                     #[must_use]
-                    pub const fn new() -> Self {
+                    const fn new() -> Self {
                         Self([0; ARRAY_LEN])
                     }
 
@@ -172,9 +169,8 @@ macro_rules! cx {
                 /// Slot Context.
                 pub struct Slot([u32;ARRAY_LEN]);
                 impl Slot{
-                    /// Creates a null Slot Context.
                     #[must_use]
-                    pub const fn new()->Self{
+                    const fn new()->Self{
                         Self([0;ARRAY_LEN])
                     }
                 }

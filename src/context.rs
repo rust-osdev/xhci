@@ -1,7 +1,7 @@
 //! The xHC Contexts.
 //!
 //! The xHC supports either 32-byte or 64-byte Contexts. You must check the Context Size bit of the
-//! HCCPARAMS1 register. If the bit is 0, use [`byte32`] module. If the bit is 1, use [`byte64`]
+//! HCCPARAMS1 register. If the bit is 0, use the [`byte32`] module. If the bit is 1, use the [`byte64`]
 //! module.
 
 use bit_field::BitField;

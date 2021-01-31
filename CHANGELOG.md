@@ -2,7 +2,7 @@
 
 ## Unreleased - ReleaseDate
 ### Added
-- `context` module.
+- The `context` module.
 
 ### Changed
 - Methods now panic if an error occurs.

@@ -363,7 +363,7 @@ pub trait EndpointHandler: AsMut<[u32]> {
     where
         Self: Sized,
     {
-        self.as_mut()[2].set_bit(0, c.into());
+        self.as_mut()[2].set_bit(0, c);
         self
     }
 

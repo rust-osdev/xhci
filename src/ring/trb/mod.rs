@@ -102,6 +102,8 @@ pub enum Type {
     EnableSlot = 9,
     /// Address Device Command TRB, 11
     AddressDevice = 11,
+    /// Configure Endpoint Command TRB, 12
+    ConfigureEndpoint = 12,
     /// No Op Command TRB, 23
     NoopCommand = 23,
 }

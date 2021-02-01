@@ -92,6 +92,26 @@ impl TransferEvent {
 
         (u << 32) | l
     }
+
+    /// Returns the value of the TRB Transfer Length field.
+    pub fn trb_transfer_length(&self) -> u32 {
+        self.0[2].get_bits(0..=23)
+    }
+
+    /// Returns the value of the Event Data field.
+    pub fn event_data(&self) -> bool {
+        self.0[3].get_bit(2)
+    }
+
+    /// Returns the value of the Endpoint ID field.
+    pub fn endpoint_id(&self) -> u8 {
+        self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
 }
 
 add_trb_with_default!(

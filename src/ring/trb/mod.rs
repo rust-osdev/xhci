@@ -100,6 +100,8 @@ impl Link {
 pub enum Type {
     /// Normal TRB, 1
     Normal = 1,
+    /// Setup Stage TRB, 2
+    SetupStage = 2,
     /// Link TRB, 6
     Link = 6,
     /// Enable Slot Command TRB, 9

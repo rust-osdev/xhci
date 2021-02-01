@@ -102,6 +102,58 @@ impl Link {
         self.0[1] = u.try_into().unwrap();
         self
     }
+
+    /// Returns the value of the Ring Segment Pointer field.
+    pub fn ring_segment_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the Interrupter Target field.
+    pub fn set_interrupter_target(&mut self, t: u32) -> &mut Self {
+        self.0[2].set_bits(22..=31, t);
+        self
+    }
+
+    /// Returns the value of the Interrupter Target field.
+    pub fn interrupter_target(&self) -> u32 {
+        self.0[2].get_bits(22..=31)
+    }
+
+    /// Sets the value of the Toggle Cycle field.
+    pub fn set_toggle_cycle(&mut self, c: bool) -> &mut Self {
+        self.0[3].set_bit(1, c);
+        self
+    }
+
+    /// Returns the value of the Toggle Cycle field.
+    pub fn toggle_cycle(&self) -> bool {
+        self.0[3].get_bit(1)
+    }
+
+    /// Sets the value of the Chain bit field.
+    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
+        self.0[3].set_bit(4, b);
+        self
+    }
+
+    /// Returns the value of the Chain bit field.
+    pub fn chain_bit(&self) -> bool {
+        self.0[3].get_bit(4)
+    }
+
+    /// Sets the value of the Interrupt On Completion field.
+    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
+        self.0[3].set_bit(5, ioc);
+        self
+    }
+
+    /// Returns the value of the Interrupt On Completion field.
+    pub fn interrupt_on_completion(&self) -> bool {
+        self.0[3].get_bit(5)
+    }
 }
 
 /// TRB Type.

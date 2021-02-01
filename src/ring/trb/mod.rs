@@ -107,6 +107,8 @@ pub enum Type {
     ConfigureEndpoint = 12,
     /// No Op Command TRB, 23
     NoopCommand = 23,
+    /// Command Completion Event TRB, 33
+    CommandCompletion = 33,
     /// Port Status Change Event TRB, 34
     PortStatusChange = 34,
 }

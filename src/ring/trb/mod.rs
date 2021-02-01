@@ -12,11 +12,13 @@ macro_rules! add_trb {
         pub struct $name([u32; 4]);
         impl $name {
             /// Returns the wrapped array.
+            #[must_use]
             pub fn into_raw(self) -> [u32; 4] {
                 self.0
             }
 
             /// Returns the value of the Cycle Bit.
+            #[must_use]
             pub fn cycle_bit(&self) -> bool {
                 self.0[3].get_bit(0)
             }
@@ -104,6 +106,7 @@ impl Link {
     }
 
     /// Returns the value of the Ring Segment Pointer field.
+    #[must_use]
     pub fn ring_segment_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -118,6 +121,7 @@ impl Link {
     }
 
     /// Returns the value of the Interrupter Target field.
+    #[must_use]
     pub fn interrupter_target(&self) -> u32 {
         self.0[2].get_bits(22..=31)
     }
@@ -129,6 +133,7 @@ impl Link {
     }
 
     /// Returns the value of the Toggle Cycle field.
+    #[must_use]
     pub fn toggle_cycle(&self) -> bool {
         self.0[3].get_bit(1)
     }
@@ -140,6 +145,7 @@ impl Link {
     }
 
     /// Returns the value of the Chain bit field.
+    #[must_use]
     pub fn chain_bit(&self) -> bool {
         self.0[3].get_bit(4)
     }
@@ -151,6 +157,7 @@ impl Link {
     }
 
     /// Returns the value of the Interrupt On Completion field.
+    #[must_use]
     pub fn interrupt_on_completion(&self) -> bool {
         self.0[3].get_bit(5)
     }

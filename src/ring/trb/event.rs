@@ -58,7 +58,6 @@ macro_rules! completion_code {
             ///
             /// This method may return an [`Err`] value with the Completion Code that is either reserved or
             /// not implemented by this crate.
-            #[must_use]
             pub fn completion_code(&self) -> Result<CompletionCode, u8> {
                 let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
                 CompletionCode::from_u8(c).ok_or(c)
@@ -94,21 +93,25 @@ impl TransferEvent {
     }
 
     /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
     pub fn trb_transfer_length(&self) -> u32 {
         self.0[2].get_bits(0..=23)
     }
 
     /// Returns the value of the Event Data field.
+    #[must_use]
     pub fn event_data(&self) -> bool {
         self.0[3].get_bit(2)
     }
 
     /// Returns the value of the Endpoint ID field.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -131,11 +134,13 @@ impl CommandCompletion {
     }
 
     /// Returns the value of the Command Completion Parameter field.
+    #[must_use]
     pub fn command_completion_parameter(&self) -> u32 {
         self.0[2].get_bits(0..=23)
     }
 
     /// Returns the value of the VF (Virtual Function) ID field.
+    #[must_use]
     pub fn vf_id(&self) -> u8 {
         self.0[3].get_bits(16..=23).try_into().unwrap()
     }

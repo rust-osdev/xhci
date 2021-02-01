@@ -2,6 +2,8 @@
 
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 add_trb_with_default!(
     PortStatusChange,
@@ -27,10 +29,16 @@ impl TransferEvent {
         (u << 32) | l
     }
 
-    /// Returns the value of the Completion Code field.
+    /// Returns the Completion Code.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
+    /// not implemented by this crate.
     #[must_use]
-    pub fn completion_code(&self) -> u8 {
-        self.0[2].get_bits(24..=31).try_into().unwrap()
+    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
+        CompletionCode::from_u8(c).ok_or(c)
     }
 }
 
@@ -55,9 +63,22 @@ impl CommandCompletion {
         (u << 32) | l
     }
 
-    /// Returns the value of the Completion Code field.
+    /// Returns the Completion Code.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
+    /// not implemented by this crate.
     #[must_use]
-    pub fn completion_code(&self) -> u8 {
-        self.0[2].get_bits(24..=31).try_into().unwrap()
+    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
+        CompletionCode::from_u8(c).ok_or(c)
     }
+}
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+#[non_exhaustive]
+pub enum CompletionCode {
+    /// The operation succeed.
+    Success = 1,
 }

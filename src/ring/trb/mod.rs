@@ -68,6 +68,7 @@ macro_rules! add_trb_with_default {
 }
 
 pub mod command;
+pub mod event;
 
 add_trb_with_default!(Link, "Link TRB", Type::Link);
 impl Link {

@@ -76,6 +76,7 @@ impl CommandCompletion {
     }
 }
 
+/// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]
 pub enum CompletionCode {

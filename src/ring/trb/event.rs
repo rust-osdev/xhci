@@ -121,12 +121,6 @@ add_trb_with_default!(
 );
 completion_code!(CommandCompletion);
 impl CommandCompletion {
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
-
     /// Returns the value of the Command TRB Pointer field.
     #[must_use]
     pub fn command_trb_pointer(&self) -> u64 {
@@ -134,6 +128,12 @@ impl CommandCompletion {
         let u: u64 = self.0[1].into();
 
         (u << 32) | l
+    }
+
+    /// Returns the value of the Slot ID field.
+    #[must_use]
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
 

@@ -98,6 +98,8 @@ impl Link {
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]
 pub enum Type {
+    /// Normal TRB, 1
+    Normal = 1,
     /// Link TRB, 6
     Link = 6,
     /// Enable Slot Command TRB, 9

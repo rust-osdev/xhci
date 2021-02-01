@@ -139,6 +139,7 @@ impl From<Direction> for bool {
 
 /// Transfer Type.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+#[allow(clippy::module_name_repetition)]
 pub enum TransferType {
     /// No Data Stage.
     No = 0,

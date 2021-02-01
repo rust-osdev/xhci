@@ -35,6 +35,7 @@ impl SetupStage {
     ///
     /// This method sets the value of the TRB Type and the Immediate Data field properly. All the
     /// other fields are set to 0.
+    #[must_use]
     pub fn new() -> Self {
         *Self([0; 4]).set_trb_type().set_idt()
     }

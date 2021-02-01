@@ -15,6 +15,22 @@ impl PortStatusChange {
     }
 }
 
+add_trb_with_default!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
+impl TransferEvent {
+    /// Returns the value of the TRB Pointer field.
+    pub fn trb_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Returns the value of the Completion Code field.
+    pub fn completion_code(&self) -> u8 {
+        self.0[2].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
 add_trb_with_default!(
     CommandCompletion,
     "Command Completion Event TRB",

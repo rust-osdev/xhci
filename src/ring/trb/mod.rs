@@ -17,6 +17,12 @@ impl Link {
         *Self([0; 4]).set_trb_type()
     }
 
+    /// Sets the value of the Cycle Bit.
+    pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
+        self.0[3].set_bit(0, b);
+        self
+    }
+
     /// Sets the value of the Ring Segment Pointer field.
     ///
     /// # Panics

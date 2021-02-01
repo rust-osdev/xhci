@@ -11,6 +11,11 @@ macro_rules! add_trb {
         #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
         pub struct $name([u32; 4]);
         impl $name {
+            /// Returns the wrapped array.
+            pub fn into_raw(self) -> [u32; 4] {
+                self.0
+            }
+
             /// Sets the value of the Cycle Bit.
             pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
                 use bit_field::BitField;

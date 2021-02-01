@@ -102,6 +102,8 @@ pub enum Type {
     Normal = 1,
     /// Setup Stage TRB, 2
     SetupStage = 2,
+    /// Data Stage TRB, 3
+    DataStage = 3,
     /// Link TRB, 6
     Link = 6,
     /// Enable Slot Command TRB, 9

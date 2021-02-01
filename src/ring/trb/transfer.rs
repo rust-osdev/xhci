@@ -2,6 +2,7 @@
 
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_derive::FromPrimitive;
 
 add_trb_with_default!(Normal, "Normal TRB", Type::Normal);
 impl Normal {
@@ -85,8 +86,50 @@ impl Default for SetupStage {
     }
 }
 
+add_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
+impl DataStage {
+    /// Sets the value of the Data Buffer Pointer field.
+    pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
+        let l = p.get_bits(0..32);
+        let u = p.get_bits(32..64);
+
+        self.0[0] = l.try_into().unwrap();
+        self.0[1] = u.try_into().unwrap();
+        self
+    }
+
+    /// Sets the value of the TRB Tranfer Length field.
+    pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
+        self.0[2].set_bits(0..=16, l);
+        self
+    }
+
+    /// Sets the value of the Direction field.
+    pub fn set_direction(&mut self, d: Direction) -> &mut Self {
+        self.0[3].set_bit(16, d.into());
+        self
+    }
+}
+
+/// The direction of the data transfer.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+pub enum Direction {
+    /// Out (Write Data)
+    Out = 0,
+    /// In (Read Data)
+    In = 1,
+}
+impl From<Direction> for bool {
+    fn from(d: Direction) -> Self {
+        match d {
+            Direction::Out => false,
+            Direction::In => true,
+        }
+    }
+}
+
 /// Transfer Type.
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum TransferType {
     /// No Data Stage.
     NoDataStage = 0,

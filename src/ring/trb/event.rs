@@ -130,6 +130,16 @@ impl CommandCompletion {
         (u << 32) | l
     }
 
+    /// Returns the value of the Command Completion Parameter field.
+    pub fn command_completion_parameter(&self) -> u32 {
+        self.0[2].get_bits(0..=23)
+    }
+
+    /// Returns the value of the VF (Virtual Function) ID field.
+    pub fn vf_id(&self) -> u8 {
+        self.0[3].get_bits(16..=23).try_into().unwrap()
+    }
+
     /// Returns the value of the Slot ID field.
     #[must_use]
     pub fn slot_id(&self) -> u8 {

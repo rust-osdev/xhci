@@ -4,6 +4,8 @@ use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 
+pub mod command;
+
 /// Link TRB.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -75,5 +77,5 @@ pub enum Type {
     /// 6
     Link = 6,
     /// 23
-    Noop = 23,
+    NoopCommand = 23,
 }

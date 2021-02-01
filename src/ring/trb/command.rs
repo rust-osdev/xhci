@@ -43,6 +43,7 @@ impl Allowed {
     }
 
     /// Returns the wrapped array.
+    #[must_use]
     pub fn into_raw(self) -> [u32; 4] {
         match self {
             Self::Noop(n) => n.into_raw(),
@@ -87,6 +88,7 @@ impl EnableSlot {
     }
 
     /// Returns the value of the Slot Type field.
+    #[must_use]
     pub fn slot_type(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }
@@ -119,6 +121,7 @@ impl AddressDevice {
     }
 
     /// Returns the value of the Input Context Pointer field.
+    #[must_use]
     pub fn input_context_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -133,6 +136,7 @@ impl AddressDevice {
     }
 
     /// Returns the value of the Block Set Address Request.
+    #[must_use]
     pub fn block_set_address_request(&self) -> bool {
         self.0[3].get_bit(9)
     }
@@ -144,6 +148,7 @@ impl AddressDevice {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -176,6 +181,7 @@ impl ConfigureEndpoint {
     }
 
     /// Returns the value of the Input Context Pointer field.
+    #[must_use]
     pub fn input_context_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -201,6 +207,7 @@ impl ConfigureEndpoint {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

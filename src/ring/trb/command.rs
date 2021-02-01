@@ -67,11 +67,11 @@ impl AsRef<[u32]> for Allowed {
 impl AsMut<[u32]> for Allowed {
     fn as_mut(&mut self) -> &mut [u32] {
         match self {
-            Self::Noop(n) => n.as_mut(),
-            Self::Link(l) => l.as_mut(),
-            Self::EnableSlot(e) => e.as_mut(),
-            Self::AddressDevice(a) => a.as_mut(),
-            Self::ConfigureEndpoint(c) => c.as_mut(),
+            Self::Noop(ref mut n) => n.as_mut(),
+            Self::Link(ref mut l) => l.as_mut(),
+            Self::EnableSlot(ref mut e) => e.as_mut(),
+            Self::AddressDevice(ref mut a) => a.as_mut(),
+            Self::ConfigureEndpoint(ref mut c) => c.as_mut(),
         }
     }
 }

@@ -6,6 +6,7 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
 /// TRBs which are allowed to be pushed to the Event Ring.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Allowed {
     /// Port Status Change Event TRB.
     PortStatusChange(PortStatusChange),

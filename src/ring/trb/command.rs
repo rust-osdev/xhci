@@ -175,9 +175,33 @@ impl ConfigureEndpoint {
         self
     }
 
+    /// Returns the value of the Input Context Pointer field.
+    pub fn input_context_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the Deconfigure field.
+    pub fn set_deconfigure(&mut self, d: bool) -> &mut Self {
+        self.0[3].set_bit(9, d);
+        self
+    }
+
+    /// Returns the value of the Deconfigure field.
+    pub fn deconfigure(&mut self) -> bool {
+        self.0[3].get_bit(9)
+    }
+
     /// Sets the value of the Slot ID field.
     pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
         self.0[3].set_bits(24..=31, i.into());
         self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

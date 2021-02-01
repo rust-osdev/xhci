@@ -1,3 +1,3 @@
 //! Command TRBs.
 
-add_trb!(Noop, "No Op Command TRB", Type::NoopCommand);
+add_trb_with_default!(Noop, "No Op Command TRB", Type::NoopCommand);

@@ -11,14 +11,6 @@ macro_rules! add_trb {
         #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
         pub struct $name([u32; 4]);
         impl $name {
-            paste::paste! {
-                #[doc = "Creates a new " $full ".\n\nThis method sets the sets the value of the TRB Type field properly. All the other fieldds are set to 0."]
-                #[must_use]
-                pub fn new()->Self{
-                    *Self([0;4]).set_trb_type()
-                }
-            }
-
             /// Sets the value of the Cycle Bit.
             pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
                 use bit_field::BitField;
@@ -31,11 +23,6 @@ macro_rules! add_trb {
                 use bit_field::BitField;
                 self.0[3].set_bits(10..=15, $ty as _);
                 self
-            }
-        }
-        impl Default for $name {
-            fn default() -> Self {
-                Self::new()
             }
         }
         impl AsRef<[u32]> for $name {
@@ -55,10 +42,34 @@ macro_rules! add_trb {
         }
     };
 }
+macro_rules! impl_default_simply_adds_trb_id {
+    ($name:ident,$full:expr) => {
+        impl $name{
+            paste::paste! {
+                #[doc = "Creates a new " $full ".\n\nThis method sets the sets the value of the TRB Type field properly. All the other fieldds are set to 0."]
+                #[must_use]
+                pub fn new()->Self{
+                    *Self([0;4]).set_trb_type()
+                }
+            }
+        }
+        impl Default for $name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+    };
+}
+macro_rules! add_trb_with_default {
+    ($name:ident,$full:expr,$type:expr) => {
+        add_trb!($name, $full, $type);
+        impl_default_simply_adds_trb_id!($name, $full);
+    };
+}
 
 pub mod command;
 
-add_trb!(Link, "Link TRB", Type::Link);
+add_trb_with_default!(Link, "Link TRB", Type::Link);
 impl Link {
     /// Sets the value of the Ring Segment Pointer field.
     ///

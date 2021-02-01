@@ -117,6 +117,36 @@ impl AddressDevice {
         self.0[1] = u.try_into().unwrap();
         self
     }
+
+    /// Returns the value of the Input Context Pointer field.
+    pub fn input_context_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the Block Set Address Request field.
+    pub fn set_block_set_address_request(&mut self, r: bool) -> &mut Self {
+        self.0[3].set_bit(9, r);
+        self
+    }
+
+    /// Returns the value of the Block Set Address Request.
+    pub fn block_set_address_request(&self) -> bool {
+        self.0[3].get_bit(9)
+    }
+
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
 }
 
 add_trb_with_default!(

@@ -5,6 +5,49 @@ use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
+/// TRBs which are allowed to be pushed to the Event Ring.
+pub enum Allowed {
+    /// Port Status Change Event TRB.
+    PortStatusChange(PortStatusChange),
+    /// Transfer Event TRB.
+    TransferEvent(TransferEvent),
+    /// Command Completion Event TRB.
+    CommandCompletion(CommandCompletion),
+}
+impl Allowed {
+    /// Returns the field of the Command Completion field.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
+    /// not implemented by this crate.
+    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+        match self {
+            Self::PortStatusChange(p) => p.completion_code(),
+            Self::TransferEvent(t) => t.completion_code(),
+            Self::CommandCompletion(c) => c.completion_code(),
+        }
+    }
+}
+impl AsRef<[u32]> for Allowed {
+    fn as_ref(&self) -> &[u32] {
+        match self {
+            Self::PortStatusChange(p) => p.as_ref(),
+            Self::TransferEvent(t) => t.as_ref(),
+            Self::CommandCompletion(c) => c.as_ref(),
+        }
+    }
+}
+impl AsMut<[u32]> for Allowed {
+    fn as_mut(&mut self) -> &mut [u32] {
+        match self {
+            Self::PortStatusChange(ref mut p) => p.as_mut(),
+            Self::TransferEvent(ref mut t) => t.as_mut(),
+            Self::CommandCompletion(ref mut c) => c.as_mut(),
+        }
+    }
+}
+
 add_trb_with_default!(
     PortStatusChange,
     "Port Status Change Event TRB",
@@ -15,6 +58,18 @@ impl PortStatusChange {
     #[must_use]
     pub fn port_id(&self) -> u8 {
         self.0[0].get_bits(24..=31).try_into().unwrap()
+    }
+
+    /// Returns the Completion Code.
+    ///
+    /// # Errors
+    ///
+    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
+    /// not implemented by this crate.
+    #[must_use]
+    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
+        CompletionCode::from_u8(c).ok_or(c)
     }
 }
 

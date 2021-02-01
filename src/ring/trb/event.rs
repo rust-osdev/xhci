@@ -49,32 +49,40 @@ impl AsMut<[u32]> for Allowed {
     }
 }
 
+macro_rules! completion_code {
+    ($name:ident) => {
+        impl $name {
+            /// Returns the Completion Code.
+            ///
+            /// # Errors
+            ///
+            /// This method may return an [`Err`] value with the Completion Code that is either reserved or
+            /// not implemented by this crate.
+            #[must_use]
+            pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+                let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
+                CompletionCode::from_u8(c).ok_or(c)
+            }
+        }
+    };
+}
+
 add_trb_with_default!(
     PortStatusChange,
     "Port Status Change Event TRB",
     Type::PortStatusChange
 );
+completion_code!(PortStatusChange);
 impl PortStatusChange {
     /// Returns the value of the Port ID field.
     #[must_use]
     pub fn port_id(&self) -> u8 {
         self.0[0].get_bits(24..=31).try_into().unwrap()
     }
-
-    /// Returns the Completion Code.
-    ///
-    /// # Errors
-    ///
-    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
-    /// not implemented by this crate.
-    #[must_use]
-    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
-        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
-        CompletionCode::from_u8(c).ok_or(c)
-    }
 }
 
 add_trb_with_default!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
+completion_code!(TransferEvent);
 impl TransferEvent {
     /// Returns the value of the TRB Pointer field.
     #[must_use]
@@ -84,18 +92,6 @@ impl TransferEvent {
 
         (u << 32) | l
     }
-
-    /// Returns the Completion Code.
-    ///
-    /// # Errors
-    ///
-    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
-    /// not implemented by this crate.
-    #[must_use]
-    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
-        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
-        CompletionCode::from_u8(c).ok_or(c)
-    }
 }
 
 add_trb_with_default!(
@@ -103,6 +99,7 @@ add_trb_with_default!(
     "Command Completion Event TRB",
     Type::CommandCompletion
 );
+completion_code!(CommandCompletion);
 impl CommandCompletion {
     /// Returns the value of the Slot ID field.
     #[must_use]
@@ -117,18 +114,6 @@ impl CommandCompletion {
         let u: u64 = self.0[1].into();
 
         (u << 32) | l
-    }
-
-    /// Returns the Completion Code.
-    ///
-    /// # Errors
-    ///
-    /// This method may return an [`Err`] value with the Completion Code that is either reserved or
-    /// not implemented by this crate.
-    #[must_use]
-    pub fn completion_code(&self) -> Result<CompletionCode, u8> {
-        let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
-        CompletionCode::from_u8(c).ok_or(c)
     }
 }
 

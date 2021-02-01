@@ -141,9 +141,9 @@ impl From<Direction> for bool {
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum TransferType {
     /// No Data Stage.
-    NoDataStage = 0,
+    No = 0,
     /// Out Data Stage.
-    OutDataStage = 2,
+    Out = 2,
     /// In Data Stage.
-    InDataStage = 3,
+    In = 3,
 }

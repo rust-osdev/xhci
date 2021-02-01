@@ -4,27 +4,62 @@ use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 
+macro_rules! add_trb {
+    ($name:ident,$full:expr,$ty:expr) => {
+        #[doc = $full ]
+        #[repr(transparent)]
+        #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+        pub struct $name([u32; 4]);
+        impl $name {
+            paste::paste! {
+                #[doc = "Creates a new " $full ".\n\nThis method sets the sets the value of the TRB Type field properly. All the other fieldds are set to 0."]
+                #[must_use]
+                pub fn new()->Self{
+                    *Self([0;4]).set_trb_type()
+                }
+            }
+
+            /// Sets the value of the Cycle Bit.
+            pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
+                use bit_field::BitField;
+                self.0[3].set_bit(0, b);
+                self
+            }
+
+            fn set_trb_type(&mut self) -> &mut Self {
+                use crate::ring::trb::Type;
+                use bit_field::BitField;
+                self.0[3].set_bits(10..=15, $ty as _);
+                self
+            }
+        }
+        impl Default for $name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        impl AsRef<[u32]> for $name {
+            fn as_ref(&self) -> &[u32] {
+                &self.0
+            }
+        }
+        impl AsMut<[u32]> for $name {
+            fn as_mut(&mut self) -> &mut [u32] {
+                &mut self.0
+            }
+        }
+        impl From<[u32; 4]> for $name {
+            fn from(raw: [u32; 4]) -> Self {
+                Self(raw)
+            }
+        }
+    };
+}
+
 pub mod command;
 
-/// Link TRB.
-#[repr(transparent)]
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Link([u32; 4]);
+add_trb!(Link, "Link TRB", Type::Link);
 impl Link {
-    /// Creates a new Link TRB.
-    ///
-    /// This method sets the TRB Type field with the correct Type. All other fields are 0.
-    #[must_use]
-    pub fn new() -> Self {
-        *Self([0; 4]).set_trb_type()
-    }
-
-    /// Sets the value of the Cycle Bit.
-    pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
-        self.0[3].set_bit(0, b);
-        self
-    }
-
     /// Sets the value of the Ring Segment Pointer field.
     ///
     /// # Panics
@@ -43,31 +78,6 @@ impl Link {
         self.0[0] = l.try_into().unwrap();
         self.0[1] = u.try_into().unwrap();
         self
-    }
-
-    fn set_trb_type(&mut self) -> &mut Self {
-        self.0[3].set_bits(10..=15, Type::Link as _);
-        self
-    }
-}
-impl Default for Link {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl AsRef<[u32]> for Link {
-    fn as_ref(&self) -> &[u32] {
-        &self.0
-    }
-}
-impl AsMut<[u32]> for Link {
-    fn as_mut(&mut self) -> &mut [u32] {
-        &mut self.0
-    }
-}
-impl From<[u32; 4]> for Link {
-    fn from(raw: [u32; 4]) -> Self {
-        Self(raw)
     }
 }
 

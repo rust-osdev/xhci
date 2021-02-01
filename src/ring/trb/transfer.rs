@@ -111,6 +111,15 @@ impl DataStage {
     }
 }
 
+add_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
+impl StatusStage {
+    /// Sets the value of the Interrupt On Completion bit.
+    pub fn set_interrupt_on_completion(&mut self, i: bool) -> &mut Self {
+        self.0[3].set_bit(5, i);
+        self
+    }
+}
+
 /// The direction of the data transfer.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum Direction {

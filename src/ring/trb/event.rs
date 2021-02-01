@@ -10,6 +10,7 @@ add_trb_with_default!(
 );
 impl PortStatusChange {
     /// Returns the value of the Port ID field.
+    #[must_use]
     pub fn port_id(&self) -> u8 {
         self.0[0].get_bits(24..=31).try_into().unwrap()
     }
@@ -18,6 +19,7 @@ impl PortStatusChange {
 add_trb_with_default!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
 impl TransferEvent {
     /// Returns the value of the TRB Pointer field.
+    #[must_use]
     pub fn trb_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -26,6 +28,7 @@ impl TransferEvent {
     }
 
     /// Returns the value of the Completion Code field.
+    #[must_use]
     pub fn completion_code(&self) -> u8 {
         self.0[2].get_bits(24..=31).try_into().unwrap()
     }
@@ -38,11 +41,13 @@ add_trb_with_default!(
 );
 impl CommandCompletion {
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 
     /// Returns the value of the Command TRB Pointer field.
+    #[must_use]
     pub fn command_trb_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -51,6 +56,7 @@ impl CommandCompletion {
     }
 
     /// Returns the value of the Completion Code field.
+    #[must_use]
     pub fn completion_code(&self) -> u8 {
         self.0[2].get_bits(24..=31).try_into().unwrap()
     }

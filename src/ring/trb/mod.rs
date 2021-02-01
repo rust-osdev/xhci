@@ -16,6 +16,11 @@ macro_rules! add_trb {
                 self.0
             }
 
+            /// Returns the value of the Cycle Bit.
+            pub fn cycle_bit(&self) -> bool {
+                self.0[3].get_bit(0)
+            }
+
             /// Sets the value of the Cycle Bit.
             pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
                 use bit_field::BitField;

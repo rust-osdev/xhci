@@ -12,6 +12,7 @@ impl Link {
     /// Creates a new Link TRB.
     ///
     /// This method sets the TRB Type field with the correct Type. All other fields are 0.
+    #[must_use]
     pub fn new() -> Self {
         *Self([0; 4]).set_trb_type()
     }

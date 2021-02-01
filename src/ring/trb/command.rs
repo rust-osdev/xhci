@@ -79,6 +79,18 @@ impl AsMut<[u32]> for Allowed {
 add_trb_with_default!(Noop, "No Op Command TRB", Type::NoopCommand);
 
 add_trb_with_default!(EnableSlot, "Enable Slot Command TRB", Type::EnableSlot);
+impl EnableSlot {
+    /// Sets the value of the Slot Type field.
+    pub fn set_slot_type(&mut self, t: u8) -> &mut Self {
+        self.0[3].set_bits(16..=20, t.into());
+        self
+    }
+
+    /// Returns the value of the Slot Type field.
+    pub fn slot_type(&self) -> u8 {
+        self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+}
 
 add_trb_with_default!(
     AddressDevice,

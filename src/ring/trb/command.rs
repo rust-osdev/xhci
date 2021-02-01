@@ -8,11 +8,16 @@ use core::convert::TryInto;
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Allowed {
-    Noop(Noop),
+    /// Link TRB
     Link(Link),
+    /// Enable Slot Command TRB
     EnableSlot(EnableSlot),
+    /// Address Device Command TRB
     AddressDevice(AddressDevice),
+    /// Configure Endpoint Command TRB
     ConfigureEndpoint(ConfigureEndpoint),
+    /// No Op Command TRB
+    Noop(Noop),
 }
 impl Allowed {
     /// Sets the value of the Cycle Bit.

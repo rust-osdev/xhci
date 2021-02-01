@@ -39,7 +39,7 @@ impl SetupStage {
         *Self([0; 4]).set_trb_type().set_idt()
     }
 
-    /// Sets the value of the bmRequestType field.
+    /// Sets the value of the `bmRequestType` field.
     pub fn set_request_type(&mut self, t: u8) -> &mut Self {
         self.0[0].set_bits(0..=7, t.into());
         self

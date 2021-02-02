@@ -27,6 +27,10 @@ allowed! {
         SetTrDequeuePointer,
         /// Reset Device Command TRB
         ResetDevice,
+        /// Force Event Command TRB
+        ForceEvent,
+        /// Negotiate Bandwidth Command TRB
+        NegotiateBandwidth,
         /// No Op Command TRB
         Noop
     }
@@ -473,5 +477,23 @@ impl ForceEvent {
     /// Returns the value of the VF ID field.
     pub fn vf_id(&self) -> u8 {
         self.0[3].get_bits(16..=23).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    NegotiateBandwidth,
+    "Negotiate Bandwidth Command TRB",
+    Type::NegotiateBandwidth
+);
+impl NegotiateBandwidth {
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

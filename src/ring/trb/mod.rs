@@ -260,6 +260,8 @@ pub enum Type {
     ResetDevice = 17,
     /// Force Event Command TRB, 18
     ForceEvent = 18,
+    /// Negotiate Bandwidth Command TRB
+    NegotiateBandwidth = 19,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

@@ -253,6 +253,8 @@ pub enum Type {
     ResetEndpoint = 14,
     /// Stop Endpoint Command TRB, 15
     StopEndpoint = 15,
+    /// Set TR Dequeue Pointer Command TRB, 16
+    SetTrDequeuePointer = 16,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

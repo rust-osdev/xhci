@@ -270,6 +270,8 @@ pub enum Type {
     ForceHeader = 22,
     /// No Op Command TRB, 23
     NoopCommand = 23,
+    /// Get Extended Property Command TRB, 24
+    GetExtendedProperty = 24,
     /// Transfer Event TRB, 32
     TransferEvent = 32,
     /// Command Completion Event TRB, 33

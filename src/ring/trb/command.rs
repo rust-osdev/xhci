@@ -21,6 +21,8 @@ allowed! {
         EvaluateContext,
         /// Reset Endpoint Command TB
         ResetEndpoint,
+        /// Stop ENdpoint Command TRB
+        StopEndpoint,
         /// No Op Command TRB
         Noop
     }
@@ -251,6 +253,46 @@ impl ResetEndpoint {
     /// Returns the value of the Endpoint ID.
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    StopEndpoint,
+    "Stop Endpoint Command TRB",
+    Type::StopEndpoint
+);
+impl StopEndpoint {
+    /// Sets the value of the Endpoint ID field.
+    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(16..=20, i.into());
+        self
+    }
+
+    /// Returns the value of the Endpoint ID field.
+    pub fn endpoint_id(&self) -> u8 {
+        self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+
+    /// Sets the value of the Suspend field.
+    pub fn set_suspend(&mut self, s: bool) -> &mut Self {
+        self.0[3].set_bit(23, s);
+        self
+    }
+
+    /// Returns the value of the Suspend field.
+    pub fn suspend(&self) -> bool {
+        self.0[3].get_bit(23)
     }
 
     /// Sets the value of the Slot ID field.

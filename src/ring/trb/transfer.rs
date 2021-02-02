@@ -347,6 +347,7 @@ impl EventData {
     }
 
     /// Returns the value of the Event Data field.
+    #[must_use]
     pub fn event_data(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -361,6 +362,7 @@ impl EventData {
     }
 
     /// Returns the value of the Interrupter Target field.
+    #[must_use]
     pub fn interrupter_target(&self) -> u16 {
         self.0[2].get_bits(22..=31).try_into().unwrap()
     }
@@ -372,6 +374,7 @@ impl EventData {
     }
 
     /// Returns the value of the Evaluate Next TRB field.
+    #[must_use]
     pub fn evaluate_next_trb(&self) -> bool {
         self.0[3].get_bit(1)
     }
@@ -383,6 +386,7 @@ impl EventData {
     }
 
     /// Returns the value of the Chain Bit field.
+    #[must_use]
     pub fn chain_bit(&self) -> bool {
         self.0[3].get_bit(4)
     }
@@ -394,6 +398,7 @@ impl EventData {
     }
 
     /// Returns the value of the Interrupt On Completion field.
+    #[must_use]
     pub fn interrupt_on_completion(&self) -> bool {
         self.0[3].get_bit(5)
     }
@@ -405,6 +410,7 @@ impl EventData {
     }
 
     /// Returns the value of the Block Event Interrupt field.
+    #[must_use]
     pub fn block_event_interrupt(&self) -> bool {
         self.0[3].get_bit(9)
     }

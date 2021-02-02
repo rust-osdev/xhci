@@ -258,6 +258,8 @@ pub enum Type {
     SetTrDequeuePointer = 16,
     /// Reset Device Command TRB, 17
     ResetDevice = 17,
+    /// Force Event Command TRB, 18
+    ForceEvent = 18,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

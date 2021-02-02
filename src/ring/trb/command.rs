@@ -425,3 +425,53 @@ impl ResetDevice {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+
+add_trb_with_default!(ForceEvent, "Force Event Command TRB", Type::ForceEvent);
+impl ForceEvent {
+    /// Sets the value of the Event TRB Pointer field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the `p` is not 16-byte aligned.
+    pub fn set_event_trb_pointer(&mut self, p: u64) -> &mut Self {
+        assert_eq!(p % 16, 0, "The Event TRB Pointer must be 16-byte aligned.");
+
+        let l = p.get_bits(0..32);
+        let u = p.get_bits(32..64);
+
+        self.0[0] = l.try_into().unwrap();
+        self.0[1] = u.try_into().unwrap();
+
+        self
+    }
+
+    /// Returns the value of the Event TRB Pointer field.
+    pub fn event_trb_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the VF Interrupter Target field.
+    pub fn set_vf_interrupter_target(&mut self, t: u16) -> &mut Self {
+        self.0[2].set_bits(22..=31, t.into());
+        self
+    }
+
+    /// Returns the value of the VF Interrupter Target field.
+    pub fn vf_interrupter_target(&self) -> u16 {
+        self.0[2].get_bits(22..=31).try_into().unwrap()
+    }
+
+    /// Sets the value of the VF ID field.
+    pub fn set_vf_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(16..=23, i.into());
+        self
+    }
+
+    /// Returns the value of the VF ID field.
+    pub fn vf_id(&self) -> u8 {
+        self.0[3].get_bits(16..=23).try_into().unwrap()
+    }
+}

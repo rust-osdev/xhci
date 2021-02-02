@@ -17,6 +17,8 @@ allowed! {
         AddressDevice,
         /// Configure Endpoint Command TRB
         ConfigureEndpoint,
+        /// Evaluate Context Command TRB
+        EvaluateContext,
         /// No Op Command TRB
         Noop
     }
@@ -167,6 +169,52 @@ impl ConfigureEndpoint {
 
     /// Returns the value of the Slot ID field.
     #[must_use]
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    EvaluateContext,
+    "Evaluate Context Command TRB",
+    Type::EvaluateContext
+);
+impl EvaluateContext {
+    /// Sets the value of the Input Context Pointer field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `p` is not 16-byte aligned.
+    pub fn set_input_context_pointer(&mut self, p: u64) -> &mut Self {
+        assert_eq!(
+            p % 16,
+            0,
+            "The Input Context Pointer must be 16-byte aligned."
+        );
+
+        let l = p.get_bits(0..32);
+        let u = p.get_bits(32..64);
+
+        self.0[0] = l.try_into().unwrap();
+        self.0[1] = u.try_into().unwrap();
+        self
+    }
+
+    /// Returns the value of the Input Context Pointer field.
+    pub fn input_context_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

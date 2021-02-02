@@ -245,6 +245,8 @@ pub enum Type {
     AddressDevice = 11,
     /// Configure Endpoint Command TRB, 12
     ConfigureEndpoint = 12,
+    /// Evaluate Context Command TRB, 13
+    EvaluateContext = 13,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

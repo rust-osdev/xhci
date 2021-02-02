@@ -33,6 +33,8 @@ allowed! {
         NegotiateBandwidth,
         /// Set Latency Tolerance Value Command TRB
         SetLatencyToleranceValue,
+        /// Get Port Bandwidth Command TRB
+        GetPortBandwidth,
         /// No Op Command TRB
         Noop
     }
@@ -515,5 +517,62 @@ impl SetLatencyToleranceValue {
     /// Returns the value of the Best Effort Latency Tolerance Value field.
     pub fn best_effort_latency_tolerance_value(&self) -> u16 {
         self.0[3].get_bits(16..=27).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    GetPortBandwidth,
+    "Get Port Bandwidth Command TRB",
+    Type::GetPortBandwidth
+);
+impl GetPortBandwidth {
+    /// Sets the value of the Port Bandwidth Context Pointer field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the `p` is not 16-byte aligned.
+    pub fn set_port_bandwidth_context_pointer(&mut self, p: u64) -> &mut Self {
+        assert_eq!(
+            p % 16,
+            0,
+            "The Port Bandwidth Context Pointer must be 16-byte aligned."
+        );
+
+        let l = p.get_bits(0..32);
+        let u = p.get_bits(32..64);
+
+        self.0[0] = l.try_into().unwrap();
+        self.0[1] = u.try_into().unwrap();
+        self
+    }
+
+    /// Returns the value of the Port Bandwidth Context Pointer field.
+    pub fn port_bandwidth_context_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the value of the Dev Speed field.
+    pub fn set_dev_speed(&mut self, s: u8) -> &mut Self {
+        self.0[3].set_bits(16..=19, s.into());
+        self
+    }
+
+    /// Returns the value of the Dev Speed field.
+    pub fn dev_speed(&self) -> u8 {
+        self.0[3].get_bits(16..=19).try_into().unwrap()
+    }
+
+    /// Sets the value of the Hub Slot ID field.
+    pub fn set_hub_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Hub Slot ID field.
+    pub fn hub_slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

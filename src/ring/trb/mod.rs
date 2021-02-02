@@ -87,10 +87,10 @@ macro_rules! allowed {
         }
     ) => {
         $(#[$outer])*
-        #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-        pub enum Allowed {
-             $($(#[$doc])* $variant($variant)),+
-        }
+            #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+            pub enum Allowed {
+                $($(#[$doc])* $variant($variant)),+
+            }
         impl Allowed{
             /// Sets the value of the Cycle Bit.
             pub fn set_cycle_bit(&mut self,b:bool)->&mut Self{
@@ -260,10 +260,12 @@ pub enum Type {
     ResetDevice = 17,
     /// Force Event Command TRB, 18
     ForceEvent = 18,
-    /// Negotiate Bandwidth Command TRB
+    /// Negotiate Bandwidth Command TRB, 19
     NegotiateBandwidth = 19,
-    /// Set Latency Tolerance Value Command TRB
+    /// Set Latency Tolerance Value Command TRB, 20
     SetLatencyToleranceValue = 20,
+    /// Get Port Bandwidth Command TRB, 21
+    GetPortBandwidth = 21,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

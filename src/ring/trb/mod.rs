@@ -262,6 +262,8 @@ pub enum Type {
     ForceEvent = 18,
     /// Negotiate Bandwidth Command TRB
     NegotiateBandwidth = 19,
+    /// Set Latency Tolerance Value Command TRB
+    SetLatencyToleranceValue = 20,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

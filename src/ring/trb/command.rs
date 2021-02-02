@@ -31,6 +31,8 @@ allowed! {
         ForceEvent,
         /// Negotiate Bandwidth Command TRB
         NegotiateBandwidth,
+        /// Set Latency Tolerance Value Command TRB
+        SetLatencyToleranceValue,
         /// No Op Command TRB
         Noop
     }
@@ -495,5 +497,23 @@ impl NegotiateBandwidth {
     /// Returns the value of the Slot ID field.
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    SetLatencyToleranceValue,
+    "Set Latency Tolerance Value Command TRB",
+    Type::SetLatencyToleranceValue
+);
+impl SetLatencyToleranceValue {
+    /// Sets the value of the Best Effort Latency Tolerance Value field.
+    pub fn set_best_effort_latency_tolerance_value(&mut self, v: u16) -> &mut Self {
+        self.0[3].set_bits(16..=27, v.into());
+        self
+    }
+
+    /// Returns the value of the Best Effort Latency Tolerance Value field.
+    pub fn best_effort_latency_tolerance_value(&self) -> u16 {
+        self.0[3].get_bits(16..=27).try_into().unwrap()
     }
 }

@@ -40,7 +40,9 @@ allowed! {
         /// No Op Command TRB
         Noop,
         /// Get Extended Property Command TRB
-        GetExtendedProperty
+        GetExtendedProperty,
+        /// Set Extended Property Command TRB
+        SetExtendedProperty
     }
 }
 
@@ -671,6 +673,68 @@ impl GetExtendedProperty {
     /// Returns the value of the Extended Capability Identifier field.
     pub fn extended_capability_identifier(&self) -> u16 {
         self.0[2].get_bits(0..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the Command Sub Type field.
+    pub fn set_command_sub_type(&mut self, t: u8) -> &mut Self {
+        self.0[3].set_bits(16..=18, t.into());
+        self
+    }
+
+    /// Returns the value of the Command Sub Type field.
+    pub fn command_sub_type(&self) -> u8 {
+        self.0[3].get_bits(16..=18).try_into().unwrap()
+    }
+
+    /// Sets the value of the Endpoint ID field.
+    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(19..=23, i.into());
+        self
+    }
+
+    /// Returns the value of the Endpoint ID field.
+    pub fn endpoint_id(&self) -> u8 {
+        self.0[3].get_bits(19..=23).try_into().unwrap()
+    }
+
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    SetExtendedProperty,
+    "Set Extended Property Command TRB",
+    Type::SetExtendedProperty
+);
+impl SetExtendedProperty {
+    /// Sets the value of the Extended Capability Identifier field.
+    pub fn set_extended_capability_identifier(&mut self, eci: u16) -> &mut Self {
+        self.0[2].set_bits(0..=15, eci.into());
+        self
+    }
+
+    /// Returns the value of the Extended Capability Identifier field.
+    pub fn extended_capability_identifier(&self) -> u16 {
+        self.0[2].get_bits(0..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the Capability Parameter field.
+    pub fn set_capability_parameter(&mut self, p: u8) -> &mut Self {
+        self.0[2].set_bits(15..=23, p.into());
+        self
+    }
+
+    /// Returns the value of the Capability Parameter field.
+    pub fn capability_parameter(&self) -> u8 {
+        self.0[2].get_bits(15..=23).try_into().unwrap()
     }
 
     /// Sets the value of the Command Sub Type field.

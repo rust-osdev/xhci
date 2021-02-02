@@ -272,6 +272,8 @@ pub enum Type {
     NoopCommand = 23,
     /// Get Extended Property Command TRB, 24
     GetExtendedProperty = 24,
+    /// Set Extended Property Command TRB, 25
+    SetExtendedProperty = 25,
     /// Transfer Event TRB, 32
     TransferEvent = 32,
     /// Command Completion Event TRB, 33

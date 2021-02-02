@@ -11,6 +11,8 @@ allowed! {
         Link,
         /// Enable Slot Command TRB
         EnableSlot,
+        /// Disable Slot Command TRB
+        DisableSlot,
         /// Address Device Command TRB
         AddressDevice,
         /// Configure Endpoint Command TRB
@@ -34,6 +36,20 @@ impl EnableSlot {
     #[must_use]
     pub fn slot_type(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(DisableSlot, "Disable Slot Command TRB", Type::DisableSlot);
+impl DisableSlot {
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
 

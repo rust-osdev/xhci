@@ -239,6 +239,8 @@ pub enum Type {
     NoopTransfer = 8,
     /// Enable Slot Command TRB, 9
     EnableSlot = 9,
+    /// Disable Slot Command TRB, 10
+    DisableSlot = 10,
     /// Address Device Command TRB, 11
     AddressDevice = 11,
     /// Configure Endpoint Command TRB, 12

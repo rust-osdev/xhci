@@ -5,103 +5,23 @@ use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 
-/// TRBs which are allowed to be pushed to the Transfer Ring.
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum Allowed {
-    /// Normal TRB.
-    Normal(Normal),
-    /// Setup Stage TRB.
-    SetupStage(SetupStage),
-    /// Data Stage TRB.
-    DataStage(DataStage),
-    /// Status Stage TRB.
-    StatusStage(StatusStage),
-    /// Isoch TRB.
-    Isoch(Isoch),
-    /// No Op TRB.
-    Noop(Noop),
-    /// Link TRB.
-    Link(Link),
-}
-impl Allowed {
-    /// Sets the value of the Cycle Bit.
-    pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
-        match self {
-            Self::Normal(ref mut n) => {
-                n.set_cycle_bit(b);
-            }
-            Self::SetupStage(ref mut s) => {
-                s.set_cycle_bit(b);
-            }
-            Self::DataStage(ref mut d) => {
-                d.set_cycle_bit(b);
-            }
-            Self::StatusStage(ref mut s) => {
-                s.set_cycle_bit(b);
-            }
-            Self::Isoch(ref mut i) => {
-                i.set_cycle_bit(b);
-            }
-            Self::Noop(ref mut n) => {
-                n.set_cycle_bit(b);
-            }
-            Self::Link(ref mut l) => {
-                l.set_chain_bit(b);
-            }
-        }
-        self
-    }
-
-    /// Returns the value of the Cycle Bit.
-    pub fn cycle_bit(&self) -> bool {
-        match self {
-            Self::Normal(ref n) => n.cycle_bit(),
-            Self::SetupStage(ref s) => s.cycle_bit(),
-            Self::DataStage(ref d) => d.cycle_bit(),
-            Self::StatusStage(ref s) => s.cycle_bit(),
-            Self::Isoch(ref i) => i.cycle_bit(),
-            Self::Noop(ref n) => n.cycle_bit(),
-            Self::Link(ref l) => l.cycle_bit(),
-        }
-    }
-
-    /// Returns the wrapped array.
-    pub fn into_raw(self) -> [u32; 4] {
-        match self {
-            Self::Normal(n) => n.into_raw(),
-            Self::SetupStage(s) => s.into_raw(),
-            Self::DataStage(d) => d.into_raw(),
-            Self::StatusStage(s) => s.into_raw(),
-            Self::Isoch(i) => i.into_raw(),
-            Self::Noop(n) => n.into_raw(),
-            Self::Link(l) => l.into_raw(),
-        }
-    }
-}
-impl AsRef<[u32]> for Allowed {
-    fn as_ref(&self) -> &[u32] {
-        match self {
-            Self::Normal(ref n) => n.as_ref(),
-            Self::SetupStage(ref s) => s.as_ref(),
-            Self::DataStage(ref d) => d.as_ref(),
-            Self::StatusStage(ref s) => s.as_ref(),
-            Self::Isoch(ref i) => i.as_ref(),
-            Self::Noop(ref n) => n.as_ref(),
-            Self::Link(ref l) => l.as_ref(),
-        }
-    }
-}
-impl AsMut<[u32]> for Allowed {
-    fn as_mut(&mut self) -> &mut [u32] {
-        match self {
-            Self::Normal(ref mut n) => n.as_mut(),
-            Self::SetupStage(ref mut s) => s.as_mut(),
-            Self::DataStage(ref mut d) => d.as_mut(),
-            Self::StatusStage(ref mut s) => s.as_mut(),
-            Self::Isoch(ref mut i) => i.as_mut(),
-            Self::Noop(ref mut n) => n.as_mut(),
-            Self::Link(ref mut l) => l.as_mut(),
-        }
+allowed! {
+    /// TRBs which are allowed to be pushed to the Transfer Ring.
+    pub enum Allowed {
+        /// Normal TRB.
+        Normal,
+        /// Setup Stage TRB.
+        SetupStage,
+        /// Data Stage TRB.
+        DataStage,
+        /// Status Stage TRB.
+        StatusStage,
+        /// Isoch TRB.
+        Isoch,
+        /// No Op TRB.
+        Noop,
+        /// Link TRB.
+        Link
     }
 }
 

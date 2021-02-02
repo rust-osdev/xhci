@@ -79,6 +79,62 @@ macro_rules! add_trb_with_default {
     };
 }
 
+macro_rules! allowed {
+    (
+        $(#[$outer:meta])*
+        $visibility:vis enum $name:ident{
+            $($(#[$doc:meta])* $variant:ident),+
+        }
+    ) => {
+        $(#[$outer])*
+        #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+        $visibility enum $name {
+             $($(#[$doc])* $variant($variant)),+
+        }
+        impl $name{
+            /// Sets the value of the Cycle Bit.
+            pub fn set_cycle_bit(&mut self,b:bool)->&mut Self{
+                match self{
+                    $(
+                        Self::$variant(ref mut v) => {
+                            v.set_cycle_bit(b);
+                        }
+                    ),+
+                }
+                self
+            }
+
+            /// Returns the value of the Cycle Bit.
+            pub fn cycle_bit(&self)->bool{
+                match self{
+                    $( Self::$variant(ref v) => v.cycle_bit() ),+
+                }
+            }
+
+            /// Returns the wrapped array.
+            pub fn into_raw(self)->[u32;4]{
+                match self{
+                    $( Self::$variant(v) => v.into_raw() ),+
+                }
+            }
+        }
+        impl AsRef<[u32]> for $name{
+            fn as_ref(&self) -> &[u32]{
+                match self{
+                    $( Self::$variant(ref v) => v.as_ref() ),+
+                }
+            }
+        }
+        impl AsMut<[u32]> for $name {
+            fn as_mut(&mut self) -> &mut [u32] {
+                match self {
+                    $( Self::$variant(ref mut v) => v.as_mut() ),+
+                }
+            }
+        }
+    };
+}
+
 pub mod command;
 pub mod event;
 pub mod transfer;

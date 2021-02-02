@@ -242,6 +242,7 @@ impl ResetEndpoint {
     }
 
     /// Returns the value of the Transfer State Preserve field.
+    #[must_use]
     pub fn transfer_state_preserve(&self) -> bool {
         self.0[3].get_bit(9)
     }
@@ -253,6 +254,7 @@ impl ResetEndpoint {
     }
 
     /// Returns the value of the Endpoint ID.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }
@@ -264,6 +266,7 @@ impl ResetEndpoint {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -282,6 +285,7 @@ impl StopEndpoint {
     }
 
     /// Returns the value of the Endpoint ID field.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }
@@ -293,6 +297,7 @@ impl StopEndpoint {
     }
 
     /// Returns the value of the Suspend field.
+    #[must_use]
     pub fn suspend(&self) -> bool {
         self.0[3].get_bit(23)
     }
@@ -304,6 +309,7 @@ impl StopEndpoint {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -322,6 +328,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Dequeue Cycle state field.
+    #[must_use]
     pub fn dequeue_cycle_state(&self) -> bool {
         self.0[0].get_bit(0)
     }
@@ -333,6 +340,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Stream Context Type field.
+    #[must_use]
     pub fn stream_context_type(&self) -> u8 {
         self.0[0].get_bits(1..=3).try_into().unwrap()
     }
@@ -358,6 +366,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the New TR Dequeue Pointer field.
+    #[must_use]
     pub fn new_tr_dequeue_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -372,6 +381,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Stream ID field.
+    #[must_use]
     pub fn stream_id(&self) -> u16 {
         self.0[2].get_bits(16..=31).try_into().unwrap()
     }
@@ -383,6 +393,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Endpoint ID field.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }

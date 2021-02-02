@@ -35,6 +35,8 @@ allowed! {
         SetLatencyToleranceValue,
         /// Get Port Bandwidth Command TRB
         GetPortBandwidth,
+        /// Force Header Command TRB
+        ForceHeader,
         /// No Op Command TRB
         Noop
     }
@@ -573,6 +575,53 @@ impl GetPortBandwidth {
 
     /// Returns the value of the Hub Slot ID field.
     pub fn hub_slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(ForceHeader, "Force Header Command TRB", Type::ForceHeader);
+impl ForceHeader {
+    /// Sets the value of the Packet Type field.
+    pub fn set_packet_type(&mut self, t: u8) -> &mut Self {
+        self.0[0].set_bits(0..=4, t.into());
+        self
+    }
+
+    /// Returns the value of the Packet Type field.
+    pub fn packet_type(&self) -> u8 {
+        self.0[0].get_bits(0..=4).try_into().unwrap()
+    }
+
+    /// Sets the value of the Header Info field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the lowest 5 bits of the `i[0]` are not 0.
+    pub fn set_header_info(&mut self, info: [u32; 3]) -> &mut Self {
+        assert!(
+            info[0].trailing_zeros() >= 5,
+            "The lowest 5 bits of the Header Info Low must be 0."
+        );
+
+        self.0[0].set_bits(5..=31, info[0].get_bits(5..=31));
+        self.0[1] = info[1];
+        self.0[2] = info[2];
+        self
+    }
+
+    /// Returns the value of the Header Info field.
+    pub fn header_info(&self) -> [u32; 3] {
+        [self.0[0] & 0xffff_ffe0, self.0[1], self.0[2]]
+    }
+
+    /// Sets the value of the Root Hub Port Number.
+    pub fn set_root_hub_port_number(&mut self, n: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, n.into());
+        self
+    }
+
+    /// Returns the value of the Root Hub Port Number.
+    pub fn root_hub_port_number(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

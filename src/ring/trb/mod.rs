@@ -266,6 +266,8 @@ pub enum Type {
     SetLatencyToleranceValue = 20,
     /// Get Port Bandwidth Command TRB, 21
     GetPortBandwidth = 21,
+    /// Force Header Command TRB, 22
+    ForceHeader = 22,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

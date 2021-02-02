@@ -19,6 +19,8 @@ allowed! {
         ConfigureEndpoint,
         /// Evaluate Context Command TRB
         EvaluateContext,
+        /// Reset Endpoint Command TB
+        ResetEndpoint,
         /// No Op Command TRB
         Noop
     }
@@ -218,6 +220,46 @@ impl EvaluateContext {
 
     /// Returns the value of the Slot ID field.
     #[must_use]
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(
+    ResetEndpoint,
+    "Reset Endpoint Command TRB",
+    Type::ResetEndpoint
+);
+impl ResetEndpoint {
+    /// Sets the value of the Transfer State Preserve field.
+    pub fn set_transfer_state_preserve(&mut self, tsp: bool) -> &mut Self {
+        self.0[3].set_bit(9, tsp);
+        self
+    }
+
+    /// Returns the value of the Transfer State Preserve field.
+    pub fn transfer_state_preserve(&self) -> bool {
+        self.0[3].get_bit(9)
+    }
+
+    /// Sets the value of the Endpoint ID field.
+    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(16..=20, i.into());
+        self
+    }
+
+    /// Returns the value of the Endpoint ID.
+    pub fn endpoint_id(&self) -> u8 {
+        self.0[3].get_bits(16..=20).try_into().unwrap()
+    }
+
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

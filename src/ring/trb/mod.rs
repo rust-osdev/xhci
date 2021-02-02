@@ -249,6 +249,8 @@ pub enum Type {
     ConfigureEndpoint = 12,
     /// Evaluate Context Command TRB, 13
     EvaluateContext = 13,
+    /// Reset Endpoint Command TRB, 14
+    ResetEndpoint = 14,
     /// No Op Command TRB, 23
     NoopCommand = 23,
     /// Transfer Event TRB, 32

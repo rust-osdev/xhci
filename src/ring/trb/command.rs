@@ -57,11 +57,11 @@ impl Allowed {
 impl AsRef<[u32]> for Allowed {
     fn as_ref(&self) -> &[u32] {
         match self {
-            Self::Noop(n) => n.as_ref(),
-            Self::Link(l) => l.as_ref(),
-            Self::EnableSlot(e) => e.as_ref(),
-            Self::AddressDevice(a) => a.as_ref(),
-            Self::ConfigureEndpoint(c) => c.as_ref(),
+            Self::Noop(ref n) => n.as_ref(),
+            Self::Link(ref l) => l.as_ref(),
+            Self::EnableSlot(ref e) => e.as_ref(),
+            Self::AddressDevice(ref a) => a.as_ref(),
+            Self::ConfigureEndpoint(ref c) => c.as_ref(),
         }
     }
 }

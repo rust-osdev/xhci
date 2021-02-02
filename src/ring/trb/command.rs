@@ -19,9 +19,9 @@ allowed! {
         ConfigureEndpoint,
         /// Evaluate Context Command TRB
         EvaluateContext,
-        /// Reset Endpoint Command TB
+        /// Reset Endpoint Command TRB
         ResetEndpoint,
-        /// Stop ENdpoint Command TRB
+        /// Stop Endpoint Command TRB
         StopEndpoint,
         /// Set TR Dequeue Pointer Command TRB
         SetTrDequeuePointer,

@@ -202,6 +202,7 @@ impl EvaluateContext {
     }
 
     /// Returns the value of the Input Context Pointer field.
+    #[must_use]
     pub fn input_context_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -216,6 +217,7 @@ impl EvaluateContext {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

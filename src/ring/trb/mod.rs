@@ -220,7 +220,6 @@ impl Link {
         self.0[3].get_bit(5)
     }
 }
-
 /// TRB Type.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]
@@ -237,6 +236,8 @@ pub enum Type {
     Isoch = 5,
     /// Link TRB, 6
     Link = 6,
+    /// Event Data TRB, 7
+    EventData = 7,
     /// No Op TRB (Transfer), 8
     NoopTransfer = 8,
     /// Enable Slot Command TRB, 9

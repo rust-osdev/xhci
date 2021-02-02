@@ -6,7 +6,7 @@ use core::convert::TryInto;
 
 allowed! {
     /// TRBs which are allowed to be pushed to the Command Ring.
-    pub enum Allowed {
+    enum {
         /// Link TRB
         Link,
         /// Enable Slot Command TRB

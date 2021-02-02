@@ -7,7 +7,7 @@ use num_derive::FromPrimitive;
 
 allowed! {
     /// TRBs which are allowed to be pushed to the Transfer Ring.
-    pub enum Allowed {
+    enum {
         /// Normal TRB.
         Normal,
         /// Setup Stage TRB.

@@ -82,16 +82,16 @@ macro_rules! add_trb_with_default {
 macro_rules! allowed {
     (
         $(#[$outer:meta])*
-        $visibility:vis enum $name:ident{
+        enum {
             $($(#[$doc:meta])* $variant:ident),+
         }
     ) => {
         $(#[$outer])*
         #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-        $visibility enum $name {
+        pub enum Allowed {
              $($(#[$doc])* $variant($variant)),+
         }
-        impl $name{
+        impl Allowed{
             /// Sets the value of the Cycle Bit.
             pub fn set_cycle_bit(&mut self,b:bool)->&mut Self{
                 match self{
@@ -118,14 +118,14 @@ macro_rules! allowed {
                 }
             }
         }
-        impl AsRef<[u32]> for $name{
+        impl AsRef<[u32]> for Allowed {
             fn as_ref(&self) -> &[u32]{
                 match self{
                     $( Self::$variant(ref v) => v.as_ref() ),+
                 }
             }
         }
-        impl AsMut<[u32]> for $name {
+        impl AsMut<[u32]> for Allowed {
             fn as_mut(&mut self) -> &mut [u32] {
                 match self {
                     $( Self::$variant(ref mut v) => v.as_mut() ),+

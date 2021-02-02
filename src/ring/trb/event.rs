@@ -7,7 +7,7 @@ use num_traits::FromPrimitive;
 
 allowed! {
     /// TRBs which are allowed to be pushed to the Event Ring.
-    pub enum Allowed {
+    enum {
         /// Port Status Change Event TRB.
         PortStatusChange,
         /// Transfer Event TRB.

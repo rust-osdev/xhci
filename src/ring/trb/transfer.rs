@@ -296,6 +296,53 @@ impl Isoch {
     }
 }
 
+add_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
+impl Noop {
+    /// Sets the value of the Interrupter Target.
+    pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {
+        self.0[2].set_bits(22..=31, t.into());
+        self
+    }
+
+    /// Returns the value of the Interrupter Target.
+    pub fn interrupter_target(&self) -> u16 {
+        self.0[2].get_bits(22..=31).try_into().unwrap()
+    }
+
+    /// Sets the value of the Evaluate Next TRB field.
+    pub fn set_evaluate_next_trb(&mut self, ent: bool) -> &mut Self {
+        self.0[3].set_bit(1, ent);
+        self
+    }
+
+    /// Returns the value of the Evaluate Next TRB field.
+    pub fn evaluate_next_trb(&self) -> bool {
+        self.0[3].get_bit(1)
+    }
+
+    /// Sets the value of the Chain Bit field.
+    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
+        self.0[3].set_bit(4, b);
+        self
+    }
+
+    /// Returns the value of the Chain Bit field.
+    pub fn chain_bit(&self) -> bool {
+        self.0[3].get_bit(4)
+    }
+
+    /// Sets the value of the Interrupt On Completion field.
+    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
+        self.0[3].set_bit(5, ioc);
+        self
+    }
+
+    /// Returns the value of the Interrupt On Completion field.
+    pub fn interrupt_on_completion(&mut self) -> bool {
+        self.0[3].get_bit(5)
+    }
+}
+
 /// The direction of the data transfer.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum Direction {

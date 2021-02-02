@@ -179,6 +179,8 @@ pub enum Type {
     Isoch = 5,
     /// Link TRB, 6
     Link = 6,
+    /// No Op TRB (Transfer), 8
+    NoopTransfer = 8,
     /// Enable Slot Command TRB, 9
     EnableSlot = 9,
     /// Address Device Command TRB, 11

@@ -175,6 +175,8 @@ pub enum Type {
     DataStage = 3,
     /// Status Stage TRB, 4
     StatusStage = 4,
+    /// Isoch TRB, 5
+    Isoch = 5,
     /// Link TRB, 6
     Link = 6,
     /// Enable Slot Command TRB, 9

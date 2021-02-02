@@ -155,6 +155,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Data Buffer Pointer.
+    #[must_use]
     pub fn data_buffer_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -169,6 +170,7 @@ impl Isoch {
     }
 
     /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
     pub fn trb_transfer_length(&self) -> u32 {
         self.0[2].get_bits(0..=16)
     }
@@ -180,6 +182,7 @@ impl Isoch {
     }
 
     /// Returns the value of the TD Size/TBC field.
+    #[must_use]
     pub fn td_size_or_tbc(&self) -> u8 {
         self.0[2].get_bits(17..=21).try_into().unwrap()
     }
@@ -191,6 +194,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Interrupter Target.
+    #[must_use]
     pub fn interrupter_target(&self) -> u16 {
         self.0[2].get_bits(22..=31).try_into().unwrap()
     }
@@ -202,6 +206,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Evaluate Next TRB field.
+    #[must_use]
     pub fn evaluate_next_trb(&self) -> bool {
         self.0[3].get_bit(1)
     }
@@ -213,6 +218,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Interrupt-on Short Packet field.
+    #[must_use]
     pub fn interrupt_on_short_packet(&self) -> bool {
         self.0[3].get_bit(2)
     }
@@ -224,6 +230,7 @@ impl Isoch {
     }
 
     /// Returns the value of the No Snoop field.
+    #[must_use]
     pub fn no_snoop(&self) -> bool {
         self.0[3].get_bit(3)
     }
@@ -235,6 +242,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Chain Bit field.
+    #[must_use]
     pub fn chain_bit(&self) -> bool {
         self.0[3].get_bit(4)
     }
@@ -246,6 +254,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Interrupt On Completion field.
+    #[must_use]
     pub fn interrupt_on_completion(&self) -> bool {
         self.0[3].get_bit(5)
     }
@@ -257,6 +266,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Immediate Data.
+    #[must_use]
     pub fn immediate_data(&self) -> bool {
         self.0[3].get_bit(6)
     }
@@ -268,6 +278,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Transfer Burst Count field.
+    #[must_use]
     pub fn transfer_burst_count(&self) -> u8 {
         self.0[3].get_bits(7..=8).try_into().unwrap()
     }
@@ -279,6 +290,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Block Event Interrupt field.
+    #[must_use]
     pub fn block_event_interrupt(&self) -> bool {
         self.0[3].get_bit(9)
     }
@@ -290,6 +302,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Transfer Last Burst Packet Count field.
+    #[must_use]
     pub fn transfer_last_burst_packet_count(&self) -> u8 {
         self.0[3].get_bits(16..=19).try_into().unwrap()
     }
@@ -301,6 +314,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Frame ID field.
+    #[must_use]
     pub fn frame_id(&self) -> u16 {
         self.0[3].get_bits(20..=30).try_into().unwrap()
     }
@@ -312,6 +326,7 @@ impl Isoch {
     }
 
     /// Returns the value of the Start Isoch ASAP field.
+    #[must_use]
     pub fn start_isoch_asap(&self) -> bool {
         self.0[3].get_bit(31)
     }
@@ -326,6 +341,7 @@ impl Noop {
     }
 
     /// Returns the value of the Interrupter Target.
+    #[must_use]
     pub fn interrupter_target(&self) -> u16 {
         self.0[2].get_bits(22..=31).try_into().unwrap()
     }
@@ -337,6 +353,7 @@ impl Noop {
     }
 
     /// Returns the value of the Evaluate Next TRB field.
+    #[must_use]
     pub fn evaluate_next_trb(&self) -> bool {
         self.0[3].get_bit(1)
     }
@@ -348,6 +365,7 @@ impl Noop {
     }
 
     /// Returns the value of the Chain Bit field.
+    #[must_use]
     pub fn chain_bit(&self) -> bool {
         self.0[3].get_bit(4)
     }

@@ -105,6 +105,7 @@ macro_rules! allowed {
             }
 
             /// Returns the value of the Cycle Bit.
+            #[must_use]
             pub fn cycle_bit(&self)->bool{
                 match self{
                     $( Self::$variant(ref v) => v.cycle_bit() ),+
@@ -112,6 +113,7 @@ macro_rules! allowed {
             }
 
             /// Returns the wrapped array.
+            #[must_use]
             pub fn into_raw(self)->[u32;4]{
                 match self{
                     $( Self::$variant(v) => v.into_raw() ),+

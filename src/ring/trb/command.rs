@@ -435,6 +435,7 @@ impl ResetDevice {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -460,6 +461,7 @@ impl ForceEvent {
     }
 
     /// Returns the value of the Event TRB Pointer field.
+    #[must_use]
     pub fn event_trb_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -474,6 +476,7 @@ impl ForceEvent {
     }
 
     /// Returns the value of the VF Interrupter Target field.
+    #[must_use]
     pub fn vf_interrupter_target(&self) -> u16 {
         self.0[2].get_bits(22..=31).try_into().unwrap()
     }
@@ -485,6 +488,7 @@ impl ForceEvent {
     }
 
     /// Returns the value of the VF ID field.
+    #[must_use]
     pub fn vf_id(&self) -> u8 {
         self.0[3].get_bits(16..=23).try_into().unwrap()
     }
@@ -503,6 +507,7 @@ impl NegotiateBandwidth {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -521,6 +526,7 @@ impl SetLatencyToleranceValue {
     }
 
     /// Returns the value of the Best Effort Latency Tolerance Value field.
+    #[must_use]
     pub fn best_effort_latency_tolerance_value(&self) -> u16 {
         self.0[3].get_bits(16..=27).try_into().unwrap()
     }
@@ -553,6 +559,7 @@ impl GetPortBandwidth {
     }
 
     /// Returns the value of the Port Bandwidth Context Pointer field.
+    #[must_use]
     pub fn port_bandwidth_context_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -567,6 +574,7 @@ impl GetPortBandwidth {
     }
 
     /// Returns the value of the Dev Speed field.
+    #[must_use]
     pub fn dev_speed(&self) -> u8 {
         self.0[3].get_bits(16..=19).try_into().unwrap()
     }
@@ -578,6 +586,7 @@ impl GetPortBandwidth {
     }
 
     /// Returns the value of the Hub Slot ID field.
+    #[must_use]
     pub fn hub_slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -592,6 +601,7 @@ impl ForceHeader {
     }
 
     /// Returns the value of the Packet Type field.
+    #[must_use]
     pub fn packet_type(&self) -> u8 {
         self.0[0].get_bits(0..=4).try_into().unwrap()
     }
@@ -614,6 +624,7 @@ impl ForceHeader {
     }
 
     /// Returns the value of the Header Info field.
+    #[must_use]
     pub fn header_info(&self) -> [u32; 3] {
         [self.0[0] & 0xffff_ffe0, self.0[1], self.0[2]]
     }
@@ -625,6 +636,7 @@ impl ForceHeader {
     }
 
     /// Returns the value of the Root Hub Port Number.
+    #[must_use]
     pub fn root_hub_port_number(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -657,6 +669,7 @@ impl GetExtendedProperty {
     }
 
     /// Returns the value of the Extended Property Context Pointer field.
+    #[must_use]
     pub fn extended_property_context_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -671,6 +684,7 @@ impl GetExtendedProperty {
     }
 
     /// Returns the value of the Extended Capability Identifier field.
+    #[must_use]
     pub fn extended_capability_identifier(&self) -> u16 {
         self.0[2].get_bits(0..=15).try_into().unwrap()
     }
@@ -682,6 +696,7 @@ impl GetExtendedProperty {
     }
 
     /// Returns the value of the Command Sub Type field.
+    #[must_use]
     pub fn command_sub_type(&self) -> u8 {
         self.0[3].get_bits(16..=18).try_into().unwrap()
     }
@@ -693,6 +708,7 @@ impl GetExtendedProperty {
     }
 
     /// Returns the value of the Endpoint ID field.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(19..=23).try_into().unwrap()
     }
@@ -704,6 +720,7 @@ impl GetExtendedProperty {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -722,6 +739,7 @@ impl SetExtendedProperty {
     }
 
     /// Returns the value of the Extended Capability Identifier field.
+    #[must_use]
     pub fn extended_capability_identifier(&self) -> u16 {
         self.0[2].get_bits(0..=15).try_into().unwrap()
     }
@@ -733,6 +751,7 @@ impl SetExtendedProperty {
     }
 
     /// Returns the value of the Capability Parameter field.
+    #[must_use]
     pub fn capability_parameter(&self) -> u8 {
         self.0[2].get_bits(15..=23).try_into().unwrap()
     }
@@ -744,6 +763,7 @@ impl SetExtendedProperty {
     }
 
     /// Returns the value of the Command Sub Type field.
+    #[must_use]
     pub fn command_sub_type(&self) -> u8 {
         self.0[3].get_bits(16..=18).try_into().unwrap()
     }
@@ -755,6 +775,7 @@ impl SetExtendedProperty {
     }
 
     /// Returns the value of the Endpoint ID field.
+    #[must_use]
     pub fn endpoint_id(&self) -> u8 {
         self.0[3].get_bits(19..=23).try_into().unwrap()
     }
@@ -766,6 +787,7 @@ impl SetExtendedProperty {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

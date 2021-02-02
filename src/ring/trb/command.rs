@@ -25,6 +25,8 @@ allowed! {
         StopEndpoint,
         /// Set TR Dequeue Pointer Command TRB
         SetTrDequeuePointer,
+        /// Reset Device Command TRB
+        ResetDevice,
         /// No Op Command TRB
         Noop
     }
@@ -406,6 +408,20 @@ impl SetTrDequeuePointer {
 
     /// Returns the value of the Slot ID field.
     pub fn slot_id(&mut self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
+add_trb_with_default!(ResetDevice, "Reset Device Command TRB", Type::ResetDevice);
+impl ResetDevice {
+    /// Sets the value of the Slot ID field.
+    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
+        self.0[3].set_bits(24..=31, i.into());
+        self
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

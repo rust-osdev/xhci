@@ -138,6 +138,7 @@ add_trb_with_default!(
 completion_code!(BandwidthRequest);
 impl BandwidthRequest {
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
@@ -147,6 +148,7 @@ add_trb_with_default!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
 completion_code!(Doorbell);
 impl Doorbell {
     /// Returns the value of the DB Reason field.
+    #[must_use]
     pub fn db_reason(&self) -> u8 {
         self.0[0].get_bits(0..=4).try_into().unwrap()
     }
@@ -167,11 +169,13 @@ add_trb_with_default!(
 completion_code!(DeviceNotification);
 impl DeviceNotification {
     /// Returns the value of the Notification Type field.
+    #[must_use]
     pub fn notification_type(&self) -> u8 {
         self.0[0].get_bits(4..=7).try_into().unwrap()
     }
 
     /// Returns the value of the Device Notification Data field.
+    #[must_use]
     pub fn device_notification_data(&self) -> u64 {
         let l: u64 = self.0[0].get_bits(8..=31).into();
         let u: u64 = self.0[1].into();
@@ -180,6 +184,7 @@ impl DeviceNotification {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

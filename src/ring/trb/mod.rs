@@ -288,4 +288,6 @@ pub enum Type {
     HostController = 37,
     /// Device Notification Event TRB, 38
     DeviceNotification = 38,
+    /// MFINDEX Wrap Event TRB, 39
+    MfindexWrap = 39,
 }

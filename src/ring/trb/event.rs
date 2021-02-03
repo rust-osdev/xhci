@@ -175,6 +175,9 @@ impl DeviceNotification {
     }
 }
 
+add_trb_with_default!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
+completion_code!(MfindexWrap);
+
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]

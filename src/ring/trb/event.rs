@@ -8,12 +8,22 @@ use num_traits::FromPrimitive;
 allowed! {
     /// TRBs which are allowed to be pushed to the Event Ring.
     enum {
-        /// Port Status Change Event TRB.
-        PortStatusChange,
         /// Transfer Event TRB.
         TransferEvent,
         /// Command Completion Event TRB.
-        CommandCompletion
+        CommandCompletion,
+        /// Port Status Change Event TRB.
+        PortStatusChange,
+        /// Bandwidth Request Event TRB.
+        BandwidthRequest,
+        /// Doorbell Event TRB.
+        Doorbell,
+        /// Host Controller Event TRB.
+        HostController,
+        /// Device Notification Event TRB.
+        DeviceNotification,
+        /// MFINDEX Wrap Event TRB.
+        MfindexWrap
     }
 }
 

@@ -120,6 +120,19 @@ impl CommandCompletion {
     }
 }
 
+add_trb_with_default!(
+    BandwidthRequest,
+    "Bandwidth Request Event TRB",
+    Type::BandwidthRequest
+);
+completion_code!(BandwidthRequest);
+impl BandwidthRequest {
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]

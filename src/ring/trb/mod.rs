@@ -280,4 +280,6 @@ pub enum Type {
     CommandCompletion = 33,
     /// Port Status Change Event TRB, 34
     PortStatusChange = 34,
+    /// Bandwidth Request Event TRB, 35
+    BandwidthRequest = 35,
 }

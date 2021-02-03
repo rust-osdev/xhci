@@ -133,6 +133,15 @@ impl BandwidthRequest {
     }
 }
 
+add_trb_with_default!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
+completion_code!(Doorbell);
+impl Doorbell {
+    /// Returns the value of the DB Reason field.
+    pub fn db_reason(&self) -> u8 {
+        self.0[0].get_bits(0..=4).try_into().unwrap()
+    }
+}
+
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]

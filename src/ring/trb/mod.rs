@@ -282,4 +282,6 @@ pub enum Type {
     PortStatusChange = 34,
     /// Bandwidth Request Event TRB, 35
     BandwidthRequest = 35,
+    /// Doorbell Event TRB, 36
+    Doorbell = 36,
 }

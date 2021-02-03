@@ -64,10 +64,7 @@ where
     /// }
     ///
     /// let mapper = MemoryMapper;
-    /// let r = unsafe {
-    ///     xhci::Registers::new(MMIO_BASE, mapper)
-    ///         .expect("The base address of the MMIO space is not aligned correctly.")
-    /// };
+    /// let r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
     /// ```
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
         let capability = Capability::new(mmio_base, &mapper);

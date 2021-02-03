@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Fixed
+- Wrong codes in documentations are fixed.
 
 ## 0.4.0 - 2021-01-31
 ### Changed

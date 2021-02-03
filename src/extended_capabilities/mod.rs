@@ -27,8 +27,7 @@
 //! }
 //!
 //! let mapper = MemoryMapper;
-//! let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper.clone()) }
-//!     .expect("The base address of the MMIO space is not aligned");
+//! let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper.clone()) };
 //! let mut l = unsafe {
 //!     extended_capabilities::List::new(MMIO_BASE, r.capability.hccparams1.read(), mapper)
 //! };

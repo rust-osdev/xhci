@@ -43,13 +43,18 @@ macro_rules! completion_code {
         }
     };
 }
+macro_rules! event {
+    ($name:ident,$full:expr,$ty:expr) => {
+        add_trb_with_default!($name, $full, $ty);
+        completion_code!($name);
+    };
+}
 
-add_trb_with_default!(
+event!(
     PortStatusChange,
     "Port Status Change Event TRB",
     Type::PortStatusChange
 );
-completion_code!(PortStatusChange);
 impl PortStatusChange {
     /// Returns the value of the Port ID field.
     #[must_use]
@@ -58,8 +63,7 @@ impl PortStatusChange {
     }
 }
 
-add_trb_with_default!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
-completion_code!(TransferEvent);
+event!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
 impl TransferEvent {
     /// Returns the value of the TRB Pointer field.
     #[must_use]
@@ -95,12 +99,11 @@ impl TransferEvent {
     }
 }
 
-add_trb_with_default!(
+event!(
     CommandCompletion,
     "Command Completion Event TRB",
     Type::CommandCompletion
 );
-completion_code!(CommandCompletion);
 impl CommandCompletion {
     /// Returns the value of the Command TRB Pointer field.
     #[must_use]
@@ -130,12 +133,11 @@ impl CommandCompletion {
     }
 }
 
-add_trb_with_default!(
+event!(
     BandwidthRequest,
     "Bandwidth Request Event TRB",
     Type::BandwidthRequest
 );
-completion_code!(BandwidthRequest);
 impl BandwidthRequest {
     /// Returns the value of the Slot ID field.
     #[must_use]
@@ -144,8 +146,7 @@ impl BandwidthRequest {
     }
 }
 
-add_trb_with_default!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
-completion_code!(Doorbell);
+event!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
 impl Doorbell {
     /// Returns the value of the DB Reason field.
     #[must_use]
@@ -154,19 +155,17 @@ impl Doorbell {
     }
 }
 
-add_trb_with_default!(
+event!(
     HostController,
     "Host Controller Event TRB",
     Type::HostController
 );
-completion_code!(HostController);
 
-add_trb_with_default!(
+event!(
     DeviceNotification,
     "Device Notification Event TRB",
     Type::DeviceNotification
 );
-completion_code!(DeviceNotification);
 impl DeviceNotification {
     /// Returns the value of the Notification Type field.
     #[must_use]
@@ -190,8 +189,7 @@ impl DeviceNotification {
     }
 }
 
-add_trb_with_default!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
-completion_code!(MfindexWrap);
+event!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
 
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]

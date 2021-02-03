@@ -284,4 +284,6 @@ pub enum Type {
     BandwidthRequest = 35,
     /// Doorbell Event TRB, 36
     Doorbell = 36,
+    /// Host Controller Event TRB, 37
+    HostController = 37,
 }

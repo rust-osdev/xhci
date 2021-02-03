@@ -142,6 +142,13 @@ impl Doorbell {
     }
 }
 
+add_trb_with_default!(
+    HostController,
+    "Host Controller Event TRB",
+    Type::HostController
+);
+completion_code!(HostController);
+
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]

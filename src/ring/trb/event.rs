@@ -149,6 +149,32 @@ add_trb_with_default!(
 );
 completion_code!(HostController);
 
+add_trb_with_default!(
+    DeviceNotification,
+    "Device Notification Event TRB",
+    Type::DeviceNotification
+);
+completion_code!(DeviceNotification);
+impl DeviceNotification {
+    /// Returns the value of the Notification Type field.
+    pub fn notification_type(&self) -> u8 {
+        self.0[0].get_bits(4..=7).try_into().unwrap()
+    }
+
+    /// Returns the value of the Device Notification Data field.
+    pub fn device_notification_data(&self) -> u64 {
+        let l: u64 = self.0[0].get_bits(8..=31).into();
+        let u: u64 = self.0[1].into();
+
+        ((u << 32) | l) >> 8
+    }
+
+    /// Returns the value of the Slot ID field.
+    pub fn slot_id(&self) -> u8 {
+        self.0[3].get_bits(24..=31).try_into().unwrap()
+    }
+}
+
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 #[non_exhaustive]

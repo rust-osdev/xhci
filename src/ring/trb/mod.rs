@@ -286,4 +286,6 @@ pub enum Type {
     Doorbell = 36,
     /// Host Controller Event TRB, 37
     HostController = 37,
+    /// Device Notification Event TRB, 38
+    DeviceNotification = 38,
 }

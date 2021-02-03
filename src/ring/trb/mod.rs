@@ -222,7 +222,6 @@ impl Link {
 }
 /// TRB Type.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
-#[non_exhaustive]
 pub enum Type {
     /// Normal TRB, 1
     Normal = 1,

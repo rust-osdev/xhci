@@ -58,6 +58,7 @@ impl Allowed {
     }
 
     /// Returns the value of the Interrupt On Completion field.
+    #[must_use]
     pub fn interrupt_on_completion(&self) -> bool {
         match self {
             Allowed::Normal(n) => n.interrupt_on_completion(),
@@ -82,6 +83,7 @@ macro_rules! interrupt_on_completion {
             }
 
             /// Returns the value of the Interrupt On Completion field.
+            #[must_use]
             pub fn interrupt_on_completion(&self) -> bool {
                 self.0[3].get_bit(5)
             }

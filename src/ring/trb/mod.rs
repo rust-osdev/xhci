@@ -127,13 +127,6 @@ macro_rules! allowed {
                 }
             }
         }
-        impl AsMut<[u32]> for Allowed {
-            fn as_mut(&mut self) -> &mut [u32] {
-                match self {
-                    $( Self::$variant(ref mut v) => v.as_mut() ),+
-                }
-            }
-        }
     };
 }
 

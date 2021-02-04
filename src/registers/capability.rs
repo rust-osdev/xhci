@@ -5,6 +5,7 @@ use bit_field::BitField;
 use core::{convert::TryInto, fmt};
 
 /// Host Controller Capability Registers
+#[derive(Debug)]
 pub struct Capability<M>
 where
     M: Mapper + Clone,

@@ -8,6 +8,7 @@ use core::{convert::TryInto, fmt};
 /// Host Controller Operational Registers
 ///
 /// This struct does not contain the Port Register set.
+#[derive(Debug)]
 pub struct Operational<M>
 where
     M: Mapper + Clone,

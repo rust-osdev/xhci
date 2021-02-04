@@ -47,6 +47,11 @@ macro_rules! add_trb {
                 Self(raw)
             }
         }
+        impl From<$name> for [u32; 4] {
+            fn from(t: $name) -> Self {
+                t.0
+            }
+        }
     };
 }
 macro_rules! impl_default_simply_adds_trb_id {

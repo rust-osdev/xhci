@@ -141,6 +141,9 @@ pub mod command;
 pub mod event;
 pub mod transfer;
 
+/// The bytes of a TRB.
+pub const BYTES: usize = 16;
+
 add_trb_with_default!(Link, "Link TRB", Type::Link);
 impl Link {
     /// Sets the value of the Ring Segment Pointer field.

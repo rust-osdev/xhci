@@ -2,7 +2,7 @@
 
 ## Unreleased - ReleaseDate
 ### Added
-- All types now implements the `Debug` trait.
+- All types now implement the `Debug` trait.
 
 ### Fixed
 - Wrong codes in documentations are fixed.

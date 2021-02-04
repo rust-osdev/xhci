@@ -28,6 +28,8 @@ allowed! {
 }
 impl Allowed {
     /// Sets the value of the Interrupt On Completion field.
+    // Unavoidable because the match arms has to be the same return types.
+    #[allow(clippy::too_many_lines)]
     pub fn set_interrupt_on_completion(&mut self, ioc: bool) {
         match self {
             Allowed::Normal(ref mut n) => {

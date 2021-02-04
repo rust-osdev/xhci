@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: -D warnings -D rustdoc -D missing_docs -D elided-lifetimes-in-paths
+  RUSTFLAGS: -D warnings -D rustdoc -D missing_docs -D elided-lifetimes-in-paths -D explicit-outlives-requirements
 
 jobs:
   build:

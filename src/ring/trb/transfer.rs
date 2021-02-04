@@ -26,8 +26,71 @@ allowed! {
         Noop
     }
 }
+impl Allowed {
+    /// Sets the value of the Interrupt On Completion field.
+    pub fn set_interrupt_on_completion(&mut self, ioc: bool) {
+        match self {
+            Allowed::Normal(ref mut n) => {
+                n.set_interrupt_on_completion(ioc);
+            }
+            Allowed::SetupStage(ref mut s) => {
+                s.set_interrupt_on_completion(ioc);
+            }
+            Allowed::DataStage(ref mut d) => {
+                d.set_interrupt_on_completion(ioc);
+            }
+            Allowed::StatusStage(ref mut s) => {
+                s.set_interrupt_on_completion(ioc);
+            }
+            Allowed::Isoch(ref mut i) => {
+                i.set_interrupt_on_completion(ioc);
+            }
+            Allowed::Link(ref mut l) => {
+                l.set_interrupt_on_completion(ioc);
+            }
+            Allowed::EventData(ref mut e) => {
+                e.set_interrupt_on_completion(ioc);
+            }
+            Allowed::Noop(ref mut n) => {
+                n.set_interrupt_on_completion(ioc);
+            }
+        }
+    }
+
+    /// Returns the value of the Interrupt On Completion field.
+    pub fn interrupt_on_completion(&self) -> bool {
+        match self {
+            Allowed::Normal(n) => n.interrupt_on_completion(),
+            Allowed::SetupStage(s) => s.interrupt_on_completion(),
+            Allowed::DataStage(d) => d.interrupt_on_completion(),
+            Allowed::StatusStage(s) => s.interrupt_on_completion(),
+            Allowed::Isoch(i) => i.interrupt_on_completion(),
+            Allowed::Link(l) => l.interrupt_on_completion(),
+            Allowed::EventData(e) => e.interrupt_on_completion(),
+            Allowed::Noop(n) => n.interrupt_on_completion(),
+        }
+    }
+}
+
+macro_rules! interrupt_on_completion {
+    ($name:ident) => {
+        impl $name {
+            /// Sets the value of the Interrupt On Completion field.
+            pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
+                self.0[3].set_bit(5, ioc);
+                self
+            }
+
+            /// Returns the value of the Interrupt On Completion field.
+            pub fn interrupt_on_completion(&self) -> bool {
+                self.0[3].get_bit(5)
+            }
+        }
+    };
+}
 
 add_trb_with_default!(Normal, "Normal TRB", Type::Normal);
+interrupt_on_completion!(Normal);
 impl Normal {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -44,15 +107,10 @@ impl Normal {
         self.0[2].set_bits(0..=16, l);
         self
     }
-
-    /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-        self.0[3].set_bit(5, ioc);
-        self
-    }
 }
 
 add_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
+interrupt_on_completion!(SetupStage);
 impl SetupStage {
     /// Creates a new Setup Stage TRB.
     ///
@@ -111,6 +169,7 @@ impl Default for SetupStage {
 }
 
 add_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
+interrupt_on_completion!(DataStage);
 impl DataStage {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -136,15 +195,10 @@ impl DataStage {
 }
 
 add_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
-impl StatusStage {
-    /// Sets the value of the Interrupt On Completion bit.
-    pub fn set_interrupt_on_completion(&mut self, i: bool) -> &mut Self {
-        self.0[3].set_bit(5, i);
-        self
-    }
-}
+interrupt_on_completion!(StatusStage);
 
 add_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
+interrupt_on_completion!(Isoch);
 impl Isoch {
     /// Sets the value of the Data Buffer Pointer.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -249,18 +303,6 @@ impl Isoch {
         self.0[3].get_bit(4)
     }
 
-    /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-        self.0[3].set_bit(5, ioc);
-        self
-    }
-
-    /// Returns the value of the Interrupt On Completion field.
-    #[must_use]
-    pub fn interrupt_on_completion(&self) -> bool {
-        self.0[3].get_bit(5)
-    }
-
     /// Sets the value of the Immediate Data field.
     pub fn set_immediate_data(&mut self, idt: bool) -> &mut Self {
         self.0[3].set_bit(6, idt);
@@ -335,6 +377,7 @@ impl Isoch {
 }
 
 add_trb_with_default!(EventData, "Event Data TRB", Type::EventData);
+interrupt_on_completion!(EventData);
 impl EventData {
     /// Sets the value of the Event Data field.
     pub fn set_event_data(&mut self, d: u64) -> &mut Self {
@@ -391,18 +434,6 @@ impl EventData {
         self.0[3].get_bit(4)
     }
 
-    /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-        self.0[3].set_bit(5, ioc);
-        self
-    }
-
-    /// Returns the value of the Interrupt On Completion field.
-    #[must_use]
-    pub fn interrupt_on_completion(&self) -> bool {
-        self.0[3].get_bit(5)
-    }
-
     /// Sets the value of the Block Event Interrupt field.
     pub fn set_block_event_interrupt(&mut self, bei: bool) -> &mut Self {
         self.0[3].set_bit(9, bei);
@@ -417,6 +448,7 @@ impl EventData {
 }
 
 add_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
+interrupt_on_completion!(Noop);
 impl Noop {
     /// Sets the value of the Interrupter Target.
     pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {
@@ -452,17 +484,6 @@ impl Noop {
     #[must_use]
     pub fn chain_bit(&self) -> bool {
         self.0[3].get_bit(4)
-    }
-
-    /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-        self.0[3].set_bit(5, ioc);
-        self
-    }
-
-    /// Returns the value of the Interrupt On Completion field.
-    pub fn interrupt_on_completion(&mut self) -> bool {
-        self.0[3].get_bit(5)
     }
 }
 

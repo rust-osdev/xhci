@@ -42,11 +42,6 @@ macro_rules! add_trb {
                 &self.0
             }
         }
-        impl From<[u32; 4]> for $name {
-            fn from(raw: [u32; 4]) -> Self {
-                Self(raw)
-            }
-        }
         impl From<$name> for [u32; 4] {
             fn from(t: $name) -> Self {
                 t.0

@@ -12,6 +12,7 @@ pub mod operational;
 pub mod runtime;
 
 /// The access point to xHCI registers.
+#[derive(Debug)]
 pub struct Registers<M>
 where
     M: Mapper + Clone,

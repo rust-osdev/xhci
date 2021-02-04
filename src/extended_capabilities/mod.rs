@@ -62,6 +62,7 @@ pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 pub mod usb_legacy_support_capability;
 
 /// A struct to access xHCI Extended Capabilities.
+#[derive(Debug)]
 pub struct List<M>
 where
     M: Mapper + Clone,
@@ -109,6 +110,7 @@ where
 }
 
 /// An iterator over the xHCI Extended Capability.
+#[derive(Debug)]
 pub struct IterMut<M>
 where
     M: Mapper + Clone,

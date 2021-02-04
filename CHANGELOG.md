@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- All types now implement the `Debug` trait.
+
 ### Fixed
 - Wrong codes in documentations are fixed.
 

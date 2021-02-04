@@ -32,3 +32,6 @@ jobs:
 
     - name: Build
       run: cargo build
+
+    - name: Build the doc for the lint related to the rustdoc
+      run: cargo doc

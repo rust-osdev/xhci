@@ -1,7 +1,7 @@
 //! Event TRBs.
 
 use bit_field::BitField;
-use core::convert::TryInto;
+use core::convert::{TryFrom, TryInto};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -24,6 +24,30 @@ allowed! {
         DeviceNotification,
         /// MFINDEX Wrap Event TRB.
         MfindexWrap
+    }
+}
+impl TryFrom<[u32; 4]> for Allowed {
+    type Error = [u32; 4];
+
+    fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
+        macro_rules! try_from {
+            ($name:ident) => {
+                if let Ok(t) = $name::try_from(raw) {
+                    return Ok(Self::$name(t));
+                }
+            };
+        }
+
+        try_from!(TransferEvent);
+        try_from!(CommandCompletion);
+        try_from!(PortStatusChange);
+        try_from!(BandwidthRequest);
+        try_from!(Doorbell);
+        try_from!(HostController);
+        try_from!(DeviceNotification);
+        try_from!(MfindexWrap);
+
+        Err(raw)
     }
 }
 
@@ -55,6 +79,13 @@ event!(
     "Port Status Change Event TRB",
     Type::PortStatusChange
 );
+reserved!(PortStatusChange(Type::PortStatusChange){
+    [0]0..=23;
+    [1]0..=31;
+    [2]0..=23;
+    [3]1..=9;
+    [3]16..=31
+});
 impl PortStatusChange {
     /// Returns the value of the Port ID field.
     #[must_use]
@@ -64,6 +95,11 @@ impl PortStatusChange {
 }
 
 event!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
+reserved!(TransferEvent(Type::TransferEvent){
+    [3]1..=1;
+    [3]3..=9;
+    [3]21..=23
+});
 impl TransferEvent {
     /// Returns the value of the TRB Pointer field.
     #[must_use]
@@ -104,6 +140,10 @@ event!(
     "Command Completion Event TRB",
     Type::CommandCompletion
 );
+reserved!(CommandCompletion(Type::CommandCompletion){
+    [0]0..=3;
+    [3]1..=9
+});
 impl CommandCompletion {
     /// Returns the value of the Command TRB Pointer field.
     #[must_use]
@@ -138,6 +178,13 @@ event!(
     "Bandwidth Request Event TRB",
     Type::BandwidthRequest
 );
+reserved!(BandwidthRequest(Type::BandwidthRequest){
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=23;
+    [3]1..=9;
+    [3]16..=23
+});
 impl BandwidthRequest {
     /// Returns the value of the Slot ID field.
     #[must_use]
@@ -147,6 +194,12 @@ impl BandwidthRequest {
 }
 
 event!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
+reserved!(Doorbell(Type::Doorbell){
+    [0]5..=31;
+    [1]0..=31;
+    [2]0..=23;
+    [3]1..=9
+});
 impl Doorbell {
     /// Returns the value of the DB Reason field.
     #[must_use]
@@ -160,12 +213,26 @@ event!(
     "Host Controller Event TRB",
     Type::HostController
 );
+reserved!(HostController(Type::HostController){
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=23;
+    [3]1..=9;
+    [3]16..=31
+});
 
 event!(
     DeviceNotification,
     "Device Notification Event TRB",
     Type::DeviceNotification
 );
+reserved!(DeviceNotification(Type::DeviceNotification){
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=23;
+    [3]1..=9;
+    [3]16..=31
+});
 impl DeviceNotification {
     /// Returns the value of the Notification Type field.
     #[must_use]
@@ -190,6 +257,12 @@ impl DeviceNotification {
 }
 
 event!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
+reserved!(MfindexWrap(Type::MfindexWrap){
+    [0]0..=3;
+    [2]0..=23;
+    [3]1..=9;
+    [3]16..=23
+});
 
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]

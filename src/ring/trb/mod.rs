@@ -4,6 +4,29 @@ use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 
+macro_rules! reserved{
+    ($name:ident($ty:expr) {
+        $([$index:expr] $range:expr);*
+    })=>{
+        impl core::convert::TryFrom<[u32;4]> for $name{
+            type Error=[u32;4];
+
+            fn try_from(raw:[u32;4])->Result<Self,Self::Error>{
+                use crate::ring::trb::Type;
+
+                $(if raw[$index].get_bits($range) != 0{
+                    return Err(raw);
+                })*
+
+                if raw[3].get_bits(10..=15)!=$ty as _ {
+                    return Err(raw);
+                }
+
+                Ok(Self(raw))
+            }
+        }
+    }
+}
 macro_rules! add_trb {
     ($name:ident,$full:expr,$ty:expr) => {
         #[doc = $full ]

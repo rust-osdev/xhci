@@ -42,11 +42,6 @@ macro_rules! add_trb {
                 &self.0
             }
         }
-        impl AsMut<[u32]> for $name {
-            fn as_mut(&mut self) -> &mut [u32] {
-                &mut self.0
-            }
-        }
         impl From<[u32; 4]> for $name {
             fn from(raw: [u32; 4]) -> Self {
                 Self(raw)

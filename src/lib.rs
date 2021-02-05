@@ -44,8 +44,7 @@
     macro_use_extern_crate,
     missing_copy_implementations,
     meta_variable_misuse,
-    missing_debug_implementations,
-    missing_doc_code_examples
+    missing_debug_implementations
 )]
 
 pub use accessor;

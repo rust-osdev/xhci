@@ -44,6 +44,7 @@
     macro_use_extern_crate,
     missing_copy_implementations,
     meta_variable_misuse,
+    non_ascii_idents,
     missing_debug_implementations
 )]
 

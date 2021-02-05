@@ -86,6 +86,13 @@ macro_rules! cx {
                 }
                 impl Input{
                     /// Creates a null Input Context.
+                    ///
+                    /// # Examples
+                    ///
+                    /// ```
+                    #[doc = "use xhci::context::byte" $bytes "::Input;"]
+                    /// let input = Input::new();
+                    /// ```
                     #[must_use]
                     pub const fn new()->Self{
                         Self{

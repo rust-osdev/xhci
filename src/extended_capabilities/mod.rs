@@ -200,6 +200,15 @@ where
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.
+///
+/// # Examples
+///
+/// ```
+/// // The Extended Capability with the ID 7 is not supported by this crate.
+/// use xhci::extended_capabilities::NotSupportedId;
+///
+/// NotSupportedId(7);
+/// ```
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Default, Debug)]
 pub struct NotSupportedId(pub u8);
 

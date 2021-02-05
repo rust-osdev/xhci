@@ -371,7 +371,7 @@ pub trait DeviceHandler {
     /// let ep1 = device.endpoints_mut(1);
     /// ```
     ///
-    /// Do not call this method with `i == 0`. Call [`slot_mut`] instead.
+    /// Do not call this method with `i == 0`. Call [`DeviceHandler::slot_mut`] instead.
     ///
     /// ```should_panic
     /// use xhci::context::{byte32::Device, DeviceHandler};

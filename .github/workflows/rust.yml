@@ -16,7 +16,7 @@ jobs:
 
     - uses: actions-rs/toolchain@v1.0.6
       with:
-        toolchain: nightly
+        toolchain: stable
         components: clippy, rustfmt
         override: true
 

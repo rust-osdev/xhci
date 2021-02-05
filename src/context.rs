@@ -423,13 +423,48 @@ pub trait EndpointPairHandler {
 }
 
 /// A trait to handle the Slot Context.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Device, DeviceHandler};
+///
+/// let mut device = Device::new();
+/// let slot = device.slot_mut();
+/// # let port_number = 1;
+/// slot.set_context_entries(1);
+/// slot.set_root_hub_port_number(port_number);
+/// ```
 pub trait SlotHandler: AsMut<[u32]> {
     /// Sets the value of the Context Entries field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let slot = device.slot_mut();
+    ///
+    /// slot.set_context_entries(1);
+    /// ```
     fn set_context_entries(&mut self, e: u8) {
         self.as_mut()[0].set_bits(27..=31, e.into());
     }
 
     /// Sets the value of the Root Hub Port Number field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let slot = device.slot_mut();
+    /// # let port_number= 1;
+    ///
+    /// slot.set_root_hub_port_number(port_number);
+    /// ```
     fn set_root_hub_port_number(&mut self, n: u8) {
         self.as_mut()[1].set_bits(16..=23, n.into());
     }

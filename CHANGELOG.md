@@ -4,6 +4,7 @@
 ### Added
 - All types now implement the `Debug` trait.
 - Code examples are added.
+- `ring` module is added.
 
 ### Fixed
 - Wrong codes in documentations are fixed.

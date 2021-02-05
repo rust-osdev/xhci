@@ -471,12 +471,38 @@ pub trait SlotHandler: AsMut<[u32]> {
 }
 
 /// A trait to handle the Input Control Context.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Input, InputHandler};
+///
+/// let mut input = Input::new();
+/// let control = input.control_mut();
+///
+/// control.set_aflag(0);
+/// control.set_aflag(1);
+///
+/// control.clear_aflag(1);
+/// ```
 pub trait InputControlHandler: AsMut<[u32]> {
     /// Sets the `i`th Add Context flag.
     ///
     /// # Panics
     ///
     /// This method panics if `i >= 32`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Input, InputHandler};
+    ///
+    /// let mut input = Input::new();
+    /// let control = input.control_mut();
+    ///
+    /// control.set_aflag(0);
+    /// control.set_aflag(1);
+    /// ```
     fn set_aflag(&mut self, i: usize) {
         assert!(i < 32, "There exists only 0..=31 Add Context flags.");
         self.as_mut()[1].set_bit(i, true);
@@ -487,6 +513,17 @@ pub trait InputControlHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `i >= 32`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Input, InputHandler};
+    ///
+    /// let mut input = Input::new();
+    /// let control = input.control_mut();
+    ///
+    /// control.clear_aflag(1);
+    /// ```
     fn clear_aflag(&mut self, i: usize) {
         assert!(i < 32, "There exists only 0..=31 Add Context flags.");
         self.as_mut()[1].set_bit(i, false);

@@ -97,6 +97,7 @@ macro_rules! cx {
                     ///
                     /// ```
                     #[doc = "use xhci::context::byte" $bytes "::Input;"]
+                    ///
                     /// let input = Input::new();
                     /// ```
                     #[must_use]
@@ -167,6 +168,7 @@ macro_rules! cx {
                     ///
                     /// ```
                     #[doc = "use xhci::context::byte" $bytes "::Device;"]
+                    ///
                     /// let device = Device::new();
                     /// ```
                     #[must_use]

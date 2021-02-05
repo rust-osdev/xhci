@@ -329,13 +329,31 @@ pub trait InputHandler {
 /// let mut device = Device::new();
 /// let slot = device.slot_mut();
 /// let ep0 = device.endpoint0_mut();
-/// let endpoints = device.endpoints_mut(1);
+/// let ep1 = device.endpoints_mut(1);
 /// ```
 pub trait DeviceHandler {
     /// Returns a mutable reference to the Slot Context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let slot = device.slot_mut();
+    /// ```
     fn slot_mut(&mut self) -> &mut dyn SlotHandler;
 
     /// Returns a mutable reference to the Endpoint Context 0.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    /// ```
     fn endpoint0_mut(&mut self) -> &mut dyn EndpointHandler;
 
     /// Returns a mutable reference to the Endpoint Context `i`.
@@ -343,6 +361,24 @@ pub trait DeviceHandler {
     /// # Panics
     ///
     /// This method panics if `i == 0` or `i > 15`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep1 = device.endpoints_mut(1);
+    /// ```
+    ///
+    /// Do not call this method with `i == 0`. Call [`slot_mut`] instead.
+    ///
+    /// ```should_panic
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoints_mut(0);
+    /// ```
     fn endpoints_mut(&mut self, i: usize) -> &mut dyn EndpointPairHandler;
 }
 

@@ -8,7 +8,7 @@ macro_rules! reserved{
     ($name:ident($ty:expr) {
         $([$index:expr] $range:expr);*
     })=>{
-        impl core::convert::TryFrom<[u32;4]> for $name{
+        impl TryFrom<[u32;4]> for $name{
             type Error=[u32;4];
 
             fn try_from(raw:[u32;4])->Result<Self,Self::Error>{

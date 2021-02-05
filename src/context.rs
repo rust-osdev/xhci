@@ -396,9 +396,29 @@ pub trait DeviceHandler {
 /// ```
 pub trait EndpointPairHandler {
     /// Returns a mutable reference to the Output Endpoint Context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep1 = device.endpoints_mut(1);
+    /// let ep1_out = ep1.output_mut();
+    /// ```
     fn output_mut(&mut self) -> &mut dyn EndpointHandler;
 
     /// Returns a mutable reference to the Input Endpoint Context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep1 = device.endpoints_mut(1);
+    /// let ep1_in = ep1.input_mut();
+    /// ```
     fn input_mut(&mut self) -> &mut dyn EndpointHandler;
 }
 

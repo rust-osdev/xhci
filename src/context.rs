@@ -531,12 +531,34 @@ pub trait InputControlHandler: AsMut<[u32]> {
 }
 
 /// A trait to handle the Endpoint Context.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Device, DeviceHandler};
+///
+/// let mut device = Device::new();
+/// let ep0 = device.endpoint0_mut();
+///
+/// ep0.set_mult(0);
+/// ```
 pub trait EndpointHandler: AsMut<[u32]> {
     /// Sets the value of the Mult field.
     ///
     /// # Panics
     ///
     /// This method panics if `m >= 4`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_mult(0);
+    /// ```
     fn set_mult(&mut self, m: u8) {
         assert!(m < 4, "Mult must be less than 4.");
 
@@ -544,21 +566,65 @@ pub trait EndpointHandler: AsMut<[u32]> {
     }
 
     /// Sets the value of the Max Primary Streams field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_max_primary_streams(0);
+    /// ```
     fn set_max_primary_streams(&mut self, s: u8) {
         self.as_mut()[0].set_bits(10..=14, s.into());
     }
 
     /// Sets the value of the Interval field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_interval(0);
+    /// ```
     fn set_interval(&mut self, i: u8) {
         self.as_mut()[0].set_bits(16..=23, i.into());
     }
 
     /// Sets the value of the Error Count field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_error_count(3);
+    /// ```
     fn set_error_count(&mut self, c: u8) {
         self.as_mut()[1].set_bits(1..=2, c.into());
     }
 
     /// Sets the type of the Endpoint.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_endpoint_type(EndpointType::Control);
+    /// ```
     fn set_endpoint_type(&mut self, t: EndpointType) {
         self.as_mut()[1].set_bits(3..=5, t as _);
     }
@@ -568,6 +634,17 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `s > 15`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_max_burst_size(0);
+    /// ```
     fn set_max_burst_size(&mut self, s: u8) {
         assert!(
             s <= 15,
@@ -578,11 +655,34 @@ pub trait EndpointHandler: AsMut<[u32]> {
     }
 
     /// Sets the value of the Max Packet Size field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    /// # let max_packet_size = 0;
+    ///
+    /// ep0.set_max_packet_size(max_packet_size);
+    /// ```
     fn set_max_packet_size(&mut self, s: u16) {
         self.as_mut()[1].set_bits(16..=31, s.into());
     }
 
     /// Sets the value of the Dequeue Cycle State field.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    ///
+    /// ep0.set_dequeue_cycle_state(true);
+    /// ```
     fn set_dequeue_cycle_state(&mut self, c: bool) {
         self.as_mut()[2].set_bit(0, c);
     }
@@ -592,6 +692,18 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// # Panics
     ///
     /// This method panics if `p` is not 16 byte aligned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+    ///
+    /// let mut device = Device::new();
+    /// let ep0 = device.endpoint0_mut();
+    /// # let ring_addr = 0x1000;
+    ///
+    /// ep0.set_transfer_ring_dequeue_pointer(ring_addr);
+    /// ```
     fn set_transfer_ring_dequeue_pointer(&mut self, p: u64) {
         assert_eq!(p % 16, 0);
 

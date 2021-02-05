@@ -320,6 +320,17 @@ pub trait InputHandler {
 }
 
 /// A trait to handle the Device Context.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Device, DeviceHandler};
+///
+/// let mut device = Device::new();
+/// let slot = device.slot_mut();
+/// let ep0 = device.endpoint0_mut();
+/// let endpoints = device.endpoints_mut(1);
+/// ```
 pub trait DeviceHandler {
     /// Returns a mutable reference to the Slot Context.
     fn slot_mut(&mut self) -> &mut dyn SlotHandler;

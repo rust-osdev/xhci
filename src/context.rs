@@ -295,9 +295,27 @@ cx!(64);
 /// ```
 pub trait InputHandler {
     /// Returns a mutable reference to the Input Control Context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Input, InputHandler};
+    ///
+    /// let mut input = Input::new();
+    /// let control = input.control_mut();
+    /// ```
     fn control_mut(&mut self) -> &mut dyn InputControlHandler;
 
     /// Returns a mutable reference to the Device Context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use xhci::context::{byte32::Input, InputHandler};
+    ///
+    /// let mut input = Input::new();
+    /// let device = input.device_mut();
+    /// ```
     fn device_mut(&mut self) -> &mut dyn DeviceHandler;
 }
 

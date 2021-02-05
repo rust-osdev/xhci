@@ -47,6 +47,7 @@
     non_ascii_idents,
     private_doc_tests,
     single_use_lifetimes,
+    unaligned_references,
     trivial_casts,
     pointer_structural_match,
     missing_debug_implementations

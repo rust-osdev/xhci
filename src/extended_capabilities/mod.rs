@@ -91,23 +91,23 @@ where
     /// # use xhci::{
     /// #     accessor::Mapper, extended_capabilities, extended_capabilities::ExtendedCapability,
     /// # };
-    ///
+    /// #
     /// # // The value of this constant is for showing an example. The user must get the correct base
     /// # // address of the MMIO space from the PCI Configuration Space.
     /// # const MMIO_BASE: usize = 0x1000;
-    ///
+    /// #
     /// # #[derive(Clone)]
     /// # struct MemoryMapper;
     /// # impl Mapper for MemoryMapper {
     /// #     unsafe fn map(&mut self, phys_start: usize, bytes: usize) -> NonZeroUsize {
     /// #         unimplemented!()
     /// #     }
-    ///
+    /// #
     /// #     fn unmap(&mut self, virt_start: usize, bytes: usize) {
     /// #         unimplemented!()
     /// #     }
     /// # }
-    ///
+    /// #
     /// # let mapper = MemoryMapper;
     /// let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper.clone()) };
     /// let mut l = unsafe {

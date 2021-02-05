@@ -5,6 +5,19 @@
 
 # xhci
 
-A library which is useful to handle xHCI.
+A library to handle xHCI.
 
-License: MIT OR Apache-2.0
+This crate provides types of the xHCI structures, such as the Registers and Contexts.
+Users can use this library to implement a USB device deriver on your own OS.
+
+This crate is `#![no_std]` compatible.
+
+# Examples
+
+```no_run
+let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
+let o = &mut r.operational;
+
+o.usbcmd.update(|u| u.set_run_stop(true));
+while o.usbsts.read().hc_halted() {}
+```

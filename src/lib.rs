@@ -49,6 +49,7 @@
     single_use_lifetimes,
     unaligned_references,
     unreachable_pub,
+    unused_crate_dependencies,
     trivial_casts,
     pointer_structural_match,
     missing_debug_implementations

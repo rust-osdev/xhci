@@ -61,6 +61,23 @@ macro_rules! cx {
                 /// Input Context.
                 ///
                 /// See the documentation of the [`InputHandler`] for the provided methods.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                #[doc = "use xhci::context::byte" $bytes "::Input;"]
+                /// use xhci::context::InputHandler;
+                /// let mut input=Input::new();
+                /// let input_control = input.control_mut();
+                /// input_control.set_aflag(0);
+                /// input_control.set_aflag(1);
+                ///
+                /// let port_id = 3;
+                /// let device = input.device_mut();
+                /// let slot = device.slot_mut();
+                /// slot.set_context_entries(1);
+                /// slot.set_root_hub_port_number(port_id);
+                /// ```
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Input{

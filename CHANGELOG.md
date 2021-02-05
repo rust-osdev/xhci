@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.4.1 - 2021-02-05
 ### Added
 - All types now implement the `Debug` trait.
 - Code examples are added.

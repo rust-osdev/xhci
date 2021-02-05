@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: -D warnings -D rustdoc -D missing_docs
+
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
 
     - uses: actions-rs/toolchain@v1.0.6
       with:
-        toolchain: nightly
+        toolchain: stable
         components: clippy, rustfmt
         override: true
 
@@ -32,3 +32,6 @@ jobs:
 
     - name: Build
       run: cargo build
+
+    - name: Build the doc for the lint related to the rustdoc
+      run: cargo doc

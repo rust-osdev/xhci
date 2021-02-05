@@ -10,23 +10,23 @@
 //! ```no_run
 //! # use core::num::NonZeroUsize;
 //! # use xhci::accessor::Mapper;
-//!
+//! #
 //! # const MMIO_BASE: usize = 0x1000;
-//!
+//! #
 //! # #[derive(Clone)]
 //! # struct MemoryMapper;
 //! # impl Mapper for MemoryMapper {
 //! #     unsafe fn map(&mut self, phys_base: usize, bytes: usize) -> NonZeroUsize {
 //! #         unimplemented!()
 //! #     }
-//!
+//! #
 //! #     fn unmap(&mut self, virt_base: usize, bytes: usize) {
 //! #         unimplemented!()
 //! #     }
 //! # }
-//!
+//! #
 //! # let mapper = MemoryMapper;
-//!
+//! #
 //! let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
 //! let o = &mut r.operational;
 //!

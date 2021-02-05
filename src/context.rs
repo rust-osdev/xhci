@@ -283,6 +283,16 @@ cx!(32);
 cx!(64);
 
 /// A trait to handle the Input Context.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Input, InputHandler};
+///
+/// let mut input = Input::new();
+/// let control = input.control_mut();
+/// let device = input.device_mut();
+/// ```
 pub trait InputHandler {
     /// Returns a mutable reference to the Input Control Context.
     fn control_mut(&mut self) -> &mut dyn InputControlHandler;

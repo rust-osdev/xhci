@@ -52,6 +52,7 @@
     unused_crate_dependencies,
     unused_extern_crates,
     trivial_casts,
+    unused_import_braces,
     pointer_structural_match,
     missing_debug_implementations
 )]

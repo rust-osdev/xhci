@@ -716,6 +716,17 @@ pub trait EndpointHandler: AsMut<[u32]> {
 }
 
 /// Endpoint Type.
+///
+/// # Examples
+///
+/// ```
+/// use xhci::context::{byte32::Device, DeviceHandler, EndpointType};
+///
+/// let mut device = Device::new();
+/// let ep0 = device.endpoint0_mut();
+///
+/// ep0.set_endpoint_type(EndpointType::Control);
+/// ```
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum EndpointType {
     /// Not Valid N/A

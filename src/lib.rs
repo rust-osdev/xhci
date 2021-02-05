@@ -50,6 +50,7 @@
     unaligned_references,
     unreachable_pub,
     unused_crate_dependencies,
+    unused_extern_crates,
     trivial_casts,
     pointer_structural_match,
     missing_debug_implementations

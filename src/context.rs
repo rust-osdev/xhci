@@ -135,6 +135,16 @@ macro_rules! cx {
                 /// Device Context.
                 ///
                 /// See the documentation of the [`DeviceHandler`] for the provided methods.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                #[doc = "use xhci::context::byte" $bytes "::Device;"]
+                /// use xhci::context::DeviceHandler;
+                /// let mut device = Device::new();
+                /// let slot = device.slot_mut();
+                /// slot.set_context_entries(1);
+                /// ```
                 #[repr(C)]
                 #[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
                 pub struct Device{

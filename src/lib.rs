@@ -48,6 +48,7 @@
     private_doc_tests,
     single_use_lifetimes,
     unaligned_references,
+    unreachable_pub,
     trivial_casts,
     pointer_structural_match,
     missing_debug_implementations

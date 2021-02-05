@@ -45,6 +45,7 @@
     missing_copy_implementations,
     meta_variable_misuse,
     non_ascii_idents,
+    pointer_structural_match,
     missing_debug_implementations
 )]
 

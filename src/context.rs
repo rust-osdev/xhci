@@ -71,13 +71,13 @@ macro_rules! cx {
                 #[doc = "use xhci::context::byte" $bytes "::Input;"]
                 /// use xhci::context::InputHandler;
                 ///
-                /// let mut input=Input::new();
+                /// let mut input = Input::new();
                 /// let input_control = input.control_mut();
                 ///
                 /// input_control.set_aflag(0);
                 /// input_control.set_aflag(1);
                 ///
-                /// let port_id = 3;
+                /// # let port_id = 3;
                 /// let device = input.device_mut();
                 /// let slot = device.slot_mut();
                 ///

@@ -54,6 +54,7 @@
     trivial_casts,
     unused_import_braces,
     unused_lifetimes,
+    unused_qualifications,
     pointer_structural_match,
     missing_debug_implementations
 )]

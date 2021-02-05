@@ -154,6 +154,13 @@ macro_rules! cx {
                 }
                 impl Device{
                     /// Creates a null Device Context.
+                    ///
+                    /// # Examples
+                    ///
+                    /// ```
+                    #[doc = "use xhci::context::byte" $bytes "::Device;"]
+                    /// let device = Device::new();
+                    /// ```
                     #[must_use]
                     pub const fn new()->Self{
                         Self{

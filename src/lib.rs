@@ -46,6 +46,7 @@
     meta_variable_misuse,
     non_ascii_idents,
     private_doc_tests,
+    single_use_lifetimes,
     pointer_structural_match,
     missing_debug_implementations
 )]

@@ -128,7 +128,7 @@ where
         }
     }
 }
-impl<'a, M> IntoIterator for &'a mut List<M>
+impl<M> IntoIterator for &mut List<M>
 where
     M: Mapper + Clone,
 {

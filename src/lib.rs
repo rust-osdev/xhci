@@ -53,6 +53,7 @@
     unused_extern_crates,
     trivial_casts,
     unused_import_braces,
+    unused_lifetimes,
     pointer_structural_match,
     missing_debug_implementations
 )]

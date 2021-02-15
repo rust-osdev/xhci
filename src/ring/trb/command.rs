@@ -180,7 +180,7 @@ impl ConfigureEndpoint {
     }
 
     /// Returns the value of the Deconfigure field.
-    pub fn deconfigure(&mut self) -> bool {
+    pub fn deconfigure(&self) -> bool {
         self.0[3].get_bit(9)
     }
 

@@ -104,6 +104,16 @@ macro_rules! transfer_trb_with_default {
         interrupt_on_completion!($name);
     };
 }
+macro_rules! impl_debug_for_transfer_trb{
+    ($name:ident {
+        $($method:ident),*
+    })=>{
+        impl_debug_for_trb!($name{
+            interrupt_on_completion,
+            $($method),*
+        });
+    }
+}
 
 transfer_trb_with_default!(Normal, "Normal TRB", Type::Normal);
 impl Normal {

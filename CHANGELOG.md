@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.5.1 - 2021-02-15
 ### Added
 - The missing Completion Codes are added to the `CompletionCode`.
 

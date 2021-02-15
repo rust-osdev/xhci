@@ -421,7 +421,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Slot ID field.
-    pub fn slot_id(&mut self) -> u8 {
+    pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }

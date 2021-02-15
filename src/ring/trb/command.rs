@@ -47,6 +47,7 @@ allowed! {
 }
 
 add_trb_with_default!(Noop, "No Op Command TRB", Type::NoopCommand);
+impl_debug_for_trb!(Noop {});
 
 add_trb_with_default!(EnableSlot, "Enable Slot Command TRB", Type::EnableSlot);
 impl EnableSlot {
@@ -62,6 +63,7 @@ impl EnableSlot {
         self.0[3].get_bits(16..=20).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(EnableSlot { slot_type });
 
 add_trb_with_default!(DisableSlot, "Disable Slot Command TRB", Type::DisableSlot);
 impl DisableSlot {
@@ -77,6 +79,7 @@ impl DisableSlot {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(DisableSlot { slot_id });
 
 add_trb_with_default!(
     AddressDevice,
@@ -137,6 +140,11 @@ impl AddressDevice {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(AddressDevice {
+    input_context_pointer,
+    block_set_address_request,
+    slot_id
+});
 
 add_trb_with_default!(
     ConfigureEndpoint,
@@ -197,6 +205,11 @@ impl ConfigureEndpoint {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(ConfigureEndpoint {
+    input_context_pointer,
+    deconfigure,
+    slot_id
+});
 
 add_trb_with_default!(
     EvaluateContext,
@@ -245,6 +258,10 @@ impl EvaluateContext {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(EvaluateContext {
+    input_context_pointer,
+    slot_id
+});
 
 add_trb_with_default!(
     ResetEndpoint,
@@ -288,6 +305,11 @@ impl ResetEndpoint {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(ResetEndpoint {
+    transfer_state_preserve,
+    endpoint_id,
+    slot_id
+});
 
 add_trb_with_default!(
     StopEndpoint,
@@ -331,6 +353,11 @@ impl StopEndpoint {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(StopEndpoint {
+    endpoint_id,
+    suspend,
+    slot_id
+});
 
 add_trb_with_default!(
     SetTrDequeuePointer,
@@ -427,6 +454,14 @@ impl SetTrDequeuePointer {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(SetTrDequeuePointer {
+    dequeue_cycle_state,
+    stream_context_type,
+    new_tr_dequeue_pointer,
+    stream_id,
+    endpoint_id,
+    slot_id
+});
 
 add_trb_with_default!(ResetDevice, "Reset Device Command TRB", Type::ResetDevice);
 impl ResetDevice {
@@ -442,6 +477,7 @@ impl ResetDevice {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(ResetDevice { slot_id });
 
 add_trb_with_default!(ForceEvent, "Force Event Command TRB", Type::ForceEvent);
 impl ForceEvent {
@@ -495,6 +531,11 @@ impl ForceEvent {
         self.0[3].get_bits(16..=23).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(ForceEvent {
+    event_trb_pointer,
+    vf_interrupter_target,
+    vf_id
+});
 
 add_trb_with_default!(
     NegotiateBandwidth,
@@ -514,6 +555,7 @@ impl NegotiateBandwidth {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(NegotiateBandwidth { slot_id });
 
 add_trb_with_default!(
     SetLatencyToleranceValue,
@@ -533,6 +575,9 @@ impl SetLatencyToleranceValue {
         self.0[3].get_bits(16..=27).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(SetLatencyToleranceValue {
+    best_effort_latency_tolerance_value
+});
 
 add_trb_with_default!(
     GetPortBandwidth,
@@ -593,6 +638,11 @@ impl GetPortBandwidth {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(GetPortBandwidth {
+    port_bandwidth_context_pointer,
+    dev_speed,
+    hub_slot_id
+});
 
 add_trb_with_default!(ForceHeader, "Force Header Command TRB", Type::ForceHeader);
 impl ForceHeader {
@@ -643,6 +693,11 @@ impl ForceHeader {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(ForceHeader {
+    packet_type,
+    header_info,
+    root_hub_port_number
+});
 
 add_trb_with_default!(
     GetExtendedProperty,
@@ -727,6 +782,13 @@ impl GetExtendedProperty {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(GetExtendedProperty {
+    extended_property_context_pointer,
+    extended_capability_identifier,
+    command_sub_type,
+    endpoint_id,
+    slot_id
+});
 
 add_trb_with_default!(
     SetExtendedProperty,
@@ -794,3 +856,10 @@ impl SetExtendedProperty {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_trb!(SetExtendedProperty {
+    extended_capability_identifier,
+    capability_parameter,
+    command_sub_type,
+    endpoint_id,
+    slot_id
+});

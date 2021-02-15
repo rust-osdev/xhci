@@ -105,6 +105,21 @@ macro_rules! transfer_trb_with_default {
         interrupt_on_completion!($name);
     };
 }
+macro_rules! impl_debug_for_transfer_trb{
+    ($name:ident {})=>{
+        impl_debug_for_trb!($name{
+            interrupt_on_completion
+        });
+    };
+    ($name:ident {
+        $($method:ident),*
+    })=>{
+        impl_debug_for_trb!($name{
+            interrupt_on_completion,
+            $($method),*
+        });
+    }
+}
 
 transfer_trb_with_default!(Normal, "Normal TRB", Type::Normal);
 impl Normal {
@@ -139,6 +154,10 @@ impl Normal {
         self.0[2].get_bits(0..=16)
     }
 }
+impl_debug_for_transfer_trb!(Normal {
+    data_buffer_pointer,
+    trb_transfer_length
+});
 
 transfer_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
 impl SetupStage {
@@ -237,6 +256,14 @@ impl Default for SetupStage {
         Self::new()
     }
 }
+impl_debug_for_transfer_trb!(SetupStage {
+    request_type,
+    request,
+    value,
+    length,
+    trb_transfer_length,
+    transfer_type
+});
 
 transfer_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
 impl DataStage {
@@ -283,8 +310,14 @@ impl DataStage {
         self.0[3].get_bit(16).into()
     }
 }
+impl_debug_for_transfer_trb!(DataStage {
+    data_buffer_pointer,
+    trb_transfer_length,
+    direction
+});
 
 transfer_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
+impl_debug_for_transfer_trb!(StatusStage {});
 
 transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
 impl Isoch {
@@ -463,6 +496,22 @@ impl Isoch {
         self.0[3].get_bit(31)
     }
 }
+impl_debug_for_transfer_trb!(Isoch {
+    data_buffer_pointer,
+    trb_transfer_length,
+    td_size_or_tbc,
+    interrupter_target,
+    evaluate_next_trb,
+    interrupt_on_short_packet,
+    no_snoop,
+    chain_bit,
+    immediate_data,
+    transfer_burst_count,
+    block_event_interrupt,
+    transfer_last_burst_packet_count,
+    frame_id,
+    start_isoch_asap
+});
 
 transfer_trb_with_default!(EventData, "Event Data TRB", Type::EventData);
 impl EventData {
@@ -533,6 +582,13 @@ impl EventData {
         self.0[3].get_bit(9)
     }
 }
+impl_debug_for_transfer_trb!(EventData {
+    event_data,
+    interrupter_target,
+    evaluate_next_trb,
+    chain_bit,
+    block_event_interrupt
+});
 
 transfer_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
 impl Noop {
@@ -572,6 +628,11 @@ impl Noop {
         self.0[3].get_bit(4)
     }
 }
+impl_debug_for_transfer_trb!(Noop {
+    interrupter_target,
+    evaluate_next_trb,
+    chain_bit
+});
 
 /// The direction of the data transfer.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]

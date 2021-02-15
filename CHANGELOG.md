@@ -4,6 +4,9 @@
 ### Added
 - All the missing getters of the Transfer TRBs are implemented.
 
+### Changed
+- The debug prints of the all TRBs now print the value of each field.
+
 ### Fixed
 - `ConfigureEndpoint::deconfigure` and `SetTrDequeuePointer::slot_id` wrongly took the mutable references to the `self`. They now take the immutable references.
 

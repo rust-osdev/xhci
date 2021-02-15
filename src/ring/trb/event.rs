@@ -73,6 +73,21 @@ macro_rules! event {
         completion_code!($name);
     };
 }
+macro_rules! impl_debug_for_event_trb{
+    ($name:ident{})=>{
+        impl_debug_for_trb!($name{
+            completion_code
+        });
+    };
+    ($name:ident {
+        $($method:ident),*
+    })=>{
+        impl_debug_for_trb!($name{
+            completion_code,
+            $($method),*
+        });
+    }
+}
 
 event!(
     PortStatusChange,
@@ -93,6 +108,7 @@ impl PortStatusChange {
         self.0[0].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(PortStatusChange { port_id });
 
 event!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
 reserved!(TransferEvent(Type::TransferEvent){
@@ -134,6 +150,13 @@ impl TransferEvent {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(TransferEvent {
+    trb_pointer,
+    trb_transfer_length,
+    event_data,
+    endpoint_id,
+    slot_id
+});
 
 event!(
     CommandCompletion,
@@ -172,6 +195,12 @@ impl CommandCompletion {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(CommandCompletion {
+    command_trb_pointer,
+    command_completion_parameter,
+    vf_id,
+    slot_id
+});
 
 event!(
     BandwidthRequest,
@@ -192,6 +221,7 @@ impl BandwidthRequest {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(BandwidthRequest { slot_id });
 
 event!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
 reserved!(Doorbell(Type::Doorbell){
@@ -207,6 +237,7 @@ impl Doorbell {
         self.0[0].get_bits(0..=4).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(Doorbell { db_reason });
 
 event!(
     HostController,
@@ -220,6 +251,7 @@ reserved!(HostController(Type::HostController){
     [3]1..=9;
     [3]16..=31
 });
+impl_debug_for_event_trb!(HostController {});
 
 event!(
     DeviceNotification,
@@ -255,6 +287,11 @@ impl DeviceNotification {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }
 }
+impl_debug_for_event_trb!(DeviceNotification {
+    notification_type,
+    device_notification_data,
+    slot_id
+});
 
 event!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
 reserved!(MfindexWrap(Type::MfindexWrap){
@@ -263,6 +300,7 @@ reserved!(MfindexWrap(Type::MfindexWrap){
     [3]1..=9;
     [3]16..=23
 });
+impl_debug_for_event_trb!(MfindexWrap {});
 
 /// The Completion Code.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]

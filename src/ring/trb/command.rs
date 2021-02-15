@@ -180,6 +180,7 @@ impl ConfigureEndpoint {
     }
 
     /// Returns the value of the Deconfigure field.
+    #[must_use]
     pub fn deconfigure(&self) -> bool {
         self.0[3].get_bit(9)
     }
@@ -421,6 +422,7 @@ impl SetTrDequeuePointer {
     }
 
     /// Returns the value of the Slot ID field.
+    #[must_use]
     pub fn slot_id(&self) -> u8 {
         self.0[3].get_bits(24..=31).try_into().unwrap()
     }

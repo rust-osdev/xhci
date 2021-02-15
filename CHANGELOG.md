@@ -4,6 +4,9 @@
 ### Added
 - All the missing getters of the Transfer TRBs are implemented.
 
+### Changed
+- The debug prints of the all TRBs now print the value of each field.
+
 ## 0.4.1 - 2021-02-05
 ### Added
 - All types now implement the `Debug` trait.

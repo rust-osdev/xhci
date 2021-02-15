@@ -7,6 +7,9 @@
 ### Changed
 - The debug prints of the all TRBs now print the value of each field.
 
+### Fixed
+- `ConfigureEndpoint::deconfigure` and `SetTrDequeuePointer::slot_id` wrongly took the mutable references to the `self`. They now take the immutable references.
+
 ## 0.4.1 - 2021-02-05
 ### Added
 - All types now implement the `Debug` trait.

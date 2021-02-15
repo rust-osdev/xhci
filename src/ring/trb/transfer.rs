@@ -591,9 +591,10 @@ impl From<Direction> for bool {
 }
 impl From<bool> for Direction {
     fn from(b: bool) -> Self {
-        match b {
-            false => Direction::Out,
-            true => Direction::In,
+        if b {
+            Direction::In
+        } else {
+            Direction::Out
         }
     }
 }

@@ -92,9 +92,20 @@ macro_rules! interrupt_on_completion {
         }
     };
 }
+macro_rules! transfer_trb {
+    ($name:ident,$full:expr,$type:expr) => {
+        add_trb!($name, $full, $type);
+        interrupt_on_completion!($name);
+    };
+}
+macro_rules! transfer_trb_with_default {
+    ($name:ident,$full:expr,$type:expr) => {
+        add_trb_with_default!($name, $full, $type);
+        interrupt_on_completion!($name);
+    };
+}
 
-add_trb_with_default!(Normal, "Normal TRB", Type::Normal);
-interrupt_on_completion!(Normal);
+transfer_trb_with_default!(Normal, "Normal TRB", Type::Normal);
 impl Normal {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -113,8 +124,7 @@ impl Normal {
     }
 }
 
-add_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
-interrupt_on_completion!(SetupStage);
+transfer_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
 impl SetupStage {
     /// Creates a new Setup Stage TRB.
     ///
@@ -172,8 +182,7 @@ impl Default for SetupStage {
     }
 }
 
-add_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
-interrupt_on_completion!(DataStage);
+transfer_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
 impl DataStage {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -198,11 +207,9 @@ impl DataStage {
     }
 }
 
-add_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
-interrupt_on_completion!(StatusStage);
+transfer_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
 
-add_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
-interrupt_on_completion!(Isoch);
+transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
 impl Isoch {
     /// Sets the value of the Data Buffer Pointer.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -380,8 +387,7 @@ impl Isoch {
     }
 }
 
-add_trb_with_default!(EventData, "Event Data TRB", Type::EventData);
-interrupt_on_completion!(EventData);
+transfer_trb_with_default!(EventData, "Event Data TRB", Type::EventData);
 impl EventData {
     /// Sets the value of the Event Data field.
     pub fn set_event_data(&mut self, d: u64) -> &mut Self {
@@ -451,8 +457,7 @@ impl EventData {
     }
 }
 
-add_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
-interrupt_on_completion!(Noop);
+transfer_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
 impl Noop {
     /// Sets the value of the Interrupter Target.
     pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {

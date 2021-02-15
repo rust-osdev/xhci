@@ -119,6 +119,7 @@ impl Normal {
     }
 
     /// Returns the value of the Data Buffer Pointer field.
+    #[must_use]
     pub fn data_buffer_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -133,6 +134,7 @@ impl Normal {
     }
 
     /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
     pub fn trb_transfer_length(&self) -> u32 {
         self.0[2].get_bits(0..=16)
     }
@@ -156,6 +158,7 @@ impl SetupStage {
     }
 
     /// Returns the value of the `bmRequestType` field.
+    #[must_use]
     pub fn request_type(&self) -> u8 {
         self.0[0].get_bits(0..=7).try_into().unwrap()
     }
@@ -167,6 +170,7 @@ impl SetupStage {
     }
 
     /// Returns the value of the bRequest field.
+    #[must_use]
     pub fn request(&self) -> u8 {
         self.0[0].get_bits(8..=15).try_into().unwrap()
     }
@@ -178,6 +182,7 @@ impl SetupStage {
     }
 
     /// Returns the value of the wValue field.
+    #[must_use]
     pub fn value(&self) -> u16 {
         self.0[0].get_bits(16..=31).try_into().unwrap()
     }
@@ -189,6 +194,7 @@ impl SetupStage {
     }
 
     /// Returns the value of the wLength field.
+    #[must_use]
     pub fn length(&self) -> u16 {
         self.0[1].get_bits(16..=31).try_into().unwrap()
     }
@@ -200,6 +206,7 @@ impl SetupStage {
     }
 
     /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
     pub fn trb_transfer_length(&self) -> u32 {
         self.0[2].get_bits(0..=16)
     }
@@ -215,6 +222,7 @@ impl SetupStage {
     /// # Panics
     ///
     /// This method panics if the Transfer Type field contains 1 which is reserved.
+    #[must_use]
     pub fn transfer_type(&self) -> TransferType {
         FromPrimitive::from_u32(self.0[3].get_bits(16..=17)).expect("Transfer Type 1 is reserved.")
     }
@@ -243,6 +251,7 @@ impl DataStage {
     }
 
     /// Returns the value of the Data Buffer Pointer field.
+    #[must_use]
     pub fn data_buffer_pointer(&self) -> u64 {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
@@ -257,6 +266,7 @@ impl DataStage {
     }
 
     /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
     pub fn trb_transfer_length(&self) -> u32 {
         self.0[2].get_bits(0..=16)
     }
@@ -268,6 +278,7 @@ impl DataStage {
     }
 
     /// Returns the value of the Direction field.
+    #[must_use]
     pub fn direction(&self) -> Direction {
         self.0[3].get_bit(16).into()
     }

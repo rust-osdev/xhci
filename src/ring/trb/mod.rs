@@ -31,7 +31,7 @@ macro_rules! add_trb {
     ($name:ident,$full:expr,$ty:expr) => {
         #[doc = $full ]
         #[repr(transparent)]
-        #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+        #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
         pub struct $name([u32; 4]);
         impl $name {
             /// Returns the wrapped array.
@@ -95,6 +95,20 @@ macro_rules! add_trb_with_default {
         add_trb!($name, $full, $type);
         impl_default_simply_adds_trb_id!($name, $full);
     };
+}
+macro_rules! impl_debug_for_trb{
+    ($name:ident {
+        $($method:ident),*
+    })=>{
+        impl core::fmt::Debug for $name{
+            fn fmt(&self, f:&mut core::fmt::Formatter<'_>)->core::fmt::Result{
+                f.debug_struct(core::stringify!($name))
+                    $(.field(core::stringify!($method), &self.$method()))*
+                    .field("cycle_bit", &self.cycle_bit())
+                    .finish()
+            }
+        }
+    }
 }
 
 macro_rules! allowed {
@@ -234,6 +248,14 @@ impl Link {
         self.0[3].get_bit(5)
     }
 }
+impl_debug_for_trb!(Link {
+    ring_segment_pointer,
+    interrupter_target,
+    toggle_cycle,
+    chain_bit,
+    interrupt_on_completion
+});
+
 /// TRB Type.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
 pub enum Type {

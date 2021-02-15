@@ -4,6 +4,7 @@ use super::Link;
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 allowed! {
     /// TRBs which are allowed to be pushed to the Transfer Ring.
@@ -127,10 +128,25 @@ impl Normal {
         self
     }
 
+    /// Returns the value of the Data Buffer Pointer field.
+    #[must_use]
+    pub fn data_buffer_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (l << 32) | u
+    }
+
     /// Sets the value of the TRB Transfer Length field.
     pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
         self.0[2].set_bits(0..=16, l);
         self
+    }
+
+    /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
+    pub fn trb_transfer_length(&self) -> u32 {
+        self.0[2].get_bits(0..=16)
     }
 }
 
@@ -151,10 +167,22 @@ impl SetupStage {
         self
     }
 
+    /// Returns the value of the `bmRequestType` field.
+    #[must_use]
+    pub fn request_type(&self) -> u8 {
+        self.0[0].get_bits(0..=7).try_into().unwrap()
+    }
+
     /// Sets the value of the bRequest field.
     pub fn set_request(&mut self, r: u8) -> &mut Self {
         self.0[0].set_bits(8..=15, r.into());
         self
+    }
+
+    /// Returns the value of the bRequest field.
+    #[must_use]
+    pub fn request(&self) -> u8 {
+        self.0[0].get_bits(8..=15).try_into().unwrap()
     }
 
     /// Sets the value of the wValue field.
@@ -163,10 +191,22 @@ impl SetupStage {
         self
     }
 
+    /// Returns the value of the wValue field.
+    #[must_use]
+    pub fn value(&self) -> u16 {
+        self.0[0].get_bits(16..=31).try_into().unwrap()
+    }
+
     /// Sets the value of the wLength field.
     pub fn set_length(&mut self, l: u16) -> &mut Self {
         self.0[1].set_bits(16..=31, l.into());
         self
+    }
+
+    /// Returns the value of the wLength field.
+    #[must_use]
+    pub fn length(&self) -> u16 {
+        self.0[1].get_bits(16..=31).try_into().unwrap()
     }
 
     /// Sets the value of the TRB Transfer Length field.
@@ -175,10 +215,26 @@ impl SetupStage {
         self
     }
 
+    /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
+    pub fn trb_transfer_length(&self) -> u32 {
+        self.0[2].get_bits(0..=16)
+    }
+
     /// Sets the value of the Transfer Type field.
     pub fn set_transfer_type(&mut self, t: TransferType) -> &mut Self {
         self.0[3].set_bits(16..=17, t as _);
         self
+    }
+
+    /// Returns the value of the Transfer Type field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the Transfer Type field contains 1 which is reserved.
+    #[must_use]
+    pub fn transfer_type(&self) -> TransferType {
+        FromPrimitive::from_u32(self.0[3].get_bits(16..=17)).expect("Transfer Type 1 is reserved.")
     }
 
     fn set_idt(&mut self) -> &mut Self {
@@ -204,16 +260,37 @@ impl DataStage {
         self
     }
 
+    /// Returns the value of the Data Buffer Pointer field.
+    #[must_use]
+    pub fn data_buffer_pointer(&self) -> u64 {
+        let l: u64 = self.0[0].into();
+        let u: u64 = self.0[1].into();
+
+        (u << 32) | l
+    }
+
     /// Sets the value of the TRB Tranfer Length field.
     pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
         self.0[2].set_bits(0..=16, l);
         self
     }
 
+    /// Returns the value of the TRB Transfer Length field.
+    #[must_use]
+    pub fn trb_transfer_length(&self) -> u32 {
+        self.0[2].get_bits(0..=16)
+    }
+
     /// Sets the value of the Direction field.
     pub fn set_direction(&mut self, d: Direction) -> &mut Self {
         self.0[3].set_bit(16, d.into());
         self
+    }
+
+    /// Returns the value of the Direction field.
+    #[must_use]
+    pub fn direction(&self) -> Direction {
+        self.0[3].get_bit(16).into()
     }
 }
 
@@ -519,6 +596,15 @@ impl From<Direction> for bool {
         match d {
             Direction::Out => false,
             Direction::In => true,
+        }
+    }
+}
+impl From<bool> for Direction {
+    fn from(b: bool) -> Self {
+        if b {
+            Direction::In
+        } else {
+            Direction::Out
         }
     }
 }

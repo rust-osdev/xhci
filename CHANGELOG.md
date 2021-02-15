@@ -1,6 +1,11 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- The missing Completion Codes are added to the `CompletionCode`.
+
+### Changed
+- `CompletionCode` becomes an exhausive enum.
 
 ## 0.5.0 - 2021-02-15
 ### Added

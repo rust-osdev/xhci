@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.5.0 - 2021-02-15
 ### Added
 - All the missing getters of the Transfer TRBs are implemented.
 

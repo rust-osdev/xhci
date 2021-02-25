@@ -159,6 +159,13 @@ macro_rules! allowed {
                 }
             }
         }
+        $(
+            impl From<$variant> for Allowed{
+                fn from(v:$variant)->Self{
+                    Self::$variant(v)
+                }
+            }
+        )+
     };
 }
 

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- `From` trait is implemented for the `Allowed` enum to convert from the structs of TRBs to the enum.
 
 ## 0.5.1 - 2021-02-15
 ### Added

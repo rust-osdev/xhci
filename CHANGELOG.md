@@ -2,6 +2,10 @@
 
 ## Unreleased - ReleaseDate
 
+## 0.5.3 - 2021-04-12
+### Fixed
+- The typo of the URL to the repository is fixed.
+
 ## 0.5.2 - 2021-02-25
 ### Added
 - `From` trait is implemented for the `Allowed` enum to convert from the structs of TRBs to the enum.

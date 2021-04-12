@@ -58,6 +58,7 @@
     pointer_structural_match,
     missing_debug_implementations
 )]
+#![allow(clippy::missing_panics_doc)]
 
 pub use accessor;
 pub use extended_capabilities::ExtendedCapability;

@@ -12,6 +12,8 @@ where
 {
     /// Capability Registers Length
     pub caplength: accessor::Single<CapabilityRegistersLength, M>,
+    /// Host Controller Interface Version Number
+    pub hciversion: accessor::Single<InterfaceVersionNumber, M>,
     /// Structural Parameters 1
     pub hcsparams1: accessor::Single<StructuralParameters1, M>,
     /// Structural Parameters 2
@@ -49,6 +51,7 @@ where
 
         Self {
             caplength: m!(0x00),
+            hciversion: m!(0x02),
             hcsparams1: m!(0x04),
             hcsparams2: m!(0x08),
             hccparams1: m!(0x10),
@@ -68,6 +71,23 @@ impl CapabilityRegistersLength {
     #[must_use]
     pub fn get(self) -> u8 {
         self.0
+    }
+}
+
+/// Interface Version Number
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct InterfaceVersionNumber(u16);
+impl InterfaceVersionNumber {
+    /// Returns the version of the xHCI specification revision number supported by HC.
+    ///
+    /// For example, if the HC supports version 1.1.0, the return value is `(1, 0)`.
+    #[must_use]
+    pub fn major_minor(self) -> (u8, u8) {
+        let major: u8 = self.0.get_bits(8..16).try_into().unwrap();
+        let minor: u8 = self.0.get_bits(0..8).try_into().unwrap();
+
+        (major, minor)
     }
 }
 

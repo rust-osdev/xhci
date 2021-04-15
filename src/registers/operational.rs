@@ -3,7 +3,7 @@
 use super::capability::{Capability, CapabilityRegistersLength};
 use accessor::Mapper;
 use bit_field::BitField;
-use core::{convert::TryInto, fmt};
+use core::convert::TryInto;
 
 /// Host Controller Operational Registers
 ///
@@ -91,12 +91,10 @@ impl UsbCommandRegister {
         self.0.set_bit(1, b);
     }
 }
-impl fmt::Debug for UsbCommandRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("UsbCommandRegister")
-            .field("run_stop", &self.run_stop())
-            .field("host_controller_reset", &self.host_controller_reset())
-            .finish()
+impl_debug_from_methods! {
+    UsbCommandRegister{
+        run_stop,
+        host_controller_reset,
     }
 }
 
@@ -130,14 +128,12 @@ impl UsbStatusRegister {
         self.0.get_bit(12)
     }
 }
-impl fmt::Debug for UsbStatusRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("UsbStatusRegister")
-            .field("hc_halted", &self.hc_halted())
-            .field("host_system_error", &self.host_system_error())
-            .field("controller_not_ready", &self.controller_not_ready())
-            .field("host_controller_error", &self.host_controller_error())
-            .finish()
+impl_debug_from_methods! {
+    UsbStatusRegister{
+        hc_halted,
+        host_system_error,
+        controller_not_ready,
+        host_controller_error,
     }
 }
 
@@ -181,11 +177,9 @@ impl CommandRingControlRegister {
         self.0.set_bits(6..=63, p);
     }
 }
-impl fmt::Debug for CommandRingControlRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CommandRingControlRegister")
-            .field("command_ring_running", &self.command_ring_running())
-            .finish()
+impl_debug_from_methods! {
+    CommandRingControlRegister{
+        command_ring_running
     }
 }
 
@@ -221,11 +215,9 @@ impl ConfigureRegister {
         self.0.set_bits(0..=7, s.into());
     }
 }
-impl fmt::Debug for ConfigureRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ConfigureRegister")
-            .field("max_device_slots_enabled", &self.max_device_slots_enabled())
-            .finish()
+impl_debug_from_methods! {
+    ConfigureRegister {
+        max_device_slots_enabled
     }
 }
 
@@ -302,13 +294,11 @@ impl PortStatusAndControlRegister {
         self.0.get_bit(21)
     }
 }
-impl fmt::Debug for PortStatusAndControlRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("PortStatusAndControlRegister")
-            .field("current_connect_status", &self.current_connect_status())
-            .field("port_reset", &self.port_reset())
-            .field("port_speed", &self.port_speed())
-            .field("port_reset_changed", &self.port_reset_changed())
-            .finish()
+impl_debug_from_methods! {
+    PortStatusAndControlRegister{
+        current_connect_status,
+        port_reset,
+        port_speed,
+        port_reset_changed,
     }
 }

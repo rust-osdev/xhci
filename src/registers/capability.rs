@@ -443,7 +443,7 @@ impl CapabilityParameters2 {
 
     /// Returns the value of the Get/Set Extended Property Capability field.
     #[must_use]
-    pub fn get_set_extended_property_capability_field(self) -> bool {
+    pub fn get_set_extended_property_capability(self) -> bool {
         self.0.get_bit(8)
     }
 
@@ -485,7 +485,7 @@ impl fmt::Debug for CapabilityParameters2 {
             )
             .field(
                 "get_set_extended_property_capability_field",
-                &self.get_set_extended_property_capability_field(),
+                &self.get_set_extended_property_capability(),
             )
             .field(
                 "virtualization_based_trusted_io_capability",

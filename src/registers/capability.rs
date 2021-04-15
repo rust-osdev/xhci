@@ -274,57 +274,68 @@ impl RuntimeRegisterSpaceOffset {
 pub struct CapabilityParameters2(u32);
 impl CapabilityParameters2 {
     /// Returns the value of the U3 Entry Capability field.
+    #[must_use]
     pub fn u3_entry_capability(self) -> bool {
         self.0.get_bit(0)
     }
 
     /// Returns the value of the Configure Endpoint Command Max Exit Latency Too Large Capability
     /// field.
+    #[must_use]
     pub fn configure_endpoint_command_max_exit_latency_too_large_capability(self) -> bool {
         self.0.get_bit(1)
     }
 
     /// Returns the value of the Force Save Context Capability field.
+    #[must_use]
     pub fn force_save_context_capability(self) -> bool {
         self.0.get_bit(2)
     }
 
     /// Returns the value of the Compliance Transition Capability field.
+    #[must_use]
     pub fn compliance_transition_capability(self) -> bool {
         self.0.get_bit(3)
     }
 
     /// Returns the value of the Large ESIT Payload Capability field.
+    #[must_use]
     pub fn large_esit_payload_capability(self) -> bool {
         self.0.get_bit(4)
     }
 
     /// Returns the value of the Configuration Information Capability field.
+    #[must_use]
     pub fn configuration_information_capability(self) -> bool {
         self.0.get_bit(5)
     }
 
     /// Returns the value of the Extended TBC Capability field.
+    #[must_use]
     pub fn extended_tbc_capability(self) -> bool {
         self.0.get_bit(6)
     }
 
     /// Returns the value of the Extended TBC TRB Status Capability field.
+    #[must_use]
     pub fn extended_tbc_trb_status_capability(self) -> bool {
         self.0.get_bit(7)
     }
 
     /// Returns the value of the Get/Set Extended Property Capability field.
+    #[must_use]
     pub fn get_set_extended_property_capability_field(self) -> bool {
         self.0.get_bit(8)
     }
 
     /// Returns the value of the Virtualization Based Trusted I/O Capability field.
+    #[must_use]
     pub fn virtualization_based_trusted_io_capability(self) -> bool {
         self.0.get_bit(9)
     }
 }
 impl fmt::Debug for CapabilityParameters2 {
+    #[allow(clippy::too_many_lines)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CapabilityParameters2")
             .field("u3_entry_capability", &self.u3_entry_capability())

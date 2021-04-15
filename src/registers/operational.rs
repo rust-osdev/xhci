@@ -693,7 +693,7 @@ impl_debug_from_methods! {
     }
 }
 
-/// A type returned by [`CommandRingControlRegister::port_indicator_control`].
+/// A type returned by [`PortStatusAndControlRegister::port_indicator_control`].
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum PortIndicator {
     /// Port Indicators are off.

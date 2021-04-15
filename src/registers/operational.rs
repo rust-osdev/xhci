@@ -457,10 +457,33 @@ impl ConfigureRegister {
     pub fn set_max_device_slots_enabled(&mut self, s: u8) {
         self.0.set_bits(0..=7, s.into());
     }
+
+    /// Returns the value of the U3 Entry Enable bit.
+    #[must_use]
+    pub fn u3_entry_enable(self) -> bool {
+        self.0.get_bit(8)
+    }
+
+    /// Sets the value of the U3 Entry Enable bit.
+    pub fn set_u3_entry_enable(&mut self, b: bool) {
+        self.0.set_bit(8, b);
+    }
+
+    /// Returns the value of the Configuration Information Enable bit.
+    pub fn configuration_information_enable(self) -> bool {
+        self.0.get_bit(9)
+    }
+
+    /// Sets the value of the Configuration Information Enable bit.
+    pub fn set_configuration_information_enable(&mut self, b: bool) {
+        self.0.set_bit(9, b);
+    }
 }
 impl_debug_from_methods! {
     ConfigureRegister {
-        max_device_slots_enabled
+        max_device_slots_enabled,
+        u3_entry_enable,
+        configuration_information_enable,
     }
 }
 

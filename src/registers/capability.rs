@@ -28,6 +28,8 @@ where
     pub rtsoff: accessor::Single<RuntimeRegisterSpaceOffset, M>,
     /// Capability Parameters 2
     pub hccparams2: accessor::Single<CapabilityParameters2, M>,
+    /// Virtualization Based Trusted IO Register Space Offset
+    pub vtiosoff: accessor::Single<VirtualizationBasedTrustedIoRegisterSpaceOffset, M>,
 }
 impl<M> Capability<M>
 where
@@ -63,6 +65,7 @@ where
             dboff: m!(0x14),
             rtsoff: m!(0x18),
             hccparams2: m!(0x1c),
+            vtiosoff: m!(0x20),
         }
     }
 }
@@ -373,5 +376,15 @@ impl fmt::Debug for CapabilityParameters2 {
                 &self.virtualization_based_trusted_io_capability(),
             )
             .finish()
+    }
+}
+
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct VirtualizationBasedTrustedIoRegisterSpaceOffset(u32);
+impl VirtualizationBasedTrustedIoRegisterSpaceOffset {
+    /// Returns the offset of the VTIO Registers from the MMIO base.
+    pub fn get(self) -> u32 {
+        self.0
     }
 }

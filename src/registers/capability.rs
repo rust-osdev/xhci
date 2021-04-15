@@ -317,6 +317,7 @@ impl CapabilityParameters1 {
     }
 }
 impl fmt::Debug for CapabilityParameters1 {
+    #[allow(clippy::too_many_lines)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CapabilityParameters1")
             .field("address_capability", &self.addressing_capability())

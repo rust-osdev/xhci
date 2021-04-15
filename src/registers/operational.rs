@@ -659,7 +659,6 @@ impl PortStatusAndControlRegister {
     }
 
     /// Clears the Over-current Change bit.
-    #[must_use]
     pub fn clear_over_current_change(&mut self) {
         self.0.set_bit(20, true);
     }

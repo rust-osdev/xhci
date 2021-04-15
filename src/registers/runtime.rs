@@ -2,7 +2,7 @@
 
 use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
-use core::{convert::TryFrom, fmt};
+use core::convert::TryFrom;
 
 /// Interrupt Register Set
 #[repr(C)]
@@ -94,13 +94,8 @@ impl EventRingDequeuePointerRegister {
         self.0 = p;
     }
 }
-impl fmt::Debug for EventRingDequeuePointerRegister {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("EventRingDequeuePointerRegister")
-            .field(
-                "event_ring_dequeue_pointer",
-                &self.event_ring_dequeue_pointer(),
-            )
-            .finish()
+impl_debug_from_methods! {
+    EventRingDequeuePointerRegister{
+        event_ring_dequeue_pointer
     }
 }

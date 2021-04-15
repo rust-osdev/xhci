@@ -251,6 +251,56 @@ impl UsbStatusRegister {
         self.0.get_bit(2)
     }
 
+    /// Clears the Host System Error bit.
+    pub fn clear_host_system_error(&mut self) {
+        self.0.set_bit(2, true);
+    }
+
+    /// Returns the value of the Event Interrupt bit.
+    #[must_use]
+    pub fn event_interrupt(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Clears the Event Interrupt bit.
+    pub fn clear_event_interrupt(&mut self) {
+        self.0.set_bit(3, true);
+    }
+
+    /// Returns the value of the Port Change Detect bit.
+    #[must_use]
+    pub fn port_change_detect(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Clears the Port Change Detect bit.
+    pub fn clear_port_change_detect(&mut self) {
+        self.0.set_bit(4, true);
+    }
+
+    /// Returns the value of the Save State Status field.
+    #[must_use]
+    pub fn save_state_status(self) -> bool {
+        self.0.get_bit(8)
+    }
+
+    /// Returns the value of the Restore State Status field.
+    #[must_use]
+    pub fn restore_state_status(self) -> bool {
+        self.0.get_bit(9)
+    }
+
+    /// Returns the value of the Save/Restore Error field.
+    #[must_use]
+    pub fn save_restore_error(self) -> bool {
+        self.0.get_bit(10)
+    }
+
+    /// Clears the Save/Restore Error field.
+    pub fn clear_save_restore_error(&mut self) {
+        self.0.set_bit(10, true);
+    }
+
     /// Returns the value of the Controller Not Ready bit.
     #[must_use]
     pub fn controller_not_ready(self) -> bool {
@@ -267,6 +317,11 @@ impl_debug_from_methods! {
     UsbStatusRegister{
         hc_halted,
         host_system_error,
+        event_interrupt,
+        port_change_detect,
+        save_state_status,
+        restore_state_status,
+        save_restore_error,
         controller_not_ready,
         host_controller_error,
     }

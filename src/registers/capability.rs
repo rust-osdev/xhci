@@ -18,6 +18,8 @@ where
     pub hcsparams1: accessor::Single<StructuralParameters1, M>,
     /// Structural Parameters 2
     pub hcsparams2: accessor::Single<StructuralParameters2, M>,
+    /// Structural Parameters 3
+    pub hcsparams3: accessor::Single<StructuralParameters3, M>,
     /// Capability Parameters 1
     pub hccparams1: accessor::Single<CapabilityParameters1, M>,
     /// Doorbell Offset
@@ -54,6 +56,7 @@ where
             hciversion: m!(0x02),
             hcsparams1: m!(0x04),
             hcsparams2: m!(0x08),
+            hcsparams3: m!(0x0c),
             hccparams1: m!(0x10),
             dboff: m!(0x14),
             rtsoff: m!(0x18),
@@ -177,6 +180,30 @@ impl fmt::Debug for StructuralParameters2 {
                 &self.event_ring_segment_table_max(),
             )
             .field("max_scratchpad_buffers", &self.max_scratchpad_buffers())
+            .finish()
+    }
+}
+
+/// Structural Parameters 3
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct StructuralParameters3(u32);
+impl StructuralParameters3 {
+    /// Returns the value of the U1 Device Exit Latency field.
+    pub fn u1_device_exit_latency(self) -> u8 {
+        self.0.get_bits(0..=7).try_into().unwrap()
+    }
+
+    /// Returns the value of the U2 Device Exit Latency field.
+    pub fn u2_device_exit_latency(self) -> u16 {
+        self.0.get_bits(16..=31).try_into().unwrap()
+    }
+}
+impl fmt::Debug for StructuralParameters3 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("StructuralParameters3")
+            .field("u1_device_exit_latency", &self.u1_device_exit_latency())
+            .field("u2_device_exit_latency", &self.u2_device_exit_latency())
             .finish()
     }
 }

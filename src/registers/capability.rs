@@ -85,35 +85,17 @@ impl CapabilityRegistersLength {
 
 /// Interface Version Number
 #[repr(transparent)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct InterfaceVersionNumber(u16);
 impl InterfaceVersionNumber {
-    /// Returns the version of the xHCI specification revision number supported by HC.
+    /// Returns a BCD encoding of the xHCI specification revision number supported by HC.
     ///
-    /// For example, if the HC supports version 1.1.0, the return value is `(1, 0)`.
-    #[must_use]
-    pub fn major_minor(self) -> (u8, u8) {
-        (self.major(), self.minor())
-    }
-
-    /// Returns the major version of the xHCI specification revision number supported by HC.
-    #[must_use]
-    pub fn major(self) -> u8 {
-        self.0.get_bits(8..16).try_into().unwrap()
-    }
-
-    /// Returns the minor version of the xHCI specification revision number supported by HC.
-    #[must_use]
-    pub fn minor(self) -> u8 {
-        self.0.get_bits(0..8).try_into().unwrap()
-    }
-}
-impl fmt::Debug for InterfaceVersionNumber {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("InterfaceVersionNumber")
-            .field("major", &self.major())
-            .field("minor", &self.minor())
-            .finish()
+    /// The most significant byte of the value represents a major version and the least significant
+    /// byte contains the minor revision extensions.
+    ///
+    /// For example, 0x0110 means xHCI version 1.1.0.
+    pub fn get(self) -> u16 {
+        self.0
     }
 }
 

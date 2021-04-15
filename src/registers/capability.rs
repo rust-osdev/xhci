@@ -26,6 +26,8 @@ where
     pub dboff: accessor::Single<DoorbellOffset, M>,
     /// Runtime Register Space Offset
     pub rtsoff: accessor::Single<RuntimeRegisterSpaceOffset, M>,
+    /// Capability Parameters 2
+    pub hccparams2: accessor::Single<CapabilityParameters2, M>,
 }
 impl<M> Capability<M>
 where
@@ -60,6 +62,7 @@ where
             hccparams1: m!(0x10),
             dboff: m!(0x14),
             rtsoff: m!(0x18),
+            hccparams2: m!(0x1c),
         }
     }
 }
@@ -261,5 +264,102 @@ impl RuntimeRegisterSpaceOffset {
     #[must_use]
     pub fn get(self) -> u32 {
         self.0
+    }
+}
+
+/// Capability Parameters 2
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct CapabilityParameters2(u32);
+impl CapabilityParameters2 {
+    /// Returns the value of the U3 Entry Capability field.
+    pub fn u3_entry_capability(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Returns the value of the Configure Endpoint Command Max Exit Latency Too Large Capability
+    /// field.
+    pub fn configure_endpoint_command_max_exit_latency_too_large_capability(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Returns the value of the Force Save Context Capability field.
+    pub fn force_save_context_capability(self) -> bool {
+        self.0.get_bit(2)
+    }
+
+    /// Returns the value of the Compliance Transition Capability field.
+    pub fn compliance_transition_capability(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Returns the value of the Large ESIT Payload Capability field.
+    pub fn large_esit_payload_capability(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Returns the value of the Configuration Information Capability field.
+    pub fn configuration_information_capability(self) -> bool {
+        self.0.get_bit(5)
+    }
+
+    /// Returns the value of the Extended TBC Capability field.
+    pub fn extended_tbc_capability(self) -> bool {
+        self.0.get_bit(6)
+    }
+
+    /// Returns the value of the Extended TBC TRB Status Capability field.
+    pub fn extended_tbc_trb_status_capability(self) -> bool {
+        self.0.get_bit(7)
+    }
+
+    /// Returns the value of the Get/Set Extended Property Capability field.
+    pub fn get_set_extended_property_capability_field(self) -> bool {
+        self.0.get_bit(8)
+    }
+
+    /// Returns the value of the Virtualization Based Trusted I/O Capability field.
+    pub fn virtualization_based_trusted_io_capability(self) -> bool {
+        self.0.get_bit(9)
+    }
+}
+impl fmt::Debug for CapabilityParameters2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("CapabilityParameters2")
+            .field("u3_entry_capability", &self.u3_entry_capability())
+            .field(
+                "configure_endpoint_command_max_exit_latency_too_large_capability",
+                &self.configure_endpoint_command_max_exit_latency_too_large_capability(),
+            )
+            .field(
+                "force_save_context_capability",
+                &self.force_save_context_capability(),
+            )
+            .field(
+                "compliance_transition_capability",
+                &self.compliance_transition_capability(),
+            )
+            .field(
+                "large_esit_payload_capability",
+                &self.large_esit_payload_capability(),
+            )
+            .field(
+                "configuration_information_capability",
+                &self.configuration_information_capability(),
+            )
+            .field("extended_tbc_capability", &self.extended_tbc_capability())
+            .field(
+                "extended_tbc_trb_status_capability",
+                &self.extended_tbc_trb_status_capability(),
+            )
+            .field(
+                "get_set_extended_property_capability_field",
+                &self.get_set_extended_property_capability_field(),
+            )
+            .field(
+                "virtualization_based_trusted_io_capability",
+                &self.virtualization_based_trusted_io_capability(),
+            )
+            .finish()
     }
 }

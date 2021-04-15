@@ -51,6 +51,7 @@ impl Register {
     }
 
     /// Get a Doorbell Stream ID.
+    #[must_use]
     pub fn doorbell_stream_id(self) -> u16 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }

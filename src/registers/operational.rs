@@ -4,6 +4,8 @@ use super::capability::{Capability, CapabilityRegistersLength};
 use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 /// Host Controller Operational Registers
 ///
@@ -537,6 +539,23 @@ impl PortStatusAndControlRegister {
         self.0.get_bit(0)
     }
 
+    /// Returns the value of the Port Enabled/Disabled bit.
+    #[must_use]
+    pub fn port_enabled_disabled(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Disable this port by writing `1` to the Port Enabled/Disabled bit.
+    pub fn disable_port(&mut self) {
+        self.0.set_bit(1, true);
+    }
+
+    /// Returns the value of the Over-current Active bit.
+    #[must_use]
+    pub fn over_current_active(self) -> bool {
+        self.0.get_bit(3)
+    }
+
     /// Returns the value of the Port Reset bit.
     #[must_use]
     pub fn port_reset(self) -> bool {
@@ -548,10 +567,100 @@ impl PortStatusAndControlRegister {
         self.0.set_bit(4, b);
     }
 
+    /// Returns the value of the Port Link State field.
+    #[must_use]
+    pub fn port_link_state(self) -> u8 {
+        self.0.get_bits(5..=8).try_into().unwrap()
+    }
+
+    /// Sets the value of the Port Link State field.
+    pub fn set_port_link_state(&mut self, state: u8) {
+        self.0.set_bits(5..=8, state.into());
+    }
+
+    /// Returns the value of the Port Power bit.
+    #[must_use]
+    pub fn port_power(self) -> bool {
+        self.0.get_bit(9)
+    }
+
+    /// Sets the value of the Port Power bit.
+    pub fn set_port_power(&mut self, b: bool) {
+        self.0.set_bit(9, b);
+    }
+
     /// Returns the value of the Port Speed field.
     #[must_use]
     pub fn port_speed(self) -> u8 {
         self.0.get_bits(10..=13).try_into().unwrap()
+    }
+
+    /// Returns the value of the Port Indicator Control field.
+    #[must_use]
+    pub fn port_indicator_control(self) -> PortIndicator {
+        let i = FromPrimitive::from_u32(self.0.get_bits(14..=15));
+        i.expect("The indicator must be less than 4.")
+    }
+
+    /// Sets the value of the Port Indicator Control field.
+    pub fn set_port_indicator_control(&mut self, i: PortIndicator) {
+        self.0.set_bits(14..=15, i as _);
+    }
+
+    /// Returns the value of the Port Link State Write Strobe bit.
+    #[must_use]
+    pub fn port_link_state_write_strobe(self) -> bool {
+        self.0.get_bit(16)
+    }
+
+    /// Sets the value of the Port Link State Write Strobe bit.
+    pub fn set_port_link_state_write_strobe(&mut self, b: bool) {
+        self.0.set_bit(16, b);
+    }
+
+    /// Returns the value of the Connect Status Change bit.
+    #[must_use]
+    pub fn connect_status_change(self) -> bool {
+        self.0.get_bit(17)
+    }
+
+    /// Clears the Connect Status Change bit.
+    pub fn clear_connect_status_change(&mut self) {
+        self.0.set_bit(17, true);
+    }
+
+    /// Returns the value of the Port Enabled/Disabled Change bit.
+    #[must_use]
+    pub fn port_enabled_disabled_change(self) -> bool {
+        self.0.get_bit(18)
+    }
+
+    /// Clears the Port Enabled/Disabled Change bit.
+    pub fn clear_port_enabled_disabled_change(&mut self) {
+        self.0.set_bit(18, true);
+    }
+
+    /// Returns the value of the Warm Port Reset Change bit.
+    #[must_use]
+    pub fn warm_port_reset_change(self) -> bool {
+        self.0.get_bit(19)
+    }
+
+    /// Clears the Warm Port Reset Change bit.
+    pub fn clear_warm_port_reset_change(&mut self) {
+        self.0.set_bit(19, true);
+    }
+
+    /// Returns the value of the Over-current Change bit.
+    #[must_use]
+    pub fn over_current_change(self) -> bool {
+        self.0.get_bit(20)
+    }
+
+    /// Clears the Over-current Change bit.
+    #[must_use]
+    pub fn clear_over_current_change(&mut self) {
+        self.0.set_bit(20, true);
     }
 
     /// Returns the value of the Port Reset Changed bit.
@@ -559,12 +668,40 @@ impl PortStatusAndControlRegister {
     pub fn port_reset_changed(self) -> bool {
         self.0.get_bit(21)
     }
+
+    /// Clears the value of the Port Reset Changed bit.
+    pub fn clear_reset_changed(&mut self) {
+        self.0.set_bit(21, true);
+    }
 }
 impl_debug_from_methods! {
     PortStatusAndControlRegister{
         current_connect_status,
+        port_enabled_disabled,
+        over_current_active,
         port_reset,
+        port_link_state,
+        port_power,
         port_speed,
+        port_indicator_control,
+        port_link_state_write_strobe,
+        connect_status_change,
+        port_enabled_disabled_change,
+        warm_port_reset_change,
+        over_current_change,
         port_reset_changed,
     }
+}
+
+/// A type returned by [`CommandRingControlRegister::port_indicator_control`].
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
+pub enum PortIndicator {
+    /// Port Indicators are off.
+    Off = 0,
+    /// Amber.
+    Amber = 1,
+    /// Green.
+    Green = 2,
+    /// Undefined.
+    Undefined = 3,
 }

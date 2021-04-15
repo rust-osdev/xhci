@@ -426,6 +426,7 @@ impl_debug_from_methods! {
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Returns the value of the Device Context Base Address Array Pointer.
+    #[must_use]
     pub fn get(self) -> u64 {
         self.0
     }

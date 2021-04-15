@@ -76,7 +76,7 @@ impl CapabilityRegistersLength {
 
 /// Interface Version Number
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct InterfaceVersionNumber(u16);
 impl InterfaceVersionNumber {
     /// Returns the version of the xHCI specification revision number supported by HC.
@@ -88,6 +88,14 @@ impl InterfaceVersionNumber {
         let minor: u8 = self.0.get_bits(0..8).try_into().unwrap();
 
         (major, minor)
+    }
+}
+impl fmt::Debug for InterfaceVersionNumber {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InterfaceVersionNumber")
+            .field("major", &self.major_minor().0)
+            .field("minor", &self.major_minor().1)
+            .finish()
     }
 }
 

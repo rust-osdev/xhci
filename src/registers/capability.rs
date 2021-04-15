@@ -111,6 +111,12 @@ impl StructuralParameters1 {
         self.0.get_bits(0..=7).try_into().unwrap()
     }
 
+    /// Returns the number of interrupts implemented on HC.
+    #[must_use]
+    pub fn number_of_interrupts(self) -> u16 {
+        self.0.get_bits(8..=18).try_into().unwrap()
+    }
+
     /// Returns the number of ports.
     #[must_use]
     pub fn number_of_ports(self) -> u8 {
@@ -121,6 +127,7 @@ impl fmt::Debug for StructuralParameters1 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("StructuralParameters1")
             .field("number_of_device_slots", &self.number_of_device_slots())
+            .field("number_of_interrupts", &self.number_of_interrupts())
             .field("number_of_ports", &self.number_of_ports())
             .finish()
     }

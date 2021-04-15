@@ -379,6 +379,7 @@ impl fmt::Debug for CapabilityParameters2 {
     }
 }
 
+/// Virtualization Based Trusted IO Register Space Offset
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug)]
 pub struct VirtualizationBasedTrustedIoRegisterSpaceOffset(u32);

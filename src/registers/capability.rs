@@ -342,10 +342,7 @@ impl fmt::Debug for CapabilityParameters1 {
                 "stopped_short_packet_capability",
                 &self.stopped_short_packet_capability(),
             )
-            .field(
-                "stopped_edtla_capability_field",
-                &self.stopped_edtla_capability(),
-            )
+            .field("stopped_edtla_capability", &self.stopped_edtla_capability())
             .field(
                 "contiguous_frame_id_capability",
                 &self.contiguous_frame_id_capability(),

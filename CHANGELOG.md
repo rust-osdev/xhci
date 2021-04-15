@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- Missing members of `Capability` are added.
 
 ## 0.5.3 - 2021-04-12
 ### Fixed

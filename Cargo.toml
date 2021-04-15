@@ -10,9 +10,6 @@ readme = "README.md"
 categories = ["no-std", "os"]
 keywords = ["no_std", "OS"]
 
-[badges]
-github = { repository = "toku-sa-n/xhci", workflow = "Rust" }
-
 [dependencies]
 accessor = "0.3.0"
 bit_field = "0.10.1"

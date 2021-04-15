@@ -93,11 +93,143 @@ impl UsbCommandRegister {
     pub fn set_host_controller_reset(&mut self, b: bool) {
         self.0.set_bit(1, b);
     }
+
+    /// Returns the value of the Interrupter Enable bit.
+    #[must_use]
+    pub fn interrupter_enable(self) -> bool {
+        self.0.get_bit(2)
+    }
+
+    /// Sets the value of the Interrupter Enable bit.
+    pub fn set_interrupter_enable(&mut self, b: bool) {
+        self.0.set_bit(2, b);
+    }
+
+    /// Returns the value of the Host System Error Enable bit.
+    #[must_use]
+    pub fn host_system_error_enable(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Sets the value of the Host System Error Enable bit.
+    pub fn set_host_system_error_enable(&mut self, b: bool) {
+        self.0.set_bit(3, b);
+    }
+
+    /// Returns the value of the Light Host Controller Reset bit.
+    #[must_use]
+    pub fn light_host_controller_reset(self) -> bool {
+        self.0.get_bit(7)
+    }
+
+    /// Sets the value of the Light Host Controller Reset bit.
+    pub fn set_light_host_controller_reset(&mut self, b: bool) {
+        self.0.set_bit(7, b);
+    }
+
+    /// Returns the value of the Controller Save State bit.
+    #[must_use]
+    pub fn controller_save_state(self) -> bool {
+        self.0.get_bit(8)
+    }
+
+    /// Sets the value of the Controller Save State bit.
+    pub fn set_controller_save_state(&mut self, b: bool) {
+        self.0.set_bit(8, b);
+    }
+
+    /// Returns the value of the Controller Restore State bit.
+    #[must_use]
+    pub fn controller_restore_state(self) -> bool {
+        self.0.get_bit(9)
+    }
+
+    /// Sets the value of the Controller Restore State bit.
+    pub fn set_controller_restore_state(&mut self, b: bool) {
+        self.0.set_bit(9, b);
+    }
+
+    /// Returns the value of the Enable Wrap Event bit.
+    #[must_use]
+    pub fn enable_wrap_event(self) -> bool {
+        self.0.get_bit(10)
+    }
+
+    /// Sets the value of the Enable Wrap Event bit.
+    pub fn set_enable_wrap_event(&mut self, b: bool) {
+        self.0.set_bit(10, b);
+    }
+
+    /// Returns the value of the Enable U3 MFINDEX Stop bit.
+    #[must_use]
+    pub fn enable_u3_mfindex_stop(self) -> bool {
+        self.0.get_bit(11)
+    }
+
+    /// Sets the value of the Enable U3 MFINDEX Stop bit.
+    pub fn set_enable_u3_mfindex_stop(&mut self, b: bool) {
+        self.0.set_bit(11, b);
+    }
+
+    /// Returns the value of the CEM Enable bit.
+    #[must_use]
+    pub fn cem_enable(self) -> bool {
+        self.0.get_bit(13)
+    }
+
+    /// Sets the value of the CEM Enable bit.
+    pub fn set_cem_enable(&mut self, b: bool) {
+        self.0.set_bit(13, b);
+    }
+
+    /// Returns the value of the Extended TBC Enable bit.
+    #[must_use]
+    pub fn extended_tbc_enable(self) -> bool {
+        self.0.get_bit(14)
+    }
+
+    /// Sets the value of the Extended TBC Enable bit.
+    pub fn set_extended_tbc_enable(&mut self, b: bool) {
+        self.0.set_bit(14, b);
+    }
+
+    /// Returns the value of the Extended TBC Status Enable bit.
+    #[must_use]
+    pub fn extended_tbc_status_enable(self) -> bool {
+        self.0.get_bit(15)
+    }
+
+    /// Sets the value of the Extended TBC Status Enable bit.
+    pub fn set_extended_tbc_status_enable(&mut self, b: bool) {
+        self.0.set_bit(15, b);
+    }
+
+    /// Returns the value of the VTIO Enable bit.
+    #[must_use]
+    pub fn vtio_enable(self) -> bool {
+        self.0.get_bit(16)
+    }
+
+    /// Sets the value of the VTIO Enable bit.
+    pub fn set_vtio_enable(&mut self, b: bool) {
+        self.0.set_bit(16, b);
+    }
 }
 impl_debug_from_methods! {
     UsbCommandRegister{
         run_stop,
         host_controller_reset,
+        interrupter_enable,
+        host_system_error_enable,
+        light_host_controller_reset,
+        controller_save_state,
+        controller_restore_state,
+        enable_wrap_event,
+        enable_u3_mfindex_stop,
+        cem_enable,
+        extended_tbc_enable,
+        extended_tbc_status_enable,
+        vtio_enable,
     }
 }
 

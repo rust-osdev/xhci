@@ -19,6 +19,8 @@ where
     pub usbsts: accessor::Single<UsbStatusRegister, M>,
     /// Page Size Register
     pub pagesize: accessor::Single<PageSizeRegister, M>,
+    /// Device Notification Control
+    pub dnctrl: accessor::Single<DeviceNotificationControl, M>,
     /// Command Ring Control Register
     pub crcr: accessor::Single<CommandRingControlRegister, M>,
     /// Device Context Base Address Array Pointer Register
@@ -57,6 +59,7 @@ where
             usbcmd: m!(0x00),
             usbsts: m!(0x04),
             pagesize: m!(0x08),
+            dnctrl: m!(0x14),
             crcr: m!(0x18),
             dcbaap: m!(0x30),
             config: m!(0x38),
@@ -146,6 +149,43 @@ impl PageSizeRegister {
     #[must_use]
     pub fn get(self) -> u16 {
         self.0.try_into().unwrap()
+    }
+}
+
+/// Device Notification Control
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct DeviceNotificationControl(u32);
+impl DeviceNotificationControl {
+    /// Returns the value of the `i`th of the Notification Enable field. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i >= 16`.
+    #[must_use]
+    pub fn get(self, i: usize) -> bool {
+        Self::ensure_index_is_within_range(i);
+
+        self.0.get_bit(i)
+    }
+
+    /// Sets the value of the `i`th of the Notification Enable field. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i >= 16`.
+    pub fn set(&mut self, i: usize, ne: bool) -> &mut Self {
+        Self::ensure_index_is_within_range(i);
+
+        self.0.set_bit(i, ne);
+        self
+    }
+
+    fn ensure_index_is_within_range(i: usize) {
+        assert!(
+            i < 16,
+            "The index of the Notification Enable field must be less than 16."
+        );
     }
 }
 

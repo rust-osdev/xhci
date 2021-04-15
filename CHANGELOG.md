@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.5.5 - 2021-04-15
 ### Added
 - The `doorbell_stream_id` and `set_doorbell_stream_id` methods are added to `doorbell::Register`.
 

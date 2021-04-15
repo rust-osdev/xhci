@@ -472,6 +472,7 @@ impl ConfigureRegister {
     }
 
     /// Returns the value of the Configuration Information Enable bit.
+    #[must_use]
     pub fn configuration_information_enable(self) -> bool {
         self.0.get_bit(9)
     }

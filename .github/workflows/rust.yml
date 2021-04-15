@@ -14,11 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions-rs/toolchain@v1.0.6
-      with:
-        toolchain: stable
-        components: clippy, rustfmt
-        override: true
+    - name: Install clippy and rustfmt
+      run: rustup component add clippy rustfmt
 
     - name: Run rustfmt with check mode
       run: |

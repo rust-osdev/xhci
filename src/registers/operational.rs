@@ -425,6 +425,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
+    /// Returns the value of the Device Context Base Address Array Pointer.
+    pub fn get(self) -> u64 {
+        self.0
+    }
+
     /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
     ///
     /// # Panics

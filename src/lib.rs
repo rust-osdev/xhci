@@ -62,7 +62,7 @@
 
 macro_rules! impl_debug_from_methods {
     ($name:ident {
-        $($method:ident),*$(,)*
+        $($method:ident),*$(,)?
     }) => {
         impl core::fmt::Debug for $name {
             fn fmt(&self, f:&mut core::fmt::Formatter<'_>) -> core::fmt::Result{

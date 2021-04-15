@@ -381,9 +381,19 @@ impl DeviceNotificationControl {
 #[derive(Copy, Clone)]
 pub struct CommandRingControlRegister(u64);
 impl CommandRingControlRegister {
-    /// Sets the value of the Ring Cycle State bit.
+    /// Sets the Ring Cycle State bit.
     pub fn set_ring_cycle_state(&mut self, s: bool) {
         self.0.set_bit(0, s);
+    }
+
+    /// Sets the Command Stop bit.
+    pub fn set_command_stop(&mut self) {
+        self.0.set_bit(1, true);
+    }
+
+    /// Sets the Command Abort bit.
+    pub fn set_command_abort(&mut self) {
+        self.0.set_bit(2, true);
     }
 
     /// Returns the bit of the Command Ring Running bit.

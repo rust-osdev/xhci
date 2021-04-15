@@ -269,6 +269,7 @@ impl RuntimeRegisterSpaceOffset {
 
 /// Capability Parameters 2
 #[repr(transparent)]
+#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct CapabilityParameters2(u32);
 impl CapabilityParameters2 {

@@ -481,7 +481,7 @@ impl fmt::Debug for CapabilityParameters2 {
                 &self.extended_tbc_trb_status_capability(),
             )
             .field(
-                "get_set_extended_property_capability_field",
+                "get_set_extended_property_capability",
                 &self.get_set_extended_property_capability(),
             )
             .field(

@@ -229,11 +229,83 @@ impl fmt::Debug for StructuralParameters3 {
 #[allow(clippy::module_name_repetitions)]
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
+    /// Returns the value of the 64-bit Addressing Capability field.
+    #[must_use]
+    pub fn addressing_capability(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Returns the value of the BW Negotiation Capability field.
+    #[must_use]
+    pub fn bw_negotiation_capability(self) -> bool {
+        self.0.get_bit(1)
+    }
+
     /// Returns `true` if the xHC uses 64 byte Context data structures, and `false` if the xHC uses
     /// 32 byte Context data structures.
     #[must_use]
     pub fn context_size(self) -> bool {
         self.0.get_bit(2)
+    }
+
+    /// Returns the value of the Port Power Control field.
+    #[must_use]
+    pub fn port_power_control(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Returns the value of the Port Indicators field.
+    #[must_use]
+    pub fn port_indicators(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Returns the value of the Light HC Reset Capability field.
+    #[must_use]
+    pub fn light_hc_reset_capability(self) -> bool {
+        self.0.get_bit(5)
+    }
+
+    /// Returns the value of the Latency Tolerance Messaging Capability field.
+    #[must_use]
+    pub fn latency_tolerance_messaging_capability(self) -> bool {
+        self.0.get_bit(6)
+    }
+
+    /// Returns the value of the No Secondary SID Support field.
+    #[must_use]
+    pub fn no_secondary_sid_support(self) -> bool {
+        self.0.get_bit(7)
+    }
+
+    /// Returns the value of the Parse All Event Data field.
+    #[must_use]
+    pub fn parse_all_event_data(self) -> bool {
+        self.0.get_bit(8)
+    }
+
+    /// Returns the value of the Stopped - Short Packet Capability field.
+    #[must_use]
+    pub fn stopped_short_packet_capability(self) -> bool {
+        self.0.get_bit(9)
+    }
+
+    /// Returns the value of the Stopped EDTLA Capability field.
+    #[must_use]
+    pub fn stopped_edtla_capability(self) -> bool {
+        self.0.get_bit(10)
+    }
+
+    /// Returns the value of the Contiguous Frame ID Capability field.
+    #[must_use]
+    pub fn contiguous_frame_id_capability(self) -> bool {
+        self.0.get_bit(11)
+    }
+
+    /// Returns the value of the Maximum Primary Stream Array Size field.
+    #[must_use]
+    pub fn max_primary_stream_array_size(self) -> u8 {
+        self.0.get_bits(12..=15).try_into().unwrap()
     }
 
     /// Returns the offset of the xHCI extended capability list from the MMIO base. If this value is
@@ -247,8 +319,44 @@ impl CapabilityParameters1 {
 impl fmt::Debug for CapabilityParameters1 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CapabilityParameters1")
+            .field("address_capability", &self.addressing_capability())
+            .field(
+                "bw_negotiation_capability",
+                &self.bw_negotiation_capability(),
+            )
             .field("context_size", &self.context_size())
-            .field("xhci_extended_capabilities_pointer", &self.context_size())
+            .field("port_power_control", &self.port_power_control())
+            .field("port_indicators", &self.port_indicators())
+            .field(
+                "light_hc_reset_capability",
+                &self.light_hc_reset_capability(),
+            )
+            .field(
+                "latency_tolerance_messaging_capability",
+                &self.latency_tolerance_messaging_capability(),
+            )
+            .field("no_secondary_sid_support", &self.no_secondary_sid_support())
+            .field("parse_all_event_data", &self.parse_all_event_data())
+            .field(
+                "stopped_short_packet_capability",
+                &self.stopped_short_packet_capability(),
+            )
+            .field(
+                "stopped_edtla_capability_field",
+                &self.stopped_edtla_capability(),
+            )
+            .field(
+                "contiguous_frame_id_capability",
+                &self.contiguous_frame_id_capability(),
+            )
+            .field(
+                "max_primary_stream_array_size",
+                &self.max_primary_stream_array_size(),
+            )
+            .field(
+                "xhci_extended_capabilities_pointer",
+                &self.xhci_extended_capabilities_pointer(),
+            )
             .finish()
     }
 }

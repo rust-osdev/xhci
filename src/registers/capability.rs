@@ -384,6 +384,7 @@ impl fmt::Debug for CapabilityParameters2 {
 pub struct VirtualizationBasedTrustedIoRegisterSpaceOffset(u32);
 impl VirtualizationBasedTrustedIoRegisterSpaceOffset {
     /// Returns the offset of the VTIO Registers from the MMIO base.
+    #[must_use]
     pub fn get(self) -> u32 {
         self.0
     }

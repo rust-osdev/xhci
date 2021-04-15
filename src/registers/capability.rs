@@ -2,7 +2,7 @@
 
 use accessor::Mapper;
 use bit_field::BitField;
-use core::{convert::TryInto, fmt};
+use core::convert::TryInto;
 
 /// Host Controller Capability Registers
 #[derive(Debug)]
@@ -123,13 +123,11 @@ impl StructuralParameters1 {
         self.0.get_bits(24..=31).try_into().unwrap()
     }
 }
-impl fmt::Debug for StructuralParameters1 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("StructuralParameters1")
-            .field("number_of_device_slots", &self.number_of_device_slots())
-            .field("number_of_interrupts", &self.number_of_interrupts())
-            .field("number_of_ports", &self.number_of_ports())
-            .finish()
+impl_debug_from_methods! {
+    StructuralParameters1{
+        number_of_device_slots,
+        number_of_interrupts,
+        number_of_ports
     }
 }
 
@@ -180,20 +178,12 @@ impl StructuralParameters2 {
         self.0.get_bits(27..=31)
     }
 }
-impl fmt::Debug for StructuralParameters2 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("StructuralParameters2")
-            .field(
-                "isochronous_scheduling_threshold",
-                &self.isochronous_scheduling_threshold(),
-            )
-            .field(
-                "event_ring_segment_table_max",
-                &self.event_ring_segment_table_max(),
-            )
-            .field("max_scratchpad_buffers", &self.max_scratchpad_buffers())
-            .field("scratchpad_restore", &self.scratchpad_restore())
-            .finish()
+impl_debug_from_methods! {
+    StructuralParameters2{
+        isochronous_scheduling_threshold,
+        event_ring_segment_table_max,
+        max_scratchpad_buffers,
+        scratchpad_restore
     }
 }
 
@@ -214,12 +204,10 @@ impl StructuralParameters3 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }
 }
-impl fmt::Debug for StructuralParameters3 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("StructuralParameters3")
-            .field("u1_device_exit_latency", &self.u1_device_exit_latency())
-            .field("u2_device_exit_latency", &self.u2_device_exit_latency())
-            .finish()
+impl_debug_from_methods! {
+    StructuralParameters3{
+        u1_device_exit_latency,
+        u2_device_exit_latency
     }
 }
 
@@ -316,46 +304,22 @@ impl CapabilityParameters1 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }
 }
-impl fmt::Debug for CapabilityParameters1 {
-    #[allow(clippy::too_many_lines)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CapabilityParameters1")
-            .field("address_capability", &self.addressing_capability())
-            .field(
-                "bw_negotiation_capability",
-                &self.bw_negotiation_capability(),
-            )
-            .field("context_size", &self.context_size())
-            .field("port_power_control", &self.port_power_control())
-            .field("port_indicators", &self.port_indicators())
-            .field(
-                "light_hc_reset_capability",
-                &self.light_hc_reset_capability(),
-            )
-            .field(
-                "latency_tolerance_messaging_capability",
-                &self.latency_tolerance_messaging_capability(),
-            )
-            .field("no_secondary_sid_support", &self.no_secondary_sid_support())
-            .field("parse_all_event_data", &self.parse_all_event_data())
-            .field(
-                "stopped_short_packet_capability",
-                &self.stopped_short_packet_capability(),
-            )
-            .field("stopped_edtla_capability", &self.stopped_edtla_capability())
-            .field(
-                "contiguous_frame_id_capability",
-                &self.contiguous_frame_id_capability(),
-            )
-            .field(
-                "max_primary_stream_array_size",
-                &self.max_primary_stream_array_size(),
-            )
-            .field(
-                "xhci_extended_capabilities_pointer",
-                &self.xhci_extended_capabilities_pointer(),
-            )
-            .finish()
+impl_debug_from_methods! {
+    CapabilityParameters1 {
+        addressing_capability,
+        bw_negotiation_capability,
+        context_size,
+        port_power_control,
+        port_indicators,
+        light_hc_reset_capability,
+        latency_tolerance_messaging_capability,
+        no_secondary_sid_support,
+        parse_all_event_data,
+        stopped_short_packet_capability,
+        stopped_edtla_capability,
+        contiguous_frame_id_capability,
+        max_primary_stream_array_size,
+        xhci_extended_capabilities_pointer
     }
 }
 
@@ -450,45 +414,18 @@ impl CapabilityParameters2 {
         self.0.get_bit(9)
     }
 }
-impl fmt::Debug for CapabilityParameters2 {
-    #[allow(clippy::too_many_lines)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CapabilityParameters2")
-            .field("u3_entry_capability", &self.u3_entry_capability())
-            .field(
-                "configure_endpoint_command_max_exit_latency_too_large_capability",
-                &self.configure_endpoint_command_max_exit_latency_too_large_capability(),
-            )
-            .field(
-                "force_save_context_capability",
-                &self.force_save_context_capability(),
-            )
-            .field(
-                "compliance_transition_capability",
-                &self.compliance_transition_capability(),
-            )
-            .field(
-                "large_esit_payload_capability",
-                &self.large_esit_payload_capability(),
-            )
-            .field(
-                "configuration_information_capability",
-                &self.configuration_information_capability(),
-            )
-            .field("extended_tbc_capability", &self.extended_tbc_capability())
-            .field(
-                "extended_tbc_trb_status_capability",
-                &self.extended_tbc_trb_status_capability(),
-            )
-            .field(
-                "get_set_extended_property_capability",
-                &self.get_set_extended_property_capability(),
-            )
-            .field(
-                "virtualization_based_trusted_io_capability",
-                &self.virtualization_based_trusted_io_capability(),
-            )
-            .finish()
+impl_debug_from_methods! {
+    CapabilityParameters2 {
+        u3_entry_capability,
+        configure_endpoint_command_max_exit_latency_too_large_capability,
+        force_save_context_capability,
+        compliance_transition_capability,
+        large_esit_payload_capability,
+        configuration_information_capability,
+        extended_tbc_capability,
+        extended_tbc_trb_status_capability,
+        get_set_extended_property_capability,
+        virtualization_based_trusted_io_capability
     }
 }
 

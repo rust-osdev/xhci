@@ -190,11 +190,13 @@ impl fmt::Debug for StructuralParameters2 {
 pub struct StructuralParameters3(u32);
 impl StructuralParameters3 {
     /// Returns the value of the U1 Device Exit Latency field.
+    #[must_use]
     pub fn u1_device_exit_latency(self) -> u8 {
         self.0.get_bits(0..=7).try_into().unwrap()
     }
 
     /// Returns the value of the U2 Device Exit Latency field.
+    #[must_use]
     pub fn u2_device_exit_latency(self) -> u16 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }

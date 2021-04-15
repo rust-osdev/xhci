@@ -84,17 +84,26 @@ impl InterfaceVersionNumber {
     /// For example, if the HC supports version 1.1.0, the return value is `(1, 0)`.
     #[must_use]
     pub fn major_minor(self) -> (u8, u8) {
-        let major: u8 = self.0.get_bits(8..16).try_into().unwrap();
-        let minor: u8 = self.0.get_bits(0..8).try_into().unwrap();
+        (self.major(), self.minor())
+    }
 
-        (major, minor)
+    /// Returns the major version of the xHCI specification revision number supported by HC.
+    #[must_use]
+    pub fn major(self) -> u8 {
+        self.0.get_bits(8..16).try_into().unwrap()
+    }
+
+    /// Returns the minor version of the xHCI specification revision number supported by HC.
+    #[must_use]
+    pub fn minor(self) -> u8 {
+        self.0.get_bits(0..8).try_into().unwrap()
     }
 }
 impl fmt::Debug for InterfaceVersionNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InterfaceVersionNumber")
-            .field("major", &self.major_minor().0)
-            .field("minor", &self.major_minor().1)
+            .field("major", &self.major())
+            .field("minor", &self.minor())
             .finish()
     }
 }

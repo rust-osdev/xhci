@@ -138,6 +138,12 @@ impl fmt::Debug for StructuralParameters1 {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters2(u32);
 impl StructuralParameters2 {
+    /// Returns the value of the Isochronous Scheduling Threshold field.
+    #[must_use]
+    pub fn isochronous_scheduling_threshold(self) -> u8 {
+        self.0.get_bits(0..=3).try_into().unwrap()
+    }
+
     /// Returns the maximum number of the elements the Event Ring Segment Table can contain.
     ///
     /// Note that the `ERST Max` field of the Structural Parameters 2 register contains the exponential
@@ -156,6 +162,12 @@ impl StructuralParameters2 {
         h << 5 | l
     }
 
+    /// Returns the value of the Scratchpad Restore field.
+    #[must_use]
+    pub fn scratchpad_restore(self) -> bool {
+        self.0.get_bit(26)
+    }
+
     fn erst_max(self) -> u32 {
         self.0.get_bits(4..=7)
     }
@@ -172,10 +184,15 @@ impl fmt::Debug for StructuralParameters2 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("StructuralParameters2")
             .field(
+                "isochronous_scheduling_threshold",
+                &self.isochronous_scheduling_threshold(),
+            )
+            .field(
                 "event_ring_segment_table_max",
                 &self.event_ring_segment_table_max(),
             )
             .field("max_scratchpad_buffers", &self.max_scratchpad_buffers())
+            .field("scratchpad_restore", &self.scratchpad_restore())
             .finish()
     }
 }

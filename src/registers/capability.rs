@@ -94,6 +94,7 @@ impl InterfaceVersionNumber {
     /// byte contains the minor revision extensions.
     ///
     /// For example, 0x0110 means xHCI version 1.1.0.
+    #[must_use]
     pub fn get(self) -> u16 {
         self.0
     }

@@ -49,11 +49,22 @@ impl Register {
     pub fn set_doorbell_target(&mut self, target: u8) {
         self.0.set_bits(0..=7, target.into());
     }
+
+    /// Get a Doorbell Stream ID.
+    pub fn doorbell_stream_id(self) -> u16 {
+        self.0.get_bits(16..=31).try_into().unwrap()
+    }
+
+    /// Set a Doorbell Stream ID.
+    pub fn set_doorbell_stream_id(&mut self, id: u16) {
+        self.0.set_bits(16..=31, id.into());
+    }
 }
 impl fmt::Debug for Register {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("doorbell::Register")
             .field("doorbell_target", &self.doorbell_target())
+            .field("doorbell_stream_id", &self.doorbell_stream_id())
             .finish()
     }
 }

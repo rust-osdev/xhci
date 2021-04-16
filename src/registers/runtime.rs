@@ -11,14 +11,14 @@ use core::convert::TryInto;
 /// Note that this struct does not contain the interrupt register sets. Refer to
 /// [`InterruptRegisterSet`].
 #[derive(Debug)]
-pub struct RuntimeRegisters<M>
+pub struct Runtime<M>
 where
     M: Mapper + Clone,
 {
     /// Microframe Index Register
     pub mfindex: accessor::Single<MicroframeIndexRegister, M>,
 }
-impl<M> RuntimeRegisters<M>
+impl<M> Runtime<M>
 where
     M: Mapper + Clone,
 {

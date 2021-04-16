@@ -6,6 +6,55 @@ use bit_field::BitField;
 use core::convert::TryFrom;
 use core::convert::TryInto;
 
+/// Runtime Registers
+///
+/// Note that this struct does not contain the interrupt register sets. Refer to
+/// [`InterruptRegisterSet`].
+#[derive(Debug)]
+pub struct RuntimeRegisters<M>
+where
+    M: Mapper + Clone,
+{
+    /// Microframe Index Register
+    pub mfindex: accessor::Single<MicroframeIndexRegister, M>,
+}
+impl<M> RuntimeRegisters<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates a new accessor to the Host Controller Runtime Registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Runtime Registers are accessed only through
+    /// this struct.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `mmio_base` is not aligned correctly.
+    pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
+        Self {
+            mfindex: accessor::Single::new(mmio_base, mapper),
+        }
+    }
+}
+
+/// Microframe Index Register
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct MicroframeIndexRegister(u32);
+impl MicroframeIndexRegister {
+    /// Returns the value of the Microframe Index field.
+    pub fn microframe_index(self) -> u16 {
+        self.0.get_bits(0..=13).try_into().unwrap()
+    }
+}
+impl_debug_from_methods! {
+    MicroframeIndexRegister {
+        microframe_index,
+    }
+}
+
 /// Interrupt Register Set
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]

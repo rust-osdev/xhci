@@ -32,9 +32,11 @@ where
     /// # Panics
     ///
     /// This method panics if `mmio_base` is not aligned correctly.
-    pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
+    pub unsafe fn new(mmio_base: usize, rtoff: RuntimeRegisterSpaceOffset, mapper: M) -> Self {
+        let base = mmio_base + usize::try_from(rtoff.get()).unwrap();
+
         Self {
-            mfindex: accessor::Single::new(mmio_base, mapper),
+            mfindex: accessor::Single::new(base, mapper),
         }
     }
 }

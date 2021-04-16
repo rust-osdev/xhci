@@ -13,7 +13,7 @@ pub struct InterruptRegisterSet {
     /// Interrupt Management Register
     pub iman: InterrupterManagementRegister,
     /// Interrupt Moderation Register
-    pub imod: u32,
+    pub imod: InterrupterModerationRegister,
     /// Event Ring Segment Table Size Register
     pub erstsz: EventRingSegmentTableSizeRegister,
     _rsvd: u32,

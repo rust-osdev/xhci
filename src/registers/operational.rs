@@ -498,7 +498,8 @@ pub struct PortRegisterSet {
     pub portsc: PortStatusAndControlRegister,
     /// Port PM Status and Control Register
     pub portpmsc: PortPowerManagementStatusAndControlRegister,
-    portli: u32,
+    /// Port Link Info Register
+    pub portli: PortLinkInfoRegister,
     porthlpmc: u32,
 }
 impl PortRegisterSet {
@@ -844,6 +845,44 @@ impl_debug_from_methods! {
         l1_device_slot,
         hardware_lpm_enable,
         port_test_control,
+    }
+}
+
+/// Port Link Info Register.
+///
+/// **This register is only valid for USB3 and is reserved for USB2.**
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PortLinkInfoRegister(u32);
+impl PortLinkInfoRegister {
+    /// Returns the value of the Link Error Count field.
+    #[must_use]
+    pub fn link_error_count(self) -> u16 {
+        self.0.get_bits(0..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the Link Error Count field.
+    pub fn set_link_error_count(&mut self, c: u16) {
+        self.0.set_bits(0..=15, c.into());
+    }
+
+    /// Returns the value of the Rx Lane Count field.
+    #[must_use]
+    pub fn rx_lane_count(self) -> u8 {
+        self.0.get_bits(16..=19).try_into().unwrap()
+    }
+
+    /// Returns the value of the Tx Lane Count field.
+    #[must_use]
+    pub fn tx_lane_count(self) -> u8 {
+        self.0.get_bits(20..=23).try_into().unwrap()
+    }
+}
+impl_debug_from_methods! {
+    PortLinkInfoRegister{
+        link_error_count,
+        rx_lane_count,
+        tx_lane_count,
     }
 }
 

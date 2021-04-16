@@ -2,7 +2,7 @@
 
 ## Unreleased - ReleaseDate
 ### Added
-- Missing members and accessors of the Operational Registers are added.
+- Missing members and accessors of the Operational Registers and the Runtime Registers are added.
 
 ## 0.5.5 - 2021-04-15
 ### Added

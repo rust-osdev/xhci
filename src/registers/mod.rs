@@ -5,6 +5,7 @@ use accessor::Mapper;
 pub use capability::Capability;
 pub use operational::{Operational, PortRegisterSet};
 pub use runtime::InterruptRegisterSet;
+pub use runtime::Runtime;
 
 pub mod capability;
 pub mod doorbell;
@@ -25,6 +26,8 @@ where
     pub operational: Operational<M>,
     /// Port Register Set Array
     pub port_register_set: accessor::Array<PortRegisterSet, M>,
+    /// Runtime Registers
+    pub runtime: Runtime<M>,
     /// Interrupt Register Set Array
     pub interrupt_register_set: accessor::Array<InterruptRegisterSet, M>,
 }
@@ -72,6 +75,7 @@ where
         let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone());
         let operational = Operational::new(mmio_base, capability.caplength.read(), &mapper);
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
+        let runtime = Runtime::new(mmio_base, capability.rtsoff.read(), mapper.clone());
         let interrupt_register_set =
             InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper);
 
@@ -80,6 +84,7 @@ where
             doorbell,
             operational,
             port_register_set,
+            runtime,
             interrupt_register_set,
         }
     }

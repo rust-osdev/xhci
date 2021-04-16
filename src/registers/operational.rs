@@ -496,7 +496,8 @@ impl_debug_from_methods! {
 pub struct PortRegisterSet {
     /// Port Status and Control Register
     pub portsc: PortStatusAndControlRegister,
-    _portpmsc: u32,
+    /// Port PM Status and Control Register
+    pub portpmsc: PortPowerManagementStatusAndControlRegister,
     portli: u32,
     porthlpmc: u32,
 }
@@ -693,6 +694,158 @@ impl_debug_from_methods! {
     }
 }
 
+/// Port Power Management Status and Control Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PortPowerManagementStatusAndControlRegister(u32);
+impl PortPowerManagementStatusAndControlRegister {
+    /// Returns the value of the U1 Timeout field.
+    ///
+    /// **This field is USB3 only.**
+    #[must_use]
+    pub fn u1_timeout(self) -> u8 {
+        self.0.get_bits(0..=7).try_into().unwrap()
+    }
+
+    /// Sets the value of the U1 Timeout field.
+    ///
+    /// **This field is USB3 only.**
+    pub fn set_u1_timeout(&mut self, timeout: u8) {
+        self.0.set_bits(0..=7, timeout.into());
+    }
+
+    /// Returns the value of the U2 Timeout field.
+    ///
+    /// **This field is USB3 only.**
+    #[must_use]
+    pub fn u2_timeout(self) -> u8 {
+        self.0.get_bits(8..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the U2 Timeout field.
+    ///
+    /// **This field is USB3 only.**
+    pub fn set_u2_timeout(&mut self, timeout: u8) {
+        self.0.set_bits(8..=15, timeout.into());
+    }
+
+    /// Returns the value of the Force Link PM Accept bit.
+    ///
+    /// **This field is USB3 only.**
+    #[must_use]
+    pub fn force_link_pm_accept(self) -> bool {
+        self.0.get_bit(16)
+    }
+
+    /// Sets the value of the Force Link PM Accept bit.
+    ///
+    /// **This field is USB3 only.**
+    pub fn set_force_link_pm_accept(&mut self, b: bool) {
+        self.0.set_bit(16, b);
+    }
+
+    /// Returns the value of the L1 Status field.
+    ///
+    /// This field returns [`None`] if the value means `Reserved`.
+    ///
+    /// **This field is USB2 only.**
+    #[must_use]
+    pub fn l1_status(self) -> Option<L1Status> {
+        let s = self.0.get_bits(0..=2);
+        FromPrimitive::from_u32(s)
+    }
+
+    /// Returns the value of the Remote Wake Enable field.
+    ///
+    /// **This field is USB2 only.**
+    #[must_use]
+    pub fn remote_wake_enable(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Sets the value of the Remote Wake Enable field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn set_remote_wake_enable(&mut self, b: bool) {
+        self.0.set_bit(3, b);
+    }
+
+    /// Returns the value of the Best Effort Service Latency field.
+    ///
+    /// **This field is USB2 only.**
+    #[must_use]
+    pub fn best_effort_service_latency(self) -> u8 {
+        self.0.get_bits(4..=7).try_into().unwrap()
+    }
+
+    /// Sets the value of the Best Effort Service Latency field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn set_best_effort_service_latency(&mut self, l: u8) {
+        self.0.set_bits(4..=7, l.into());
+    }
+
+    /// Returns the value of the L1 Device Slot field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn l1_device_slot(self) -> u8 {
+        self.0.get_bits(8..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the L1 Device Slot field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn set_l1_device_slot(&mut self, slot: u8) {
+        self.0.set_bits(8..=15, slot.into());
+    }
+
+    /// Returns the value of the Hardware LPM Enable field.
+    ///
+    /// **This field is USB2 only.**
+    #[must_use]
+    pub fn hardware_lpm_enable(self) -> bool {
+        self.0.get_bit(16)
+    }
+
+    /// Sets the value of the Hardware LPM Enable field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn set_hardware_lpm_enable(&mut self, b: bool) {
+        self.0.set_bit(16, b);
+    }
+
+    /// Returns the value of the Port Test Control field.
+    ///
+    /// This field returns [`None`] if the value means `Reserved`.
+    ///
+    /// **This field is USB2 only.**
+    #[must_use]
+    pub fn port_test_control(self) -> Option<TestMode> {
+        let t = self.0.get_bits(28..=31);
+        FromPrimitive::from_u32(t)
+    }
+
+    /// Sets the value of the Port Test Control field.
+    ///
+    /// **This field is USB2 only.**
+    pub fn set_port_test_control(&mut self, m: TestMode) {
+        self.0.set_bits(28..=31, m as _);
+    }
+}
+impl_debug_from_methods! {
+    PortPowerManagementStatusAndControlRegister{
+        u1_timeout,
+        u2_timeout,
+        force_link_pm_accept,
+        l1_status,
+        remote_wake_enable,
+        best_effort_service_latency,
+        l1_device_slot,
+        hardware_lpm_enable,
+        port_test_control,
+    }
+}
+
 /// A type returned by [`PortStatusAndControlRegister::port_indicator_control`].
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum PortIndicator {
@@ -704,4 +857,38 @@ pub enum PortIndicator {
     Green = 2,
     /// Undefined.
     Undefined = 3,
+}
+
+/// A type returned by [`PortPowerManagementStatusAndControlRegister::l1_status`].
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
+pub enum L1Status {
+    /// The L1 Status field shall be ignored by software.
+    Invalid = 0,
+    /// Port successfully transitioned to L1 (ACK).
+    Success = 1,
+    /// Device is unable to enter L1 at this time (NYET).
+    NotYet = 2,
+    /// Device does not support L1 transitions (STALL).
+    NotSupported = 3,
+    /// Device failed to respond to the LPM Transaction or an error occurred.
+    TimeOutOrError = 4,
+}
+
+/// A type returned by [`PortPowerManagementStatusAndControlRegister::port_test_control`].
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
+pub enum TestMode {
+    /// Test mode not enabled.
+    NotEnabled = 0,
+    /// Test J_STATE.
+    JState = 1,
+    /// Test K_STATE.
+    KState = 2,
+    /// Test SE0_NAK.
+    Se0Nak = 3,
+    /// Test Packet.
+    Pakcet = 4,
+    /// Test FORCE_ENABLE.
+    ForceEnable = 5,
+    /// Port Test Control Error.
+    PortTestControlError = 15,
 }

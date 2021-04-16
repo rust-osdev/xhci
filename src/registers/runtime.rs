@@ -4,6 +4,7 @@ use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryFrom;
+use core::convert::TryInto;
 
 /// Interrupt Register Set
 #[repr(C)]
@@ -11,7 +12,8 @@ use core::convert::TryFrom;
 pub struct InterruptRegisterSet {
     /// Interrupt Management Register
     pub iman: InterrupterManagementRegister,
-    _imod: u32,
+    /// Interrupt Moderation Register
+    pub imod: u32,
     /// Event Ring Segment Table Size Register
     pub erstsz: EventRingSegmentTableSizeRegister,
     _rsvd: u32,
@@ -79,6 +81,39 @@ impl_debug_from_methods! {
     InterrupterManagementRegister {
         interrupt_pending,
         interrupt_enable,
+    }
+}
+
+/// Interrupter Moderation Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct InterrupterModerationRegister(u32);
+impl InterrupterModerationRegister {
+    /// Returns the value of the Interrupt Moderation Interval field.
+    #[must_use]
+    pub fn interrupt_moderation_interval(self) -> u16 {
+        self.0.get_bits(0..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the Interrupt Moderation Interval field.
+    pub fn set_interrupt_moderation_interval(&mut self, interval: u16) {
+        self.0.set_bits(0..=15, interval.into());
+    }
+
+    /// Returns the value of the Interrupt Moderation Counter field.
+    pub fn interrupt_moderation_counter(self) -> u16 {
+        self.0.get_bits(16..=31).try_into().unwrap()
+    }
+
+    /// Sets the value of the Interrupt Moderation Counter field.
+    pub fn set_interrupt_moderation_counter(&mut self, counter: u16) {
+        self.0.set_bits(16..=31, counter.into());
+    }
+}
+impl_debug_from_methods! {
+    InterrupterModerationRegister{
+        interrupt_moderation_interval,
+        interrupt_moderation_counter,
     }
 }
 

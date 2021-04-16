@@ -788,6 +788,7 @@ impl PortPowerManagementStatusAndControlRegister {
     /// Returns the value of the L1 Device Slot field.
     ///
     /// **This field is USB2 only.**
+    #[must_use]
     pub fn l1_device_slot(self) -> u8 {
         self.0.get_bits(8..=15).try_into().unwrap()
     }

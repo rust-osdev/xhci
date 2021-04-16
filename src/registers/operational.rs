@@ -676,6 +676,80 @@ impl PortStatusAndControlRegister {
     pub fn clear_reset_changed(&mut self) {
         self.0.set_bit(21, true);
     }
+
+    /// Returns the value of the Port Link State Change bit.
+    #[must_use]
+    pub fn port_link_state_change(self) -> bool {
+        self.0.get_bit(22)
+    }
+
+    /// Clears the value of the Port Link State Change bit.
+    pub fn clear_link_state_change(&mut self) {
+        self.0.set_bit(22, true);
+    }
+
+    /// Returns the value of the Port Config Error Change bit.
+    #[must_use]
+    pub fn port_config_error_change(self) -> bool {
+        self.0.get_bit(23)
+    }
+
+    /// Clears the value of the Port Config Error Change bit.
+    pub fn clear_port_config_error_change(&mut self) {
+        self.0.set_bit(23, true);
+    }
+
+    /// Returns the value of the Cold Attach Status bit.
+    #[must_use]
+    pub fn cold_attach_status(self) -> bool {
+        self.0.get_bit(24)
+    }
+
+    /// Returns the value of the Wake on Connect Enable bit.
+    #[must_use]
+    pub fn wake_on_connect_enable(self) -> bool {
+        self.0.get_bit(25)
+    }
+
+    /// Sets the value of the Wake on Connect Enable bit.
+    pub fn set_wake_on_connect_enable(&mut self, b: bool) {
+        self.0.set_bit(25, b);
+    }
+
+    /// Returns the value of the Wake on Disconnect Enable bit.
+    #[must_use]
+    pub fn wake_on_disconnect_enable(self) -> bool {
+        self.0.get_bit(26)
+    }
+
+    /// Sets the value of the Wake on Disconnect Enable bit.
+    pub fn set_wake_on_disconnect_enable(&mut self, b: bool) {
+        self.0.set_bit(26, b);
+    }
+
+    /// Returns the value of the Wake on Over-current Enable bit.
+    #[must_use]
+    pub fn wake_on_over_current_enable(self) -> bool {
+        self.0.get_bit(27)
+    }
+
+    /// Sets the value of the Wake on Over-current Enable bit.
+    pub fn set_wake_on_over_current_enable(&mut self, b: bool) {
+        self.0.set_bit(27, b);
+    }
+
+    /// Returns the value of the Device Removable field.
+    #[must_use]
+    pub fn device_removable(self) -> bool {
+        self.0.get_bit(30)
+    }
+
+    /// Sets the value of the Warm Port Reset field.
+    ///
+    /// This bit is RW1S.
+    pub fn set_warm_port_rest(&mut self) {
+        self.0.set_bit(30, true);
+    }
 }
 impl_debug_from_methods! {
     PortStatusAndControlRegister{
@@ -693,6 +767,13 @@ impl_debug_from_methods! {
         warm_port_reset_change,
         over_current_change,
         port_reset_changed,
+        port_link_state_change,
+        port_config_error_change,
+        cold_attach_status,
+        wake_on_connect_enable,
+        wake_on_disconnect_enable,
+        wake_on_over_current_enable,
+        device_removable,
     }
 }
 

@@ -2,13 +2,15 @@
 
 use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
+use bit_field::BitField;
 use core::convert::TryFrom;
 
 /// Interrupt Register Set
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct InterruptRegisterSet {
-    _iman: u32,
+    /// Interrupt Management Register
+    pub iman: InterrupterManagementRegister,
     _imod: u32,
     /// Event Ring Segment Table Size Register
     pub erstsz: EventRingSegmentTableSizeRegister,
@@ -43,6 +45,40 @@ impl InterruptRegisterSet {
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
 
         accessor::Array::new(base, NUM_INTERRUPT_REGISTER_SET, mapper)
+    }
+}
+
+/// Interrupter Management Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct InterrupterManagementRegister(u32);
+impl InterrupterManagementRegister {
+    /// Returns the value of the Interrupter Pending bit.
+    #[must_use]
+    pub fn interrupt_pending(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Sets the value of the Interrupt Pending bit.
+    pub fn set_interrupt_pending(&mut self, b: bool) {
+        self.0.set_bit(0, b);
+    }
+
+    /// Returns the value of the Interrupt Enable bit.
+    #[must_use]
+    pub fn interrupt_enable(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Sets the value of the Interrupt Enable bit.
+    pub fn set_interrupt_enable(&mut self, b: bool) {
+        self.0.set_bit(1, b);
+    }
+}
+impl_debug_from_methods! {
+    InterrupterManagementRegister {
+        interrupt_pending,
+        interrupt_enable,
     }
 }
 

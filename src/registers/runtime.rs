@@ -149,6 +149,26 @@ impl EventRingSegmentTableBaseAddressRegister {
 #[derive(Copy, Clone)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
+    /// Returns the value of the Dequeue ERST Segment Index field.
+    pub fn dequeue_erst_segment_index(self) -> u8 {
+        self.0.get_bits(0..=2).try_into().unwrap()
+    }
+
+    /// Sets the value of the Dequeue ERST Segment Index field.
+    pub fn set_dequeue_erst_segment_index(&mut self, i: u8) {
+        self.0.set_bits(0..=2, i.into());
+    }
+
+    /// Returns the value of the Event Handler Busy bit.
+    pub fn event_handler_busy(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Clears the Event Handler Busy bit.
+    pub fn clear_event_handler_busy(&mut self) {
+        self.0.set_bit(3, true);
+    }
+
     /// Returns the address of the current Event Ring Dequeue Pointer.
     #[must_use]
     pub fn event_ring_dequeue_pointer(self) -> u64 {
@@ -167,6 +187,8 @@ impl EventRingDequeuePointerRegister {
 }
 impl_debug_from_methods! {
     EventRingDequeuePointerRegister{
+        dequeue_erst_segment_index,
+        event_handler_busy,
         event_ring_dequeue_pointer
     }
 }

@@ -500,7 +500,8 @@ pub struct PortRegisterSet {
     pub portpmsc: PortPowerManagementStatusAndControlRegister,
     /// Port Link Info Register
     pub portli: PortLinkInfoRegister,
-    porthlpmc: u32,
+    /// Port Hardware LPM Control Register
+    pub porthlpmc: PortHardwareLpmControlRegister,
 }
 impl PortRegisterSet {
     /// Creates a new accessor to the array of the Port Register Set.
@@ -883,6 +884,54 @@ impl_debug_from_methods! {
         link_error_count,
         rx_lane_count,
         tx_lane_count,
+    }
+}
+
+/// Port Hardware LPM Control Register
+///
+/// **This register is onlyvalid for USB2 and is reserved for USB3.**
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PortHardwareLpmControlRegister(u32);
+impl PortHardwareLpmControlRegister {
+    /// Returns the value of the Host Initiated Resume Duration Mode field.
+    #[must_use]
+    pub fn host_initiated_resume_duration_mode(self) -> u8 {
+        self.0.get_bits(0..=1).try_into().unwrap()
+    }
+
+    /// Sets the value of the Host Initiated Resume Duration Mode field.
+    pub fn set_host_initiated_resume_duration_mode(&mut self, mode: u8) {
+        self.0.set_bits(0..=1, mode.into());
+    }
+
+    /// Returns the value of the L1 Timeout field.
+    #[must_use]
+    pub fn l1_timeout(self) -> u8 {
+        self.0.get_bits(2..=9).try_into().unwrap()
+    }
+
+    /// Sets the value of the L1 Timeout field.
+    pub fn set_l1_timeout(&mut self, timeout: u8) {
+        self.0.set_bits(2..=9, timeout.into());
+    }
+
+    /// Returns the value of the Best Effort Service Latency Deep field.
+    #[must_use]
+    pub fn best_effort_service_latency_deep(self) -> u8 {
+        self.0.get_bits(10..=13).try_into().unwrap()
+    }
+
+    /// Sets the value of the Best Effort Service Latency Deep field.
+    pub fn set_best_effort_service_latency_deep(&mut self, latency: u8) {
+        self.0.set_bits(10..=13, latency.into());
+    }
+}
+impl_debug_from_methods! {
+    PortHardwareLpmControlRegister {
+        host_initiated_resume_duration_mode,
+        l1_timeout,
+        best_effort_service_latency_deep,
     }
 }
 

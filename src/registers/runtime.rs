@@ -113,9 +113,9 @@ impl InterrupterManagementRegister {
         self.0.get_bit(0)
     }
 
-    /// Sets the value of the Interrupt Pending bit.
-    pub fn set_interrupt_pending(&mut self, b: bool) {
-        self.0.set_bit(0, b);
+    /// Clears the value of the Interrupt Pending bit.
+    pub fn clear_interrupt_pending(&mut self) {
+        self.0.set_bit(0, true);
     }
 
     /// Returns the value of the Interrupt Enable bit.

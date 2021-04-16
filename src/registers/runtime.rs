@@ -13,14 +13,14 @@ use core::convert::TryInto;
 #[derive(Debug)]
 pub struct Runtime<M>
 where
-    M: Mapper + Clone,
+    M: Mapper,
 {
     /// Microframe Index Register
     pub mfindex: accessor::Single<MicroframeIndexRegister, M>,
 }
 impl<M> Runtime<M>
 where
-    M: Mapper + Clone,
+    M: Mapper,
 {
     /// Creates a new accessor to the Host Controller Runtime Registers.
     ///

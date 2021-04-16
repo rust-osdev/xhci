@@ -47,6 +47,7 @@ where
 pub struct MicroframeIndexRegister(u32);
 impl MicroframeIndexRegister {
     /// Returns the value of the Microframe Index field.
+    #[must_use]
     pub fn microframe_index(self) -> u16 {
         self.0.get_bits(0..=13).try_into().unwrap()
     }
@@ -152,6 +153,7 @@ impl InterrupterModerationRegister {
     }
 
     /// Returns the value of the Interrupt Moderation Counter field.
+    #[must_use]
     pub fn interrupt_moderation_counter(self) -> u16 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }
@@ -201,6 +203,7 @@ impl EventRingSegmentTableBaseAddressRegister {
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
     /// Returns the value of the Dequeue ERST Segment Index field.
+    #[must_use]
     pub fn dequeue_erst_segment_index(self) -> u8 {
         self.0.get_bits(0..=2).try_into().unwrap()
     }
@@ -211,6 +214,7 @@ impl EventRingDequeuePointerRegister {
     }
 
     /// Returns the value of the Event Handler Busy bit.
+    #[must_use]
     pub fn event_handler_busy(self) -> bool {
         self.0.get_bit(3)
     }

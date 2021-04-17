@@ -55,6 +55,8 @@ where
     /// // address from the PCI configuration space.
     /// const MMIO_BASE: usize = 0x1000;
     ///
+    /// // This `Mapper` implementation is also for showing an example. The user must implement a
+    /// // correct mapper.
     /// #[derive(Clone)]
     /// struct MemoryMapper;
     /// impl Mapper for MemoryMapper {

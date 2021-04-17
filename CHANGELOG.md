@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- A note about `Mapper` is added to the documentation of `Registers`
 
 ## 0.5.6 - 2021-04-16
 ### Added

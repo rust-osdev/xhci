@@ -14,7 +14,7 @@ This crate is `#![no_std]` compatible.
 
 # Examples
 
-```no_run
+```rust
 let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
 let o = &mut r.operational;
 

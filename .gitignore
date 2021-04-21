@@ -1,6 +1,7 @@
 /target
-Cargo.lock
 tags
 **/*.swp
 **/*.swo
 **/*~
+*.temp
+*.lock

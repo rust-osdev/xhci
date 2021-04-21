@@ -59,6 +59,7 @@ use core::convert::TryInto;
 
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 
+pub mod supported_protocol;
 pub mod usb_legacy_support_capability;
 
 /// A struct to access xHCI Extended Capabilities.

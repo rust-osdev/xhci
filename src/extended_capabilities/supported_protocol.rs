@@ -60,13 +60,13 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum BitRate {
     /// Bits Per Second
-    BitsPerSecond = 0,
+    Bits = 0,
     /// Kb/s
-    KbPerSecond = 1,
+    Kb = 1,
     /// Mb/s
-    MbPerSecond = 2,
+    Mb = 2,
     /// Gb/s
-    GbPerSecond = 3,
+    Gb = 3,
 }
 
 /// PSI Type

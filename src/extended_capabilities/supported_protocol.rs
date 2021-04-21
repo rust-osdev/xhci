@@ -11,34 +11,40 @@ use num_traits::FromPrimitive;
 pub struct ProtocolSpeedId(u32);
 impl ProtocolSpeedId {
     /// Returns the value of the Protocol Speed ID Value field.
+    #[must_use]
     pub fn protocol_speed_id_value(self) -> u8 {
         self.0.get_bits(0..=3).try_into().unwrap()
     }
 
     /// Returns the value of the Protocol Speed ID Exponent field.
+    #[must_use]
     pub fn protocol_speed_id_exponent(self) -> BitRate {
         let r = FromPrimitive::from_u32(self.0.get_bits(4..=5));
         r.expect("The value must be less than 4.")
     }
 
     /// Returns the value of the PSI Type field.
+    #[must_use]
     pub fn psi_type(self) -> PsiType {
         let r = FromPrimitive::from_u32(self.0.get_bits(6..=7));
         r.expect("The PSI Type must not take the reserved value.")
     }
 
     /// Returns the PSI Full-duplex bit.
+    #[must_use]
     pub fn psi_full_duplex(self) -> bool {
         self.0.get_bit(8)
     }
 
     /// Returns the value of the Link Protocol field.
+    #[must_use]
     pub fn link_protocol(self) -> LinkProtocol {
         let r = FromPrimitive::from_u32(self.0.get_bits(14..=15));
         r.expect("The Link Protocol field must not take the reserved value.")
     }
 
     /// Returns the value of the Protocol Speed ID Mantissa field.
+    #[must_use]
     pub fn protocol_speed_id_mantissa(self) -> u16 {
         self.0.get_bits(16..=31).try_into().unwrap()
     }

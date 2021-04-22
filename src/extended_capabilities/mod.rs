@@ -57,6 +57,8 @@ use accessor::Mapper;
 use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 pub use hci_extended_power_management::HciExtendedPowerManagement;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
@@ -183,18 +185,26 @@ where
             Some(current + (usize::from(h.next()) << 2))
         };
 
-        Some(match h.id() {
-            // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-            1 => Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
-                Single::new(current, self.m.clone())
-            })),
-            2 => Ok(ExtendedCapability::XhciSupportedProtocol(unsafe {
-                XhciSupportedProtocol::new(current, self.m.clone())
-            })),
-            3 => Ok(ExtendedCapability::HciExtendedPowerManagementCapability(
-                unsafe { Single::new(current, self.m.clone()) },
-            )),
-            e => Err(NotSupportedId(e)),
+        Some(if let Some(id) = FromPrimitive::from_u8(h.id()) {
+            match id {
+                // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
+                Ty::UsbLegacySupport => {
+                    Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
+                        Single::new(current, self.m.clone())
+                    }))
+                }
+                Ty::SupportedProtocol => Ok(ExtendedCapability::XhciSupportedProtocol(unsafe {
+                    XhciSupportedProtocol::new(current, self.m.clone())
+                })),
+                Ty::ExtendedPowerManagement => {
+                    Ok(ExtendedCapability::HciExtendedPowerManagementCapability(
+                        unsafe { Single::new(current, self.m.clone()) },
+                    ))
+                }
+                _ => todo!(),
+            }
+        } else {
+            Err(NotSupportedId(h.id()))
         })
     }
 }
@@ -238,4 +248,16 @@ impl Header {
     fn next(self) -> u8 {
         self.0.get_bits(8..=15).try_into().unwrap()
     }
+}
+
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, FromPrimitive)]
+enum Ty {
+    UsbLegacySupport = 1,
+    SupportedProtocol = 2,
+    ExtendedPowerManagement = 3,
+    IoVirtualization = 4,
+    MessageInterrupt = 5,
+    LocalMemory = 6,
+    UsbDebugCapability = 10,
+    ExtendedMessageInterrupt = 17,
 }

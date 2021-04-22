@@ -3,11 +3,11 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 
-/// VF Interrupter Range Registers.
+/// VF Interrupter Range Register.
 #[repr(transparent)]
 #[derive(Copy, Clone)]
-pub struct VfInterrupterRangeRegisters(u32);
-impl VfInterrupterRangeRegisters {
+pub struct VfInterrupterRangeRegister(u32);
+impl VfInterrupterRangeRegister {
     /// Returns the value of the Interrupter Offset field.
     #[must_use]
     pub fn interrupter_offset(self) -> u16 {
@@ -48,7 +48,7 @@ impl VfInterrupterRangeRegisters {
     }
 }
 impl_debug_from_methods! {
-    VfInterrupterRangeRegisters {
+    VfInterrupterRangeRegister {
         interrupter_offset,
         interrupter_count,
         vf_run,

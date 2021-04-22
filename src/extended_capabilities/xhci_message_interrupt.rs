@@ -1,0 +1,1 @@
+//! xHCI Message Interrupt Capability.

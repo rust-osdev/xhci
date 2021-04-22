@@ -224,12 +224,10 @@ where
     unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Self {
         match ty {
             // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-            Ty::UsbLegacySupport => {
-                Single::<UsbLegacySupportCapability, M>::new(base, m.clone()).into()
-            }
-            Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m.clone()).into(),
+            Ty::UsbLegacySupport => Single::<UsbLegacySupportCapability, M>::new(base, m).into(),
+            Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m).into(),
             Ty::ExtendedPowerManagement => {
-                Single::<HciExtendedPowerManagement, M>::new(base, m.clone()).into()
+                Single::<HciExtendedPowerManagement, M>::new(base, m).into()
             }
             _ => todo!(),
         }

@@ -55,3 +55,37 @@ impl_debug_from_methods! {
         vf_halted,
     }
 }
+
+/// VF Device Slot Assignmjent Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct VfDeviceSlotAssignmentRegister(u32);
+impl VfDeviceSlotAssignmentRegister {
+    /// Returns the value of the Device Slot VF ID field.
+    #[must_use]
+    pub fn device_slot_vf_id(self) -> u8 {
+        self.0.get_bits(0..=5).try_into().unwrap()
+    }
+
+    /// Sets the value of the Device Slot VF ID field.
+    pub fn set_device_slot_vf_id(&mut self, id: u8) {
+        self.0.set_bits(0..=5, id.into());
+    }
+
+    /// Returns the Slot Emulated bit.
+    #[must_use]
+    pub fn slot_emulated(self) -> bool {
+        self.0.get_bit(6)
+    }
+
+    /// Sets the Slot Emulated bit.
+    pub fn set_slot_emulated(&mut self, b: bool) {
+        self.0.set_bit(6, b);
+    }
+}
+impl_debug_from_methods! {
+    VfDeviceSlotAssignmentRegister {
+        device_slot_vf_id,
+        slot_emulated,
+    }
+}

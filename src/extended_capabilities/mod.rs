@@ -185,23 +185,9 @@ where
             Some(current + (usize::from(h.next()) << 2))
         };
 
-        Some(if let Some(id) = FromPrimitive::from_u8(h.id()) {
-            match id {
-                // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-                Ty::UsbLegacySupport => Ok(unsafe {
-                    Single::<UsbLegacySupportCapability, M>::new(current, self.m.clone()).into()
-                }),
-                Ty::SupportedProtocol => {
-                    Ok(unsafe { XhciSupportedProtocol::new(current, self.m.clone()).into() })
-                }
-                Ty::ExtendedPowerManagement => Ok(unsafe {
-                    Single::<HciExtendedPowerManagement, M>::new(current, self.m.clone()).into()
-                }),
-                _ => todo!(),
-            }
-        } else {
-            Err(NotSupportedId(h.id()))
-        })
+        unsafe {
+            Some(ExtendedCapability::new(current, h, self.m.clone()).ok_or(NotSupportedId(h.id())))
+        }
     }
 }
 
@@ -218,6 +204,32 @@ where
     XhciSupportedProtocol(XhciSupportedProtocol<M>),
     /// HCI Extended Power Management Capability.
     HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagement, M>),
+}
+impl<M> ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    unsafe fn new(base: usize, h: Header, m: M) -> Option<Self> {
+        if let Some(ty) = FromPrimitive::from_u8(h.id()) {
+            Some(Self::from_ty(base, ty, m))
+        } else {
+            None
+        }
+    }
+
+    unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Self {
+        match ty {
+            // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
+            Ty::UsbLegacySupport => {
+                Single::<UsbLegacySupportCapability, M>::new(base, m.clone()).into()
+            }
+            Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m.clone()).into(),
+            Ty::ExtendedPowerManagement => {
+                Single::<HciExtendedPowerManagement, M>::new(base, m.clone()).into()
+            }
+            _ => todo!(),
+        }
+    }
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.

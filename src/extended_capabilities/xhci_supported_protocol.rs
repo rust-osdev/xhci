@@ -45,26 +45,31 @@ where
 pub struct Header([u32; 4]);
 impl Header {
     /// Returns the value of the Minor Revision field.
+    #[must_use]
     pub fn minor_revision(self) -> u8 {
         self.0[0].get_bits(16..=23).try_into().unwrap()
     }
 
     /// Returns the value of the Major Revision field.
+    #[must_use]
     pub fn major_revision(self) -> u8 {
         self.0[0].get_bits(24..=31).try_into().unwrap()
     }
 
     /// Returns the value of the Name String field.
+    #[must_use]
     pub fn name_string(&self) -> u32 {
         self.0[1]
     }
 
     /// Returns the value of the Compatible Port Offset field.
+    #[must_use]
     pub fn compatible_port_offset(self) -> u8 {
         self.0[2].get_bits(0..=7).try_into().unwrap()
     }
 
     /// Returns the value of the Compatible Port Count field.
+    #[must_use]
     pub fn compatible_port_count(self) -> u8 {
         self.0[2].get_bits(8..=15).try_into().unwrap()
     }
@@ -72,6 +77,7 @@ impl Header {
     /// Returns the Link Soft Error Count Capability bit.
     ///
     /// **This bit is only valid for USB3.**
+    #[must_use]
     pub fn link_soft_error_count_capability(self) -> bool {
         self.0[2].get_bit(24)
     }
@@ -79,6 +85,7 @@ impl Header {
     /// Returns the High-speed Only bit.
     ///
     /// **This bit is only valid for USB2.**
+    #[must_use]
     pub fn high_speed_only(self) -> bool {
         self.0[2].get_bit(17)
     }
@@ -86,6 +93,7 @@ impl Header {
     /// Returns the Integrated Hub Implemented bit.
     ///
     /// **This bit is only valid for USB2.**
+    #[must_use]
     pub fn integrated_hub_implemented(self) -> bool {
         self.0[2].get_bit(18)
     }
@@ -93,6 +101,7 @@ impl Header {
     /// Returns the Hardware LPM Capability bit.
     ///
     /// **This bit is only valid for USB2.**
+    #[must_use]
     pub fn hardware_lpm_capability(self) -> bool {
         self.0[2].get_bit(19)
     }
@@ -100,21 +109,25 @@ impl Header {
     /// Returns the BESL LPM Capability bit.
     ///
     /// **This bit is only valid for USB2.**
+    #[must_use]
     pub fn besl_lpm_capability(self) -> bool {
         self.0[2].get_bit(20)
     }
 
     /// Returns the value of the Hub Depth field.
+    #[must_use]
     pub fn hub_depth(self) -> u8 {
         self.0[2].get_bits(25..=27).try_into().unwrap()
     }
 
     /// Returns the value of the Protocol Speed ID Count field.
+    #[must_use]
     pub fn protocol_speed_id_count(self) -> u8 {
         self.0[2].get_bits(28..=31).try_into().unwrap()
     }
 
     /// Returns the value of the Protocol Slot Type field.
+    #[must_use]
     pub fn protocol_slot_type(self) -> u8 {
         self.0[3].get_bits(0..=4).try_into().unwrap()
     }

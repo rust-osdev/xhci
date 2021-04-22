@@ -187,7 +187,10 @@ where
         };
 
         unsafe {
-            Some(ExtendedCapability::new(current, h, self.m.clone()).ok_or(NotSupportedId(h.id())))
+            Some(
+                ExtendedCapability::new(current, h, self.m.clone())
+                    .ok_or_else(|| NotSupportedId(h.id())),
+            )
         }
     }
 }

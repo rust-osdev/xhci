@@ -1,5 +1,8 @@
 //! HCI Extended Power Management Capability.
 
+use super::ExtendedCapability;
+use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 
@@ -135,5 +138,13 @@ impl_debug_from_methods! {
         bpcc_en,
         b2_b3,
         data,
+    }
+}
+impl<M> From<Single<HciExtendedPowerManagement, M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(h: Single<HciExtendedPowerManagement, M>) -> Self {
+        ExtendedCapability::HciExtendedPowerManagementCapability(h)
     }
 }

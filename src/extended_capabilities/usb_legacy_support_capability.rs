@@ -1,5 +1,8 @@
 //! USB Legacy Support Capability
 
+use super::ExtendedCapability;
+use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::fmt;
 
@@ -36,5 +39,13 @@ impl fmt::Debug for UsbLegacySupportCapability {
             .field("hc_bios_owned_semaphore", &self.hc_bios_owned_semaphore())
             .field("hc_os_owned_semaphore", &self.hc_os_owned_semaphore())
             .finish()
+    }
+}
+impl<M> From<Single<UsbLegacySupportCapability, M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(l: Single<UsbLegacySupportCapability, M>) -> Self {
+        ExtendedCapability::UsbLegacySupportCapability(l)
     }
 }

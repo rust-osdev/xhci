@@ -1,5 +1,6 @@
 //! xHCI Supported Protocol Capability
 
+use super::ExtendedCapability;
 use accessor::Array;
 use accessor::Mapper;
 use accessor::Single;
@@ -36,6 +37,14 @@ where
         let psis = Array::new(base + 0x10, len.into(), mapper);
 
         Self { header, psis }
+    }
+}
+impl<M> From<XhciSupportedProtocol<M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(x: XhciSupportedProtocol<M>) -> Self {
+        ExtendedCapability::XhciSupportedProtocol(x)
     }
 }
 

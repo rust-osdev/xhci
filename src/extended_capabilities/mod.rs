@@ -188,19 +188,15 @@ where
         Some(if let Some(id) = FromPrimitive::from_u8(h.id()) {
             match id {
                 // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-                Ty::UsbLegacySupport => {
-                    Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
-                        Single::new(current, self.m.clone())
-                    }))
+                Ty::UsbLegacySupport => Ok(unsafe {
+                    Single::<UsbLegacySupportCapability, M>::new(current, self.m.clone()).into()
+                }),
+                Ty::SupportedProtocol => {
+                    Ok(unsafe { XhciSupportedProtocol::new(current, self.m.clone()).into() })
                 }
-                Ty::SupportedProtocol => Ok(ExtendedCapability::XhciSupportedProtocol(unsafe {
-                    XhciSupportedProtocol::new(current, self.m.clone())
-                })),
-                Ty::ExtendedPowerManagement => {
-                    Ok(ExtendedCapability::HciExtendedPowerManagementCapability(
-                        unsafe { Single::new(current, self.m.clone()) },
-                    ))
-                }
+                Ty::ExtendedPowerManagement => Ok(unsafe {
+                    Single::<HciExtendedPowerManagement, M>::new(current, self.m.clone()).into()
+                }),
                 _ => todo!(),
             }
         } else {

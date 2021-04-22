@@ -10,14 +10,14 @@ use num_traits::FromPrimitive;
 
 /// The entry point to xHCI Supported Protocol Capability.
 #[derive(Debug)]
-pub struct SupportedProtocol<M>
+pub struct XhciSupportedProtocol<M>
 where
     M: Mapper + Clone,
 {
     header: Single<Header, M>,
     psis: Array<ProtocolSpeedId, M>,
 }
-impl<M> SupportedProtocol<M>
+impl<M> XhciSupportedProtocol<M>
 where
     M: Mapper + Clone,
 {

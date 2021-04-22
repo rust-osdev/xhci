@@ -57,6 +57,7 @@ use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryInto;
 
+pub use supported_protocol::SupportedProtocol;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 
 pub mod supported_protocol;
@@ -184,6 +185,9 @@ where
             1 => Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
                 accessor::Single::new(current, self.m.clone())
             })),
+            2 => Ok(ExtendedCapability::XhciSupportedProtocol(unsafe {
+                SupportedProtocol::new(current, self.m.clone())
+            })),
             e => Err(NotSupportedId(e)),
         })
     }
@@ -194,10 +198,12 @@ where
 #[derive(Debug)]
 pub enum ExtendedCapability<M>
 where
-    M: Mapper,
+    M: Mapper + Clone,
 {
     /// USB Legacy Support Capability.
     UsbLegacySupportCapability(accessor::Single<UsbLegacySupportCapability, M>),
+    /// xHCI Supported Protocol Capability.
+    XhciSupportedProtocol(SupportedProtocol<M>),
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.

@@ -1,9 +1,43 @@
 //! xHCI Supported Protocol Capability
 
+use accessor::Array;
+use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+
+/// The entry point to xHCI Supported Protocol Capability.
+#[derive(Debug)]
+pub struct SupportedProtocol<M>
+where
+    M: Mapper + Clone,
+{
+    header: Single<Header, M>,
+    psis: Array<ProtocolSpeedId, M>,
+}
+impl<M> SupportedProtocol<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an accessor to xHCI Supported Protocol Capability.
+    ///
+    /// # Safety
+    ///
+    /// `base` must be the correct address to xHCI Supported Protocol Capability.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `base` is not aligned correctly.
+    pub unsafe fn new(base: usize, mapper: M) -> Self {
+        let header: Single<Header, M> = Single::new(base, mapper.clone());
+        let len = header.read().protocol_speed_id_count();
+        let psis = Array::new(base + 0x10, len.into(), mapper);
+
+        Self { header, psis }
+    }
+}
 
 /// The first 16 bytes of xHCI Supported Protocol Capability.
 #[repr(transparent)]

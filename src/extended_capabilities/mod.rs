@@ -66,7 +66,6 @@ pub use xhci_supported_protocol::XhciSupportedProtocol;
 
 pub mod hci_extended_power_management;
 pub mod usb_legacy_support_capability;
-pub mod xhci_io_virtualization;
 pub mod xhci_supported_protocol;
 
 /// A struct to access xHCI Extended Capabilities.
@@ -261,7 +260,6 @@ enum Ty {
     UsbLegacySupport = 1,
     SupportedProtocol = 2,
     ExtendedPowerManagement = 3,
-    IoVirtualization = 4,
     MessageInterrupt = 5,
     LocalMemory = 6,
     UsbDebugCapability = 10,

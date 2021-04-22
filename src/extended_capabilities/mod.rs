@@ -54,9 +54,11 @@
 
 use super::registers::capability::CapabilityParameters1;
 use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 
+pub use hci_extended_power_management::HciExtendedPowerManagementCapability;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 pub use xhci_supported_protocol::XhciSupportedProtocol;
 
@@ -184,11 +186,14 @@ where
         Some(match h.id() {
             // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
             1 => Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
-                accessor::Single::new(current, self.m.clone())
+                Single::new(current, self.m.clone())
             })),
             2 => Ok(ExtendedCapability::XhciSupportedProtocol(unsafe {
                 XhciSupportedProtocol::new(current, self.m.clone())
             })),
+            3 => Ok(ExtendedCapability::HciExtendedPowerManagementCapability(
+                unsafe { Single::new(current, self.m.clone()) },
+            )),
             e => Err(NotSupportedId(e)),
         })
     }
@@ -202,9 +207,11 @@ where
     M: Mapper + Clone,
 {
     /// USB Legacy Support Capability.
-    UsbLegacySupportCapability(accessor::Single<UsbLegacySupportCapability, M>),
+    UsbLegacySupportCapability(Single<UsbLegacySupportCapability, M>),
     /// xHCI Supported Protocol Capability.
     XhciSupportedProtocol(XhciSupportedProtocol<M>),
+    /// HCI Extended Power Management Capability.
+    HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagementCapability, M>),
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.

@@ -6,8 +6,8 @@ use core::convert::TryInto;
 /// HCI Extended Power Management Capability.
 #[derive(Copy, Clone)]
 #[repr(transparent)]
-pub struct HciExtendedPowerManagementCapability([u32; 2]);
-impl HciExtendedPowerManagementCapability {
+pub struct HciExtendedPowerManagement([u32; 2]);
+impl HciExtendedPowerManagement {
     /// Returns the value of the PME_Support field.
     #[must_use]
     pub fn pme_support(self) -> u8 {
@@ -119,7 +119,7 @@ impl HciExtendedPowerManagementCapability {
     }
 }
 impl_debug_from_methods! {
-    HciExtendedPowerManagementCapability {
+    HciExtendedPowerManagement {
         pme_support,
         d2_support,
         d1_support,

@@ -58,7 +58,7 @@ use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 
-pub use hci_extended_power_management::HciExtendedPowerManagementCapability;
+pub use hci_extended_power_management::HciExtendedPowerManagement;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 pub use xhci_supported_protocol::XhciSupportedProtocol;
 
@@ -211,7 +211,7 @@ where
     /// xHCI Supported Protocol Capability.
     XhciSupportedProtocol(XhciSupportedProtocol<M>),
     /// HCI Extended Power Management Capability.
-    HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagementCapability, M>),
+    HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagement, M>),
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.

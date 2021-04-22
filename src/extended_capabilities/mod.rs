@@ -186,12 +186,8 @@ where
             Some(current + (usize::from(h.next()) << 2))
         };
 
-        unsafe {
-            Some(
-                ExtendedCapability::new(current, h, self.m.clone())
-                    .ok_or_else(|| NotSupportedId(h.id())),
-            )
-        }
+        let c = unsafe { ExtendedCapability::new(current, h, self.m.clone()) };
+        Some(c.ok_or_else(|| NotSupportedId(h.id())))
     }
 }
 

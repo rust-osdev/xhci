@@ -202,7 +202,6 @@ where
 /// This Extended Capability requires the number of VFs.
 /// However, not xHCI specification but PCIe specification defines the number.
 /// It is not possible to pass an argument for a specific Extended Capability.
-#[non_exhaustive]
 #[derive(Debug)]
 pub enum ExtendedCapability<M>
 where

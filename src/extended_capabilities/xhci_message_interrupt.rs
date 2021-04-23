@@ -1,13 +1,59 @@
 //! xHCI Message Interrupt Capability.
 
+use super::ExtendedCapability;
+use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryFrom;
 use core::convert::TryInto;
 
 /// xHCI Message Interrupt Capability.
+#[derive(Debug)]
+pub enum XhciMessageInterrupt<M>
+where
+    M: Mapper,
+{
+    /// xHCI Message Interrupt Capability with the 32-bit Message Address.
+    Addr32(Single<XhciMessageInterruptInternal<u32>, M>),
+    /// xHCI Message Interrupt Capability with the 64-bit Message Address.
+    Addr64(Single<XhciMessageInterruptInternal<u64>, M>),
+}
+impl<M> XhciMessageInterrupt<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an accessor to xHCI Message Interrupt Capability.
+    ///
+    /// # Safety
+    ///
+    /// `base` must be the correct address to xHCI Message Interrupt Capability.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `base` is not aligned correctly.
+    pub unsafe fn new(base: usize, mapper: M) -> Self {
+        let control: Single<MessageControl, M> = Single::new(base + 2, mapper.clone());
+
+        if control.read().bit64_address_capable() {
+            Self::Addr64(Single::new(base, mapper))
+        } else {
+            Self::Addr32(Single::new(base, mapper))
+        }
+    }
+}
+impl<M> From<XhciMessageInterrupt<M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(x: XhciMessageInterrupt<M>) -> Self {
+        ExtendedCapability::XhciMessageInterrupt(x)
+    }
+}
+
+/// The actual structure of xHCI Message Interrupt Capability.
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
-pub struct XhciMessageInterrupt<T>
+pub struct XhciMessageInterruptInternal<T>
 where
     T: MessageAddress,
     <T as TryFrom<u64>>::Error: core::fmt::Debug,
@@ -20,19 +66,19 @@ where
     /// Data.
     pub data: u16,
 }
-impl<T> XhciMessageInterrupt<T>
+impl<T> XhciMessageInterruptInternal<T>
 where
     T: MessageAddress,
     <T as TryFrom<u64>>::Error: core::fmt::Debug,
 {
-    /// Sets the value of the Message Address.
+    /// Sets the Message Address.
     ///
     /// # Panics
     ///
-    /// This method panics if one of the following conditions is met.
+    /// This method panics if the user breaks one of the following conditions:
     ///
-    /// - The passed address does not fit.
-    /// - Bits `0..=1` of the Address are not 0.
+    /// - Bits `0..=1` of the address must be 0.
+    /// - The address must fit, especially if `T = u32`.
     pub fn set_addr(&mut self, a: u64) {
         assert!(
             a.trailing_zeros() >= 2,
@@ -42,7 +88,7 @@ where
         self.address = a.try_into().expect("The address does not fit.");
     }
 
-    /// Returns the value of the Message Address.
+    /// Returns the Message Address.
     pub fn get_addr(&self) -> u64 {
         self.address.into()
     }

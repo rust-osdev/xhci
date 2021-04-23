@@ -14,9 +14,9 @@ where
     M: Mapper,
 {
     /// xHCI Message Interrupt Capability with the 32-bit Message Address.
-    Addr32(Single<XhciMessageInterruptInternal<u32>, M>),
+    Addr32(Single<Internal<u32>, M>),
     /// xHCI Message Interrupt Capability with the 64-bit Message Address.
-    Addr64(Single<XhciMessageInterruptInternal<u64>, M>),
+    Addr64(Single<Internal<u64>, M>),
 }
 impl<M> XhciMessageInterrupt<M>
 where
@@ -53,7 +53,7 @@ where
 /// The actual structure of xHCI Message Interrupt Capability.
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
-pub struct XhciMessageInterruptInternal<T>
+pub struct Internal<T>
 where
     T: MessageAddress,
     <T as TryFrom<u64>>::Error: core::fmt::Debug,
@@ -66,7 +66,7 @@ where
     /// Data.
     pub data: u16,
 }
-impl<T> XhciMessageInterruptInternal<T>
+impl<T> Internal<T>
 where
     T: MessageAddress,
     <T as TryFrom<u64>>::Error: core::fmt::Debug,

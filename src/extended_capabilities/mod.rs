@@ -63,7 +63,6 @@ use num_traits::FromPrimitive;
 pub use hci_extended_power_management::HciExtendedPowerManagement;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 pub use xhci_message_interrupt::XhciMessageInterrupt;
-pub use xhci_message_interrupt::XhciMessageInterruptInternal;
 pub use xhci_supported_protocol::XhciSupportedProtocol;
 
 pub mod hci_extended_power_management;

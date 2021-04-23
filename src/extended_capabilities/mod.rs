@@ -62,6 +62,7 @@ use num_traits::FromPrimitive;
 
 pub use hci_extended_power_management::HciExtendedPowerManagement;
 pub use usb_legacy_support_capability::UsbLegacySupportCapability;
+pub use xhci_local_memory::XhciLocalMemory;
 pub use xhci_message_interrupt::XhciMessageInterrupt;
 pub use xhci_supported_protocol::XhciSupportedProtocol;
 
@@ -215,6 +216,8 @@ where
     HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagement, M>),
     /// xHCI Message Interrupt Capability.
     XhciMessageInterrupt(XhciMessageInterrupt<M>),
+    /// xHCI Local Memory Capability.
+    XhciLocalMemory(XhciLocalMemory<M>),
 }
 impl<M> ExtendedCapability<M>
 where
@@ -233,6 +236,7 @@ where
                 Single::<HciExtendedPowerManagement, M>::new(base, m).into()
             }
             Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
+            Ty::LocalMemory => XhciLocalMemory::new(base, m).into(),
             _ => todo!(),
         }
     }

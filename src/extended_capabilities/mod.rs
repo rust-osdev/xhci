@@ -66,6 +66,7 @@ pub use xhci_local_memory::XhciLocalMemory;
 pub use xhci_message_interrupt::XhciMessageInterrupt;
 pub use xhci_supported_protocol::XhciSupportedProtocol;
 
+pub mod debug;
 pub mod hci_extended_power_management;
 pub mod usb_legacy_support_capability;
 pub mod xhci_local_memory;

@@ -221,11 +221,7 @@ where
     M: Mapper + Clone,
 {
     unsafe fn new(base: usize, h: Header, m: M) -> Option<Self> {
-        if let Some(ty) = FromPrimitive::from_u8(h.id()) {
-            Some(Self::from_ty(base, ty, m))
-        } else {
-            None
-        }
+        FromPrimitive::from_u8(h.id()).map(|ty| Self::from_ty(base, ty, m))
     }
 
     unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Self {

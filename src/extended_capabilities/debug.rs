@@ -373,3 +373,37 @@ impl ContextPointer {
         self.0 = a;
     }
 }
+
+/// Debug Capability Device Descriptor Info Register 1
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct DeviceDescriptorInfo1(u32);
+impl DeviceDescriptorInfo1 {
+    /// Returns the value of the DbC Protocol field.
+    #[must_use]
+    pub fn dbc_protocol(self) -> u8 {
+        self.0.get_bits(0..=7).try_into().unwrap()
+    }
+
+    /// Sets the value of the DbC Protocol field.
+    pub fn set_dbc_protocol(&mut self, protocol: u8) {
+        self.0.set_bits(0..=7, protocol.into());
+    }
+
+    /// Returns the value of the Vendor ID field.
+    #[must_use]
+    pub fn vendor_id(self) -> u16 {
+        self.0.get_bits(16..=31).try_into().unwrap()
+    }
+
+    /// Sets the value of the Vendor ID field.
+    pub fn set_vendor_id(&mut self, id: u16) {
+        self.0.set_bits(16..=31, id.into());
+    }
+}
+impl_debug_from_methods! {
+    DeviceDescriptorInfo1 {
+        dbc_protocol,
+        vendor_id,
+    }
+}

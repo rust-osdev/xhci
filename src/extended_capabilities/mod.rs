@@ -241,7 +241,7 @@ where
             }
             Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
             Ty::LocalMemory => XhciLocalMemory::new(base, m).into(),
-            Ty::UsbDebugCapability => Debug::new(base, m).into(),
+            Ty::UsbDebugCapability => Debug::new(base, &m).into(),
             _ => todo!(),
         }
     }

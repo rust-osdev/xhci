@@ -108,6 +108,12 @@ impl MessageAddress for u64 {}
 #[derive(Copy, Clone)]
 pub struct MessageControl(u16);
 impl MessageControl {
+    /// Returns the Per-vector masking capable bit.
+    #[must_use]
+    pub fn per_vector_masking_capable(self) -> bool {
+        self.0.get_bit(8)
+    }
+
     /// Returns the 64 bit address capable bit.
     #[must_use]
     pub fn bit64_address_capable(self) -> bool {
@@ -144,6 +150,7 @@ impl MessageControl {
 }
 impl_debug_from_methods! {
     MessageControl {
+        per_vector_masking_capable,
         bit64_address_capable,
         multiple_message_enable,
         multiple_message_capable,

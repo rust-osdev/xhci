@@ -55,6 +55,7 @@ where
 pub struct Header([u32; 2]);
 impl Header {
     /// Returns the Local Memory Enable bit.
+    #[must_use]
     pub fn local_memory_enable(self) -> bool {
         self.0[0].get_bit(16)
     }

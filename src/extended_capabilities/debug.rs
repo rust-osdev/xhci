@@ -52,3 +52,34 @@ impl_debug_from_methods! {
         get,
     }
 }
+
+/// Debug Capability Event Ring Segment Table Base Address Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct EventRingSegmentTableBaseAddress(u64);
+impl EventRingSegmentTableBaseAddress {
+    /// Returns the value of the Event Ring Segment Table Base Address field.
+    #[must_use]
+    pub fn get(self) -> u64 {
+        self.0
+    }
+
+    /// Sets the value of the Event Ring Segment Table Base Address field.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the address is not 16-byte aligned.
+    pub fn set(&mut self, a: u64) {
+        assert!(
+            a.trailing_zeros() >= 4,
+            "The base address of the Event Ring Segment Table must be 16-byte aligned."
+        );
+
+        self.0 = a;
+    }
+}
+impl_debug_from_methods! {
+    EventRingSegmentTableBaseAddress {
+        get,
+    }
+}

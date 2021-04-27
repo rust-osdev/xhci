@@ -38,17 +38,17 @@ pub struct EventRingSegmentTableSize(u32);
 impl EventRingSegmentTableSize {
     /// Returns the value of the Event Ring Segment Table Size field.
     #[must_use]
-    pub fn event_ring_segment_table_size(self) -> u16 {
+    pub fn get(self) -> u16 {
         self.0.get_bits(0..=15).try_into().unwrap()
     }
 
     /// Sets the value of the Event Ring Segment Table Size field.
-    pub fn set_event_ring_segment_table_size(&mut self, sz: u16) {
+    pub fn set(&mut self, sz: u16) {
         self.0.set_bits(0..=15, sz.into());
     }
 }
 impl_debug_from_methods! {
     EventRingSegmentTableSize {
-        event_ring_segment_table_size,
+        get,
     }
 }

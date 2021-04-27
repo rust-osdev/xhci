@@ -16,7 +16,7 @@ where
     M: Mapper + Clone,
 {
     header: Single<Header, M>,
-    psis: Array<ProtocolSpeedId, M>,
+    psis: Option<Array<ProtocolSpeedId, M>>,
 }
 impl<M> XhciSupportedProtocol<M>
 where
@@ -34,7 +34,11 @@ where
     pub unsafe fn new(base: usize, mapper: M) -> Self {
         let header: Single<Header, M> = Single::new(base, mapper.clone());
         let len = header.read().protocol_speed_id_count();
-        let psis = Array::new(base + 0x10, len.into(), mapper);
+        let psis = if len > 0 {
+            Some(Array::new(base + 0x10, len.into(), mapper))
+        } else {
+            None
+        };
 
         Self { header, psis }
     }

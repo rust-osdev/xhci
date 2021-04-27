@@ -4,6 +4,9 @@
 ### Added
 - A note about `Mapper` is added to the documentation of `Registers`
 
+### Fixed
+- Syntax highlight is applied to the code example in README.
+
 ## 0.5.6 - 2021-04-16
 ### Added
 - Missing members and accessors of the Operational Registers and the Runtime Registers are added.

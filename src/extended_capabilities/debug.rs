@@ -221,3 +221,34 @@ impl_debug_from_methods! {
         debug_capability_enable,
     }
 }
+
+/// Debug Capability Status Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct Status(u32);
+impl Status {
+    /// Returns the Event Ring Not Empty bit.
+    #[must_use]
+    pub fn event_ring_not_empty(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Returns the DbC System Bus Reset bit.
+    #[must_use]
+    pub fn dbc_system_bus_reset(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Returns the value of the Debug Port Number field.
+    #[must_use]
+    pub fn debug_port_number(self) -> u8 {
+        self.0.get_bits(24..=31).try_into().unwrap()
+    }
+}
+impl_debug_from_methods! {
+    Status {
+        event_ring_not_empty,
+        dbc_system_bus_reset,
+        debug_port_number,
+    }
+}

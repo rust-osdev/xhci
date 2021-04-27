@@ -89,7 +89,7 @@ macro_rules! bit_getter {
 
 macro_rules! ro_bit {
     ($bit:expr,$method:ident,$name:expr) => {
-        $crate::bit_getter!($bit, $method, $name);
+        bit_getter!($bit, $method, $name);
     };
 }
 

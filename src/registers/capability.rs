@@ -160,11 +160,7 @@ impl StructuralParameters2 {
         h << 5 | l
     }
 
-    /// Returns the value of the Scratchpad Restore field.
-    #[must_use]
-    pub fn scratchpad_restore(self) -> bool {
-        self.0.get_bit(26)
-    }
+    ro_bit!(26, scratchpad_restore, "Scratchpad Restore");
 
     fn erst_max(self) -> u32 {
         self.0.get_bits(4..=7)
@@ -217,78 +213,41 @@ impl_debug_from_methods! {
 #[allow(clippy::module_name_repetitions)]
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
-    /// Returns the value of the 64-bit Addressing Capability field.
-    #[must_use]
-    pub fn addressing_capability(self) -> bool {
-        self.0.get_bit(0)
-    }
+    ro_bit!(0, addressing_capability, "64-bit Addressing Capability");
 
-    /// Returns the value of the BW Negotiation Capability field.
-    #[must_use]
-    pub fn bw_negotiation_capability(self) -> bool {
-        self.0.get_bit(1)
-    }
+    ro_bit!(1, bw_negotiation_capability, "BW Negotiation Capability");
 
-    /// Returns `true` if the xHC uses 64 byte Context data structures, and `false` if the xHC uses
-    /// 32 byte Context data structures.
-    #[must_use]
-    pub fn context_size(self) -> bool {
-        self.0.get_bit(2)
-    }
+    ro_bit!(2, context_size, "Context Size");
 
-    /// Returns the value of the Port Power Control field.
-    #[must_use]
-    pub fn port_power_control(self) -> bool {
-        self.0.get_bit(3)
-    }
+    ro_bit!(3, port_power_control, "Port Power Control");
 
-    /// Returns the value of the Port Indicators field.
-    #[must_use]
-    pub fn port_indicators(self) -> bool {
-        self.0.get_bit(4)
-    }
+    ro_bit!(4, port_indicators, "Port Indicators");
 
-    /// Returns the value of the Light HC Reset Capability field.
-    #[must_use]
-    pub fn light_hc_reset_capability(self) -> bool {
-        self.0.get_bit(5)
-    }
+    ro_bit!(5, light_hc_reset_capability, "Light HC Reset Capability");
 
-    /// Returns the value of the Latency Tolerance Messaging Capability field.
-    #[must_use]
-    pub fn latency_tolerance_messaging_capability(self) -> bool {
-        self.0.get_bit(6)
-    }
+    ro_bit!(
+        6,
+        latency_tolerance_messaging_capability,
+        "Latency Tolerance Messaging Capability"
+    );
 
-    /// Returns the value of the No Secondary SID Support field.
-    #[must_use]
-    pub fn no_secondary_sid_support(self) -> bool {
-        self.0.get_bit(7)
-    }
+    ro_bit!(7, no_secondary_sid_support, "No Secondary SID Support");
 
-    /// Returns the value of the Parse All Event Data field.
-    #[must_use]
-    pub fn parse_all_event_data(self) -> bool {
-        self.0.get_bit(8)
-    }
+    ro_bit!(8, parse_all_event_data, "Parse All Event Data");
 
-    /// Returns the value of the Stopped - Short Packet Capability field.
-    #[must_use]
-    pub fn stopped_short_packet_capability(self) -> bool {
-        self.0.get_bit(9)
-    }
+    ro_bit!(
+        9,
+        stopped_short_packet_capability,
+        "Stopped - Short Packet Capability"
+    );
 
-    /// Returns the value of the Stopped EDTLA Capability field.
-    #[must_use]
-    pub fn stopped_edtla_capability(self) -> bool {
-        self.0.get_bit(10)
-    }
+    ro_bit!(10, stopped_edtla_capability, "Stopped EDTLA Capability");
 
-    /// Returns the value of the Contiguous Frame ID Capability field.
-    #[must_use]
-    pub fn contiguous_frame_id_capability(self) -> bool {
-        self.0.get_bit(11)
-    }
+    ro_bit!(
+        11,
+        contiguous_frame_id_capability,
+        "Contiguous Frame ID Capability"
+    );
 
     /// Returns the value of the Maximum Primary Stream Array Size field.
     #[must_use]
@@ -353,66 +312,57 @@ impl RuntimeRegisterSpaceOffset {
 #[derive(Copy, Clone)]
 pub struct CapabilityParameters2(u32);
 impl CapabilityParameters2 {
-    /// Returns the value of the U3 Entry Capability field.
-    #[must_use]
-    pub fn u3_entry_capability(self) -> bool {
-        self.0.get_bit(0)
-    }
+    ro_bit!(0, u3_entry_capability, "U3 Entry Capability");
 
-    /// Returns the value of the Configure Endpoint Command Max Exit Latency Too Large Capability
-    /// field.
-    #[must_use]
-    pub fn configure_endpoint_command_max_exit_latency_too_large_capability(self) -> bool {
-        self.0.get_bit(1)
-    }
+    ro_bit!(
+        1,
+        configure_endpoint_command_max_exit_latency_too_large_capability,
+        "Configure Endpoint Command Max Exit Latency Too Large Capability"
+    );
 
-    /// Returns the value of the Force Save Context Capability field.
-    #[must_use]
-    pub fn force_save_context_capability(self) -> bool {
-        self.0.get_bit(2)
-    }
+    ro_bit!(
+        2,
+        force_save_context_capability,
+        "Force Save Context Capability"
+    );
 
-    /// Returns the value of the Compliance Transition Capability field.
-    #[must_use]
-    pub fn compliance_transition_capability(self) -> bool {
-        self.0.get_bit(3)
-    }
+    ro_bit!(
+        3,
+        compliance_transition_capability,
+        "Compliance Transition Capability"
+    );
 
-    /// Returns the value of the Large ESIT Payload Capability field.
-    #[must_use]
-    pub fn large_esit_payload_capability(self) -> bool {
-        self.0.get_bit(4)
-    }
+    ro_bit!(
+        4,
+        large_esit_payload_capability,
+        "Large ESIT Payload Capability"
+    );
 
-    /// Returns the value of the Configuration Information Capability field.
-    #[must_use]
-    pub fn configuration_information_capability(self) -> bool {
-        self.0.get_bit(5)
-    }
+    ro_bit!(
+        5,
+        configuration_information_capability,
+        "Configuration Information Capability"
+    );
 
-    /// Returns the value of the Extended TBC Capability field.
-    #[must_use]
-    pub fn extended_tbc_capability(self) -> bool {
-        self.0.get_bit(6)
-    }
+    ro_bit!(6, extended_tbc_capability, "Extended TBC Capability");
 
-    /// Returns the value of the Extended TBC TRB Status Capability field.
-    #[must_use]
-    pub fn extended_tbc_trb_status_capability(self) -> bool {
-        self.0.get_bit(7)
-    }
+    ro_bit!(
+        7,
+        extended_tbc_trb_status_capability,
+        "Extended TBC TRB Status Capability"
+    );
 
-    /// Returns the value of the Get/Set Extended Property Capability field.
-    #[must_use]
-    pub fn get_set_extended_property_capability(self) -> bool {
-        self.0.get_bit(8)
-    }
+    ro_bit!(
+        8,
+        get_set_extended_property_capability,
+        "Get/Set Extended Property Capability"
+    );
 
-    /// Returns the value of the Virtualization Based Trusted I/O Capability field.
-    #[must_use]
-    pub fn virtualization_based_trusted_io_capability(self) -> bool {
-        self.0.get_bit(9)
-    }
+    ro_bit!(
+        9,
+        virtualization_based_trusted_io_capability,
+        "Virtualization Based Trusted I/O Capability"
+    );
 }
 impl_debug_from_methods! {
     CapabilityParameters2 {

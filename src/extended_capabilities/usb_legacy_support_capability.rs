@@ -4,7 +4,6 @@ use super::ExtendedCapability;
 use accessor::Mapper;
 use accessor::Single;
 use bit_field::BitField;
-use core::fmt;
 
 /// USB Legacy Support Capability
 #[repr(transparent)]
@@ -33,12 +32,10 @@ impl UsbLegacySupportCapability {
         self.0.set_bit(24, b);
     }
 }
-impl fmt::Debug for UsbLegacySupportCapability {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("UsbLegacySupportCapability")
-            .field("hc_bios_owned_semaphore", &self.hc_bios_owned_semaphore())
-            .field("hc_os_owned_semaphore", &self.hc_os_owned_semaphore())
-            .finish()
+impl_debug_from_methods! {
+    UsbLegacySupportCapability {
+        hc_bios_owned_semaphore,
+        hc_os_owned_semaphore,
     }
 }
 impl<M> From<Single<UsbLegacySupportCapability, M>> for ExtendedCapability<M>

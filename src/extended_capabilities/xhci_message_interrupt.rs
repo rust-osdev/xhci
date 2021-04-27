@@ -65,6 +65,10 @@ where
     address: T,
     /// Data.
     pub data: u16,
+    /// Mask Bits.
+    pub mask_bits: u32,
+    /// Pending Bits.
+    pub pending_bits: u32,
 }
 impl<T> Internal<T>
 where

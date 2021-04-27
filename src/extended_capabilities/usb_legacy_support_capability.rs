@@ -11,8 +11,10 @@ pub struct UsbLegacySupport<M>
 where
     M: Mapper + Clone,
 {
-    usblegsup: Single<LegSup, M>,
-    usblegctlsts: Single<UsbLegacySupportControlStatus, M>,
+    /// The first 4 byte of USB Legacy Support Capability.
+    pub usblegsup: Single<LegSup, M>,
+    /// USB Legacy Support Control/Status.
+    pub usblegctlsts: Single<UsbLegacySupportControlStatus, M>,
 }
 impl<M> UsbLegacySupport<M>
 where

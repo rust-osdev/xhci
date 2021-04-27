@@ -117,7 +117,7 @@ impl UsbLegacySupportControlStatus {
         self.0.get_bit(13)
     }
 
-    /// Sets the SMi on OS Ownership Enable bit.
+    /// Sets the SMI on OS Ownership Enable bit.
     pub fn set_smi_on_os_ownership_enable(&mut self, b: bool) {
         self.0.set_bit(13, b);
     }

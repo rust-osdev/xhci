@@ -37,7 +37,7 @@
 //!         for e in &mut l {
 //!             match e {
 //!                 Ok(e) => match e {
-//!                     ExtendedCapability::UsbLegacySupportCapability(u) => {}
+//!                     ExtendedCapability::UsbLegacySupport(u) => {}
 //!                     _ => {}
 //!                 },
 //!                 Err(e) => {
@@ -54,12 +54,27 @@
 
 use super::registers::capability::CapabilityParameters1;
 use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
+use debug::Debug;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+use usb_legacy_support_capability::UsbLegacySupport;
 
-pub use usb_legacy_support_capability::UsbLegacySupportCapability;
+pub use hci_extended_power_management::HciExtendedPowerManagement;
+pub use xhci_extended_message_interrupt::XhciExtendedMessageInterrupt;
+pub use xhci_local_memory::XhciLocalMemory;
+pub use xhci_message_interrupt::XhciMessageInterrupt;
+pub use xhci_supported_protocol::XhciSupportedProtocol;
 
+pub mod debug;
+pub mod hci_extended_power_management;
 pub mod usb_legacy_support_capability;
+pub mod xhci_extended_message_interrupt;
+pub mod xhci_local_memory;
+pub mod xhci_message_interrupt;
+pub mod xhci_supported_protocol;
 
 /// A struct to access xHCI Extended Capabilities.
 #[derive(Debug)]
@@ -178,25 +193,67 @@ where
             Some(current + (usize::from(h.next()) << 2))
         };
 
-        Some(match h.id() {
-            // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-            1 => Ok(ExtendedCapability::UsbLegacySupportCapability(unsafe {
-                accessor::Single::new(current, self.m.clone())
-            })),
-            e => Err(NotSupportedId(e)),
-        })
+        let c = unsafe { ExtendedCapability::new(current, h, self.m.clone()) };
+        Some(c.ok_or_else(|| NotSupportedId(h.id())))
     }
 }
 
 /// The xHCI Extended Capability.
-#[non_exhaustive]
+///
+/// # Not Supported Extended Capabilities
+///
+/// ## xHCI I/O Virtualization Capability
+///
+/// This Extended Capability requires the number of VFs.
+/// However, not xHCI specification but PCIe specification defines the number.
+/// It is not possible to pass an argument for a specific Extended Capability.
 #[derive(Debug)]
 pub enum ExtendedCapability<M>
 where
-    M: Mapper,
+    M: Mapper + Clone,
 {
     /// USB Legacy Support Capability.
-    UsbLegacySupportCapability(accessor::Single<UsbLegacySupportCapability, M>),
+    UsbLegacySupport(UsbLegacySupport<M>),
+    /// xHCI Supported Protocol Capability.
+    XhciSupportedProtocol(XhciSupportedProtocol<M>),
+    /// HCI Extended Power Management Capability.
+    HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagement, M>),
+    /// xHCI Message Interrupt Capability.
+    XhciMessageInterrupt(XhciMessageInterrupt<M>),
+    /// xHCI Local Memory Capability.
+    XhciLocalMemory(XhciLocalMemory<M>),
+    /// Debug Capability.
+    Debug(Debug<M>),
+    /// xHCI Extended Message Interrupt.
+    XhciExtendedMessageInterrupt(Single<XhciExtendedMessageInterrupt, M>),
+}
+impl<M> ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    unsafe fn new(base: usize, h: Header, m: M) -> Option<Self> {
+        let ty = FromPrimitive::from_u8(h.id())?;
+        Self::from_ty(base, ty, m)
+    }
+
+    unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Option<Self> {
+        let v = match ty {
+            // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
+            Ty::UsbLegacySupport => UsbLegacySupport::new(base, m).into(),
+            Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m).into(),
+            Ty::ExtendedPowerManagement => {
+                Single::<HciExtendedPowerManagement, M>::new(base, m).into()
+            }
+            Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
+            Ty::LocalMemory => XhciLocalMemory::new(base, m)?.into(),
+            Ty::UsbDebugCapability => Debug::new(base, &m).into(),
+            Ty::ExtendedMessageInterrupt => {
+                Single::<XhciExtendedMessageInterrupt, M>::new(base, m).into()
+            }
+        };
+
+        Some(v)
+    }
 }
 
 /// A struct representing that the Extended Capability with the ID is not supported by this crate.
@@ -223,4 +280,15 @@ impl Header {
     fn next(self) -> u8 {
         self.0.get_bits(8..=15).try_into().unwrap()
     }
+}
+
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, FromPrimitive)]
+enum Ty {
+    UsbLegacySupport = 1,
+    SupportedProtocol = 2,
+    ExtendedPowerManagement = 3,
+    MessageInterrupt = 5,
+    LocalMemory = 6,
+    UsbDebugCapability = 10,
+    ExtendedMessageInterrupt = 17,
 }

@@ -252,3 +252,101 @@ impl_debug_from_methods! {
         debug_port_number,
     }
 }
+
+/// Debug Capability Port Status and Control Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PortStatusAndControl(u32);
+impl PortStatusAndControl {
+    /// Returns the Current Connect Status bit.
+    #[must_use]
+    pub fn current_connect_status(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Returns the Port Enabled/Disabled bit.
+    #[must_use]
+    pub fn port_enabled_disabled(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Sets the Port Enabled/Disabled bit.
+    pub fn set_port_enabled_disabled(&mut self, b: bool) {
+        self.0.set_bit(1, b);
+    }
+
+    /// Returns the Port Reset bit.
+    #[must_use]
+    pub fn port_reset(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Returns the value of the Port Link State field.
+    #[must_use]
+    pub fn port_link_state(self) -> u8 {
+        self.0.get_bits(5..=8).try_into().unwrap()
+    }
+
+    /// Returns the value of the Port Speed field.
+    #[must_use]
+    pub fn port_speed(self) -> u8 {
+        self.0.get_bits(10..=13).try_into().unwrap()
+    }
+
+    /// Returns the Connect Status Change bit.
+    #[must_use]
+    pub fn connect_status_change(self) -> bool {
+        self.0.get_bit(17)
+    }
+
+    /// Clears the Connect Status Change bit.
+    pub fn clear_connect_status_change(&mut self) {
+        self.0.set_bit(17, true);
+    }
+
+    /// Returns the Port Reset Change bit.
+    #[must_use]
+    pub fn port_reset_change(self) -> bool {
+        self.0.get_bit(21)
+    }
+
+    /// Clears the Port Reset Change bit.
+    pub fn clear_port_reset_change(&mut self) {
+        self.0.set_bit(21, true);
+    }
+
+    /// Returns the Port Link Status Change bit.
+    #[must_use]
+    pub fn port_link_status_change(self) -> bool {
+        self.0.get_bit(22)
+    }
+
+    /// Clears the Port Link Status Change bit.
+    pub fn clear_port_link_status_change(&mut self) {
+        self.0.set_bit(22, true);
+    }
+
+    /// Returns the Port Config Error Change bit.
+    #[must_use]
+    pub fn port_config_error_change(self) -> bool {
+        self.0.get_bit(23)
+    }
+
+    /// Clears the Port Config Error Change bit.
+    pub fn clear_port_config_error_change(&mut self) {
+        self.0.set_bit(23, true);
+    }
+}
+impl_debug_from_methods! {
+    PortStatusAndControl {
+        current_connect_status,
+        port_enabled_disabled,
+        port_reset,
+        port_link_state,
+        port_speed,
+        connect_status_change,
+        port_reset_change,
+        port_link_status_change,
+        port_config_error_change,
+    }
+}

@@ -57,6 +57,7 @@ use accessor::Mapper;
 use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
+use debug::Debug;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -219,6 +220,8 @@ where
     XhciMessageInterrupt(XhciMessageInterrupt<M>),
     /// xHCI Local Memory Capability.
     XhciLocalMemory(XhciLocalMemory<M>),
+    /// Debug Capability.
+    Debug(Debug<M>),
 }
 impl<M> ExtendedCapability<M>
 where
@@ -238,6 +241,7 @@ where
             }
             Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
             Ty::LocalMemory => XhciLocalMemory::new(base, m).into(),
+            Ty::UsbDebugCapability => Debug::new(base, m).into(),
             _ => todo!(),
         }
     }

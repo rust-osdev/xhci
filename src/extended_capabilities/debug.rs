@@ -1,5 +1,6 @@
 //! Debug Capability.
 
+use super::ExtendedCapability;
 use accessor::Mapper;
 use accessor::Single;
 use bit_field::BitField;
@@ -68,6 +69,14 @@ where
             dcddi1: m!(0x38),
             dcddi2: m!(0x3c),
         }
+    }
+}
+impl<M> From<Debug<M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(d: Debug<M>) -> Self {
+        ExtendedCapability::Debug(d)
     }
 }
 

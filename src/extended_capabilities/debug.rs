@@ -350,3 +350,26 @@ impl_debug_from_methods! {
         port_config_error_change,
     }
 }
+
+/// Debug Capability Context Pointer Register.
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct ContextPointer(u64);
+impl ContextPointer {
+    /// Returns the start address of the Debug Capability Context data structure.
+    #[must_use]
+    pub fn get(self) -> u64 {
+        self.0
+    }
+
+    /// Sets the start address of the Debug Capability Context data structure.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the address is not 16-byte aligned.
+    pub fn set(&mut self, a: u64) {
+        assert!(a.trailing_zeros()>=4,"The start address of the Debug Capability Context data structure must be 16-byte aligned.");
+
+        self.0 = a;
+    }
+}

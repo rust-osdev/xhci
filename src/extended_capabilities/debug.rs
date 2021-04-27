@@ -19,3 +19,14 @@ impl_debug_from_methods! {
         debug_capability_event_ring_segment_table_max,
     }
 }
+
+/// Debug Capability Doorbell Register.
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct DoorbellRegister(u32);
+impl DoorbellRegister {
+    /// Sets the value of the Doorbell Target field.
+    pub fn set_doorbell_target(&mut self, target: u8) {
+        self.0.set_bits(8..=15, target.into());
+    }
+}

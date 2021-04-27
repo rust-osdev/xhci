@@ -407,3 +407,37 @@ impl_debug_from_methods! {
         vendor_id,
     }
 }
+
+/// Debug Capability Device Descriptor Info Register 2.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct DeviceDescriptorInfo2(u32);
+impl DeviceDescriptorInfo2 {
+    /// Returns the value of the Product ID field.
+    #[must_use]
+    pub fn product_id(self) -> u16 {
+        self.0.get_bits(0..=15).try_into().unwrap()
+    }
+
+    /// Sets the value of the Product ID field.
+    pub fn set_product_id(&mut self, id: u16) {
+        self.0.set_bits(0..=15, id.into());
+    }
+
+    /// Returns the value of the Device Revision field.
+    #[must_use]
+    pub fn device_revision(self) -> u16 {
+        self.0.get_bits(16..=31).try_into().unwrap()
+    }
+
+    /// Sets the value of the Device Revision field.
+    pub fn set_device_revision(&mut self, revision: u16) {
+        self.0.set_bits(16..=31, revision.into());
+    }
+}
+impl_debug_from_methods! {
+    DeviceDescriptorInfo2 {
+        product_id,
+        device_revision,
+    }
+}

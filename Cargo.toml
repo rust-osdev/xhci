@@ -1,6 +1,6 @@
 [package]
 name = "xhci"
-version = "0.5.6"
+version = "0.6.0"
 authors = ["Hiroki Tokunaga <tokusan441@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"

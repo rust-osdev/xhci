@@ -1,12 +1,14 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.6.0 - 2021-04-27
 ### Added
 - A note about `Mapper` is added to the documentation of `Registers`
 - Missing members and accessors of the Extended Capabilities are added.
 
 ### Changed
-- `USBLegacySupportCapability` is redefined so that it includes the accessor to the USB Legacy Support Control and Status Register.
+- `USBLegacySupportCapability` is redefined as `USBLegacySupport`. Now it includes the accessor to the USB Legacy Support Control and Status Register.
 
 ### Fixed
 - Syntax highlight is applied to the code example in README.

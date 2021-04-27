@@ -46,3 +46,123 @@ where
         ExtendedCapability::UsbLegacySupportCapability(l)
     }
 }
+
+/// USB Legacy Support Control/Status.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct UsbLegacySupportControlStatus(u32);
+impl UsbLegacySupportControlStatus {
+    /// Returns the USB SMI Enable bit.
+    #[must_use]
+    pub fn usb_smi_enable(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Sets the USB SMI Enable bit.
+    pub fn set_usb_smi_enable(&mut self, b: bool) {
+        self.0.set_bit(0, b);
+    }
+
+    /// Returns the SMI on Host System Error Enable bit.
+    #[must_use]
+    pub fn smi_on_host_system_error_enable(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Sets the SMI on Host System Error Enable bit.
+    pub fn set_smi_on_host_system_error_enable(&mut self, b: bool) {
+        self.0.set_bit(4, b);
+    }
+
+    /// Returns the SMI on OS Ownership Enable bit.
+    #[must_use]
+    pub fn smi_on_os_ownership_enable(self) -> bool {
+        self.0.get_bit(13)
+    }
+
+    /// Sets the SMi on OS Ownership Enable bit.
+    pub fn set_smi_on_os_ownership_enable(&mut self, b: bool) {
+        self.0.set_bit(13, b);
+    }
+
+    /// Returns the SMI on PCI Command Enable bit.
+    #[must_use]
+    pub fn smi_on_pci_command_enable(self) -> bool {
+        self.0.get_bit(14)
+    }
+
+    /// Sets the SMI on PCI Command Enable bit.
+    pub fn set_smi_on_pci_command_enable(&mut self, b: bool) {
+        self.0.set_bit(14, b);
+    }
+
+    /// Returns the SMI on BAR Enable bit.
+    #[must_use]
+    pub fn smi_on_bar_enable(self) -> bool {
+        self.0.get_bit(15)
+    }
+
+    /// Sets the SMI on BAR Enable bit.
+    pub fn set_smi_on_bar_enable(&mut self, b: bool) {
+        self.0.set_bit(15, b);
+    }
+
+    /// Returns the SMI on Event Interrupt bit.
+    #[must_use]
+    pub fn smi_on_event_interrupt(self) -> bool {
+        self.0.get_bit(16)
+    }
+
+    /// Returns the SMI on Host System Error bit.
+    #[must_use]
+    pub fn smi_on_host_system_error(self) -> bool {
+        self.0.get_bit(20)
+    }
+
+    /// Returns the SMI on OS Ownership Change bit.
+    #[must_use]
+    pub fn smi_on_os_ownership_change(self) -> bool {
+        self.0.get_bit(29)
+    }
+
+    /// Clears the SMI on OS Ownership Change bit.
+    pub fn clear_smi_on_os_ownership(&mut self) {
+        self.0.set_bit(29, true);
+    }
+
+    /// Returns the SMI on PCI Command bit.
+    #[must_use]
+    pub fn smi_on_pci_command(self) -> bool {
+        self.0.get_bit(30)
+    }
+
+    /// Clears the SMI on PCI Command bit.
+    pub fn clear_smi_on_pci_command(&mut self) {
+        self.0.set_bit(30, true);
+    }
+
+    /// Returns the SMI on BAR bit.
+    #[must_use]
+    pub fn smi_on_bar(self) -> bool {
+        self.0.get_bit(31)
+    }
+
+    /// Clears the SMI on BAR bit.
+    pub fn clear_smi_on_bar(&mut self) {
+        self.0.set_bit(31, true);
+    }
+}
+impl_debug_from_methods! {
+    UsbLegacySupportControlStatus {
+        usb_smi_enable,
+        smi_on_host_system_error_enable,
+        smi_on_os_ownership_enable,
+        smi_on_pci_command_enable,
+        smi_on_bar_enable,
+        smi_on_event_interrupt,
+        smi_on_host_system_error,
+        smi_on_os_ownership_change,
+        smi_on_pci_command,
+        smi_on_bar,
+    }
+}

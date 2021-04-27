@@ -126,3 +126,98 @@ impl_debug_from_methods! {
         dequeue_pointer,
     }
 }
+
+/// Debug Capability Control Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct Control(u32);
+impl Control {
+    /// Returns the DbC Run bit.
+    #[must_use]
+    pub fn dbc_run(self) -> bool {
+        self.0.get_bit(0)
+    }
+
+    /// Returns the Link Status Event Enable bit.
+    #[must_use]
+    pub fn link_status_event_enable(self) -> bool {
+        self.0.get_bit(1)
+    }
+
+    /// Sets the Link Status Event Enable bit.
+    pub fn set_link_status_event_enable(&mut self, b: bool) {
+        self.0.set_bit(1, b);
+    }
+
+    /// Returns the Halt OUT TR bit.
+    #[must_use]
+    pub fn halt_out_tr(self) -> bool {
+        self.0.get_bit(2)
+    }
+
+    /// Sets the Halt OUT TR bit.
+    ///
+    /// This bit is RW1S.
+    pub fn set_halt_out_tr(&mut self) {
+        self.0.set_bit(2, true);
+    }
+
+    /// Returns the Halt IN TR bit.
+    #[must_use]
+    pub fn halt_in_tr(self) -> bool {
+        self.0.get_bit(3)
+    }
+
+    /// Sets the Halt IN TR bit.
+    ///
+    /// This bit is RW1S.
+    pub fn set_halt_in_tr(&mut self) {
+        self.0.set_bit(3, true);
+    }
+
+    /// Returns the DbC Run Change bit.
+    #[must_use]
+    pub fn dbc_run_change(self) -> bool {
+        self.0.get_bit(4)
+    }
+
+    /// Clears the DbC Run Change bit.
+    pub fn clear_dbc_run_change(&mut self) {
+        self.0.set_bit(4, true);
+    }
+
+    /// Returns the value of the Debug Max Burst Size field.
+    #[must_use]
+    pub fn debug_max_burst_size(self) -> u8 {
+        self.0.get_bits(16..=23).try_into().unwrap()
+    }
+
+    /// Returns the value of the Device Address field.
+    #[must_use]
+    pub fn device_address(self) -> u8 {
+        self.0.get_bits(24..=30).try_into().unwrap()
+    }
+
+    /// Returns the Debug Capability Enable bit.
+    #[must_use]
+    pub fn debug_capability_enable(self) -> bool {
+        self.0.get_bit(31)
+    }
+
+    /// Sets the Debug Capability Enable bit.
+    pub fn set_debug_capability_enable(&mut self, b: bool) {
+        self.0.set_bit(31, b);
+    }
+}
+impl_debug_from_methods! {
+    Control {
+        dbc_run,
+        link_status_event_enable,
+        halt_out_tr,
+        halt_in_tr,
+        dbc_run_change,
+        debug_max_burst_size,
+        device_address,
+        debug_capability_enable,
+    }
+}

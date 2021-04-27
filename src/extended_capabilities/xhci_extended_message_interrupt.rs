@@ -63,11 +63,13 @@ impl_debug_from_methods! {
 pub struct TableOffset(u32);
 impl TableOffset {
     /// Returns the 8-byte aligned offset.
+    #[must_use]
     pub fn offset(self) -> u32 {
         self.0 & !0b111
     }
 
     /// Returns the BIR value.
+    #[must_use]
     pub fn bir(self) -> u8 {
         self.0.get_bits(0..=2).try_into().unwrap()
     }

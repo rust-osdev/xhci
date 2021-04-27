@@ -15,8 +15,13 @@ pub struct XhciSupportedProtocol<M>
 where
     M: Mapper + Clone,
 {
-    header: Single<Header, M>,
-    psis: Option<Array<ProtocolSpeedId, M>>,
+    /// The first 16 bytes of xHCI Supported Protocol Capability.
+    pub header: Single<Header, M>,
+    /// Protocol Speed IDs.
+    ///
+    /// This field is `None` is `PSIC == 0`. Refer to 7.2.2.1.2 of the xHCI requirements
+    /// specification for more information.
+    pub psis: Option<Array<ProtocolSpeedId, M>>,
 }
 impl<M> XhciSupportedProtocol<M>
 where

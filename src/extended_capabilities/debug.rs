@@ -1,7 +1,75 @@
 //! Debug Capability.
 
+use accessor::Mapper;
+use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
+
+/// The entry point to the Debug Capability.
+#[derive(Debug)]
+pub struct Debug<M>
+where
+    M: Mapper + Clone,
+{
+    /// Capability ID.
+    pub dcid: Single<Id, M>,
+    /// Doorbell.
+    pub dcdb: Single<Doorbell, M>,
+    /// Event Ring Segment Table Size.
+    pub dcerstsz: Single<EventRingSegmentTableSize, M>,
+    /// Event Ring Segment Table Base Address.
+    pub dcerstba: Single<EventRingSegmentTableBaseAddress, M>,
+    /// Event Ring Dequeue Pointer.
+    pub dcerdp: Single<EventRingDequeuePointer, M>,
+    /// Control.
+    pub dcctrl: Single<Control, M>,
+    /// Status.
+    pub dcst: Single<Status, M>,
+    /// Port Status and Control.
+    pub dcportsc: Single<PortStatusAndControl, M>,
+    /// Debug Capability Context Pointer.
+    pub dccp: Single<ContextPointer, M>,
+    /// Device Descriptor Info Register 1.
+    pub dcddi1: Single<DeviceDescriptorInfo1, M>,
+    /// Device Descriptor Info Register 2.
+    pub dcddi2: Single<DeviceDescriptorInfo2, M>,
+}
+impl<M> Debug<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an instance of [`Debug`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Debug Capability is accessed only through the returned
+    /// accessor.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `base` is not aligned correctly.
+    pub unsafe fn new(base: usize, mapper: M) -> Self {
+        macro_rules! m {
+            ($offset:expr) => {
+                Single::new(base + $offset, mapper.clone())
+            };
+        }
+
+        Self {
+            dcid: m!(0x00),
+            dcdb: m!(0x04),
+            dcerstsz: m!(0x08),
+            dcerstba: m!(0x10),
+            dcerdp: m!(0x18),
+            dcctrl: m!(0x20),
+            dcst: m!(0x24),
+            dcportsc: m!(0x28),
+            dccp: m!(0x30),
+            dcddi1: m!(0x38),
+            dcddi2: m!(0x3c),
+        }
+    }
+}
 
 /// Debug Capability ID Register.
 #[repr(transparent)]

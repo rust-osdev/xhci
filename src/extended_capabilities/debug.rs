@@ -49,7 +49,7 @@ where
     /// # Panics
     ///
     /// This method panics if `base` is not aligned correctly.
-    pub unsafe fn new(base: usize, mapper: M) -> Self {
+    pub unsafe fn new(base: usize, mapper: &M) -> Self {
         macro_rules! m {
             ($offset:expr) => {
                 Single::new(base + $offset, mapper.clone())

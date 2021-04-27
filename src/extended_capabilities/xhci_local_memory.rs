@@ -22,6 +22,8 @@ where
 {
     /// Creates an accessor to xHCI Local Memory Capability.
     ///
+    /// This function returns `None` if the size of the Local Memory space is 0.
+    ///
     /// # Safety
     ///
     /// `base` must be the correct address to xHCI Local Memory Capability.
@@ -32,12 +34,17 @@ where
     /// # Panics
     ///
     /// This method panics if `base` is not aligned correctly.
-    pub unsafe fn new(base: usize, mapper: M) -> Self {
+    pub unsafe fn new(base: usize, mapper: M) -> Option<Self> {
         let header: Single<Header, M> = Single::new(base, mapper.clone());
         let size = header.read().size();
-        let memory = Array::new(base + 8, (size * 1024).try_into().unwrap(), mapper);
 
-        Self { header, memory }
+        if size > 0 {
+            let memory = Array::new(base + 8, (size * 1024).try_into().unwrap(), mapper);
+
+            Some(Self { header, memory })
+        } else {
+            None
+        }
     }
 }
 impl<M> From<XhciLocalMemory<M>> for ExtendedCapability<M>

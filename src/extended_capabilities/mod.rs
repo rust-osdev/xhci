@@ -232,11 +232,12 @@ where
     M: Mapper + Clone,
 {
     unsafe fn new(base: usize, h: Header, m: M) -> Option<Self> {
-        FromPrimitive::from_u8(h.id()).map(|ty| Self::from_ty(base, ty, m))
+        let ty = FromPrimitive::from_u8(h.id())?;
+        Self::from_ty(base, ty, m)
     }
 
-    unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Self {
-        match ty {
+    unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Option<Self> {
+        let v = match ty {
             // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
             Ty::UsbLegacySupport => Single::<UsbLegacySupportCapability, M>::new(base, m).into(),
             Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m).into(),
@@ -244,12 +245,14 @@ where
                 Single::<HciExtendedPowerManagement, M>::new(base, m).into()
             }
             Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
-            Ty::LocalMemory => XhciLocalMemory::new(base, m).into(),
+            Ty::LocalMemory => XhciLocalMemory::new(base, m)?.into(),
             Ty::UsbDebugCapability => Debug::new(base, &m).into(),
             Ty::ExtendedMessageInterrupt => {
                 Single::<XhciExtendedMessageInterrupt, M>::new(base, m).into()
             }
-        }
+        };
+
+        Some(v)
     }
 }
 

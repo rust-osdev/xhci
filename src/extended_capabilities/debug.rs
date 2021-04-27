@@ -39,7 +39,7 @@ impl<M> Debug<M>
 where
     M: Mapper + Clone,
 {
-    /// Creates an instance of [`Debug`].
+    /// Creates an instance of [`struct@Debug`].
     ///
     /// # Safety
     ///

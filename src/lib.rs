@@ -74,6 +74,78 @@ macro_rules! impl_debug_from_methods {
     };
 }
 
+macro_rules! bit_getter {
+    ($bit:expr,$method:ident,$name:expr) => {
+        #[doc = "Returns the"]
+        #[doc = $name]
+        #[doc = "bit."]
+        #[must_use]
+        pub fn $method(self) -> bool {
+            use bit_field::BitField;
+            self.0.get_bit($bit)
+        }
+    };
+}
+
+macro_rules! ro_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+    };
+}
+
+macro_rules! rw_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+        paste! {
+            #[doc = "Sets the"]
+            #[doc = $name]
+            #[doc = "bit."]
+            pub fn [<set_ $method>](&mut self){
+                use bit_field::BitField;
+                self.0.set_bit($bit,true);
+            }
+
+            #[doc = "Clears the"]
+            #[doc = $name]
+            #[doc = "bit."]
+            pub fn [<clear_ $method>](&mut self){
+                use bit_field::BitField;
+                self.0.set_bit($bit,false);
+            }
+        }
+    };
+}
+
+macro_rules! rw1c_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+        paste! {
+            #[doc = "Clears the"]
+            #[doc = $name]
+            #[doc = "bit."]
+            pub fn [<clear_ $method>](&mut self){
+                use bit_field::BitField;
+                self.0.set_bit($bit,true);
+            }
+        }
+    };
+}
+
+macro_rules! rw1s_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+        paste! {
+            #[doc = "Sets the"]
+            #[doc = $name]
+            #[doc = "bit."]
+            pub fn [<set_ $method>](&mut self){
+                use bit_field::BitField;
+                self.0.set_bit($bit,true);
+            }
+        }
+    };
+}
+
 pub use accessor;
 pub use extended_capabilities::ExtendedCapability;
 pub use registers::Registers;

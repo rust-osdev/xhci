@@ -5,11 +5,54 @@ use accessor::Mapper;
 use accessor::Single;
 use bit_field::BitField;
 
-/// USB Legacy Support Capability
+/// USB Legacy Support Capability.
+#[derive(Debug)]
+pub struct UsbLegacySupport<M>
+where
+    M: Mapper + Clone,
+{
+    usblegsup: Single<LegSup, M>,
+    usblegctlsts: Single<UsbLegacySupportControlStatus, M>,
+}
+impl<M> UsbLegacySupport<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an instance of [`UsbLegacySupport`].
+    ///
+    /// # Safety
+    ///
+    /// `base` must be the correct address to USB Legacy Support Capability.
+    ///
+    /// The caller must ensure that the capability is only accessed through the returned accessor.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `base` is not aligned correctly.
+    pub unsafe fn new(base: usize, m: M) -> Self {
+        let usblegsup = Single::new(base, m.clone());
+        let usblegctlsts = Single::new(base, m);
+
+        Self {
+            usblegsup,
+            usblegctlsts,
+        }
+    }
+}
+impl<M> From<UsbLegacySupport<M>> for ExtendedCapability<M>
+where
+    M: Mapper + Clone,
+{
+    fn from(u: UsbLegacySupport<M>) -> Self {
+        ExtendedCapability::UsbLegacySupport(u)
+    }
+}
+
+/// The first 4-byte of the USB Legacy Support Capability.
 #[repr(transparent)]
 #[derive(Copy, Clone)]
-pub struct UsbLegacySupportCapability(u32);
-impl UsbLegacySupportCapability {
+pub struct LegSup(u32);
+impl LegSup {
     /// Returns the value of the HC BIOS Owned Semaphore bit.
     #[must_use]
     pub fn hc_bios_owned_semaphore(self) -> bool {
@@ -33,17 +76,9 @@ impl UsbLegacySupportCapability {
     }
 }
 impl_debug_from_methods! {
-    UsbLegacySupportCapability {
+    LegSup {
         hc_bios_owned_semaphore,
         hc_os_owned_semaphore,
-    }
-}
-impl<M> From<Single<UsbLegacySupportCapability, M>> for ExtendedCapability<M>
-where
-    M: Mapper + Clone,
-{
-    fn from(l: Single<UsbLegacySupportCapability, M>) -> Self {
-        ExtendedCapability::UsbLegacySupportCapability(l)
     }
 }
 

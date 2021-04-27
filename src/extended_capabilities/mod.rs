@@ -60,9 +60,9 @@ use core::convert::TryInto;
 use debug::Debug;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+use usb_legacy_support_capability::UsbLegacySupport;
 
 pub use hci_extended_power_management::HciExtendedPowerManagement;
-pub use usb_legacy_support_capability::UsbLegacySupportCapability;
 pub use xhci_extended_message_interrupt::XhciExtendedMessageInterrupt;
 pub use xhci_local_memory::XhciLocalMemory;
 pub use xhci_message_interrupt::XhciMessageInterrupt;
@@ -213,7 +213,7 @@ where
     M: Mapper + Clone,
 {
     /// USB Legacy Support Capability.
-    UsbLegacySupportCapability(Single<UsbLegacySupportCapability, M>),
+    UsbLegacySupport(UsbLegacySupport<M>),
     /// xHCI Supported Protocol Capability.
     XhciSupportedProtocol(XhciSupportedProtocol<M>),
     /// HCI Extended Power Management Capability.
@@ -239,7 +239,7 @@ where
     unsafe fn from_ty(base: usize, ty: Ty, m: M) -> Option<Self> {
         let v = match ty {
             // SAFETY: `List::new` ensures that the all necessary conditions are fulfilled.
-            Ty::UsbLegacySupport => Single::<UsbLegacySupportCapability, M>::new(base, m).into(),
+            Ty::UsbLegacySupport => UsbLegacySupport::new(base, m).into(),
             Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m).into(),
             Ty::ExtendedPowerManagement => {
                 Single::<HciExtendedPowerManagement, M>::new(base, m).into()

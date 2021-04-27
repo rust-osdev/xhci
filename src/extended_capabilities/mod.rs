@@ -37,7 +37,7 @@
 //!         for e in &mut l {
 //!             match e {
 //!                 Ok(e) => match e {
-//!                     ExtendedCapability::UsbLegacySupportCapability(u) => {}
+//!                     ExtendedCapability::UsbLegacySupport(u) => {}
 //!                     _ => {}
 //!                 },
 //!                 Err(e) => {

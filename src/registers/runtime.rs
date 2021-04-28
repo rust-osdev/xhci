@@ -192,7 +192,10 @@ impl EventRingSegmentTableBaseAddressRegister {
     ///
     /// This method panics if the address is not 64 byte aligned.
     pub fn set(&mut self, a: u64) {
-        assert!(a.trailing_zeros() >= 6);
+        assert!(
+            a.trailing_zeros() >= 6,
+            "The Event Ring Segment Table Base Address must be 64-byte aligned."
+        );
         self.0 = a;
     }
 }
@@ -236,7 +239,10 @@ impl EventRingDequeuePointerRegister {
     ///
     /// This method panics if the address is not 16 byte aligned.
     pub fn set_event_ring_dequeue_pointer(&mut self, p: u64) {
-        assert!(p.trailing_zeros() >= 4);
+        assert!(
+            p.trailing_zeros() >= 4,
+            "The Event Ring Dequeue Pointer must be 16-byte aligned."
+        );
         self.0 = p;
     }
 }

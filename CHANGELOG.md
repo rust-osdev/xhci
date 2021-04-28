@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- Missing error messages of `assert` macros are added.
 
 ## 0.6.0 - 2021-04-27
 ### Added

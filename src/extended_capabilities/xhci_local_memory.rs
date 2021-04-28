@@ -68,8 +68,13 @@ impl Header {
     }
 
     /// Sets the Local Memory Enable bit.
-    pub fn set_local_memory_enable(&mut self, b: bool) {
-        self.0[0].set_bit(16, b);
+    pub fn set_local_memory_enable(&mut self) {
+        self.0[0].set_bit(16, true);
+    }
+
+    /// Clears the Local Memory Enable bit.
+    pub fn clear_local_memory_enable(&mut self) {
+        self.0[0].set_bit(16, false);
     }
 
     fn size(self) -> u32 {

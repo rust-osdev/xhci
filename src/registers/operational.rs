@@ -410,7 +410,10 @@ impl CommandRingControlRegister {
     ///
     /// This method panics if the given pointer is not 64 byte aligned.
     pub fn set_command_ring_pointer(&mut self, p: u64) {
-        assert!(p.trailing_zeros() >= 6);
+        assert!(
+            p.trailing_zeros() >= 6,
+            "The Command Ring Pointer must be 64-byte aligned."
+        );
 
         let p = p >> 6;
         self.0.set_bits(6..=63, p);
@@ -439,7 +442,10 @@ impl DeviceContextBaseAddressArrayPointerRegister {
     ///
     /// This method panics if the given pointer is not 64 byte aligned.
     pub fn set(&mut self, p: u64) {
-        assert!(p.trailing_zeros() >= 6);
+        assert!(
+            p.trailing_zeros() >= 6,
+            "The Device Context Base Address Array Pointer must be 64-byte aligned."
+        );
         self.0 = p;
     }
 }

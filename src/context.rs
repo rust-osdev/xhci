@@ -705,7 +705,11 @@ pub trait EndpointHandler: AsMut<[u32]> {
     /// ep0.set_transfer_ring_dequeue_pointer(ring_addr);
     /// ```
     fn set_transfer_ring_dequeue_pointer(&mut self, p: u64) {
-        assert_eq!(p % 16, 0);
+        assert_eq!(
+            p % 16,
+            0,
+            "The Transfer Ring Dequeue Pointer must be 16-byte aligned."
+        );
 
         let l: u32 = (p & 0xffff_ffff).try_into().unwrap();
         let u: u32 = (p >> 32).try_into().unwrap();

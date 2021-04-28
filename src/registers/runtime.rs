@@ -107,27 +107,8 @@ impl InterruptRegisterSet {
 #[derive(Copy, Clone)]
 pub struct InterrupterManagementRegister(u32);
 impl InterrupterManagementRegister {
-    /// Returns the value of the Interrupter Pending bit.
-    #[must_use]
-    pub fn interrupt_pending(self) -> bool {
-        self.0.get_bit(0)
-    }
-
-    /// Clears the value of the Interrupt Pending bit.
-    pub fn clear_interrupt_pending(&mut self) {
-        self.0.set_bit(0, true);
-    }
-
-    /// Returns the value of the Interrupt Enable bit.
-    #[must_use]
-    pub fn interrupt_enable(self) -> bool {
-        self.0.get_bit(1)
-    }
-
-    /// Sets the value of the Interrupt Enable bit.
-    pub fn set_interrupt_enable(&mut self, b: bool) {
-        self.0.set_bit(1, b);
-    }
+    rw1c_bit!(0, interrupt_pending, "Interrupt Pending");
+    rw_bit!(1, interrupt_enable, "Interrupt Enable");
 }
 impl_debug_from_methods! {
     InterrupterManagementRegister {
@@ -216,16 +197,7 @@ impl EventRingDequeuePointerRegister {
         self.0.set_bits(0..=2, i.into());
     }
 
-    /// Returns the value of the Event Handler Busy bit.
-    #[must_use]
-    pub fn event_handler_busy(self) -> bool {
-        self.0.get_bit(3)
-    }
-
-    /// Clears the Event Handler Busy bit.
-    pub fn clear_event_handler_busy(&mut self) {
-        self.0.set_bit(3, true);
-    }
+    rw1c_bit!(3, event_handler_busy, "Event Handler Busy");
 
     /// Returns the address of the current Event Ring Dequeue Pointer.
     #[must_use]

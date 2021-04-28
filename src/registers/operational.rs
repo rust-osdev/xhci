@@ -156,7 +156,7 @@ impl PageSizeRegister {
 #[derive(Copy, Clone, Debug)]
 pub struct DeviceNotificationControl(u32);
 impl DeviceNotificationControl {
-    /// Returns the value of the `i`th of the Notification Enable field. `i` starts from 0.
+    /// Returns the `i`th bit of the Notification Enable field. `i` starts from 0.
     ///
     /// # Panics
     ///
@@ -168,15 +168,27 @@ impl DeviceNotificationControl {
         self.0.get_bit(i)
     }
 
-    /// Sets the value of the `i`th of the Notification Enable field. `i` starts from 0.
+    /// Sets the `i`th bit of the Notification Enable field. `i` starts from 0.
     ///
     /// # Panics
     ///
     /// This method panics if `i >= 16`.
-    pub fn set(&mut self, i: usize, ne: bool) -> &mut Self {
+    pub fn set(&mut self, i: usize) -> &mut Self {
         Self::ensure_index_is_within_range(i);
 
-        self.0.set_bit(i, ne);
+        self.0.set_bit(i, true);
+        self
+    }
+
+    /// Clears the `ith` bit of the Notification Enable field. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i >= 16`.
+    pub fn clear(&mut self, i: usize) -> &mut Self {
+        Self::ensure_index_is_within_range(i);
+
+        self.0.set_bit(i, false);
         self
     }
 
@@ -458,8 +470,15 @@ impl PortPowerManagementStatusAndControlRegister {
     /// Sets the value of the Force Link PM Accept bit.
     ///
     /// **This field is USB3 only.**
-    pub fn set_force_link_pm_accept(&mut self, b: bool) {
-        self.0.set_bit(16, b);
+    pub fn set_force_link_pm_accept(&mut self) {
+        self.0.set_bit(16, true);
+    }
+
+    /// Clears the Force Link PM Accept bit.
+    ///
+    /// **This field is USB3 only.**
+    pub fn clear_force_link_pm_accept(&mut self) {
+        self.0.set_bit(16, false);
     }
 
     /// Returns the value of the L1 Status field.
@@ -484,8 +503,15 @@ impl PortPowerManagementStatusAndControlRegister {
     /// Sets the value of the Remote Wake Enable field.
     ///
     /// **This field is USB2 only.**
-    pub fn set_remote_wake_enable(&mut self, b: bool) {
-        self.0.set_bit(3, b);
+    pub fn set_remote_wake_enable(&mut self) {
+        self.0.set_bit(3, true);
+    }
+
+    /// Clears the Remote Wake Enable bit.
+    ///
+    /// **This field is USB2 only.**
+    pub fn clear_remote_wake_enable(&mut self) {
+        self.0.set_bit(3, false);
     }
 
     /// Returns the value of the Best Effort Service Latency field.
@@ -529,8 +555,15 @@ impl PortPowerManagementStatusAndControlRegister {
     /// Sets the value of the Hardware LPM Enable field.
     ///
     /// **This field is USB2 only.**
-    pub fn set_hardware_lpm_enable(&mut self, b: bool) {
-        self.0.set_bit(16, b);
+    pub fn set_hardware_lpm_enable(&mut self) {
+        self.0.set_bit(16, true);
+    }
+
+    /// Clears the Hardware LPM Enable bit.
+    ///
+    /// **This field is USB2 only.**
+    pub fn clear_hardware_lpm_enable(&mut self) {
+        self.0.set_bit(16, false);
     }
 
     /// Returns the value of the Port Test Control field.

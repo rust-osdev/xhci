@@ -87,16 +87,9 @@ macro_rules! bit_getter {
     };
 }
 
-macro_rules! ro_bit {
+macro_rules! bit_modifier {
     ($bit:expr,$method:ident,$name:expr) => {
-        bit_getter!($bit, $method, $name);
-    };
-}
-
-macro_rules! rw_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
-        $crate::bit_getter!($bit, $method, $name);
-        paste! {
+        paste::paste! {
             #[doc = "Sets the"]
             #[doc = $name]
             #[doc = "bit."]
@@ -116,10 +109,29 @@ macro_rules! rw_bit {
     };
 }
 
+macro_rules! ro_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+    };
+}
+
+macro_rules! wo_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_modifier!($bit, $method, $name);
+    };
+}
+
+macro_rules! rw_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+        bit_modifier!($bit, $method, $name);
+    };
+}
+
 macro_rules! rw1c_bit {
     ($bit:expr,$method:ident,$name:expr) => {
-        $crate::bit_getter!($bit, $method, $name);
-        paste! {
+        bit_getter!($bit, $method, $name);
+        paste::paste! {
             #[doc = "Clears the"]
             #[doc = $name]
             #[doc = "bit."]
@@ -131,10 +143,9 @@ macro_rules! rw1c_bit {
     };
 }
 
-macro_rules! rw1s_bit {
+macro_rules! w1s_bit {
     ($bit:expr,$method:ident,$name:expr) => {
-        $crate::bit_getter!($bit, $method, $name);
-        paste! {
+        paste::paste! {
             #[doc = "Sets the"]
             #[doc = $name]
             #[doc = "bit."]
@@ -143,6 +154,13 @@ macro_rules! rw1s_bit {
                 self.0.set_bit($bit,true);
             }
         }
+    };
+}
+
+macro_rules! rw1s_bit {
+    ($bit:expr,$method:ident,$name:expr) => {
+        bit_getter!($bit, $method, $name);
+        w1s_bit!($bit, $method, $name);
     };
 }
 

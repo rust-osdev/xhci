@@ -4,6 +4,9 @@
 ### Added
 - Missing error messages of `assert` macros are added.
 
+### Changed
+- `set_xxx(true_or_false)` methods of the Registers are split into `set_xxx()` and `clear_xxx()`.
+
 ## 0.6.0 - 2021-04-27
 ### Added
 - A note about `Mapper` is added to the documentation of `Registers`

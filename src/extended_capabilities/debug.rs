@@ -209,59 +209,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Control(u32);
 impl Control {
-    /// Returns the DbC Run bit.
-    #[must_use]
-    pub fn dbc_run(self) -> bool {
-        self.0.get_bit(0)
-    }
-
-    /// Returns the Link Status Event Enable bit.
-    #[must_use]
-    pub fn link_status_event_enable(self) -> bool {
-        self.0.get_bit(1)
-    }
-
-    /// Sets the Link Status Event Enable bit.
-    pub fn set_link_status_event_enable(&mut self, b: bool) {
-        self.0.set_bit(1, b);
-    }
-
-    /// Returns the Halt OUT TR bit.
-    #[must_use]
-    pub fn halt_out_tr(self) -> bool {
-        self.0.get_bit(2)
-    }
-
-    /// Sets the Halt OUT TR bit.
-    ///
-    /// This bit is RW1S.
-    pub fn set_halt_out_tr(&mut self) {
-        self.0.set_bit(2, true);
-    }
-
-    /// Returns the Halt IN TR bit.
-    #[must_use]
-    pub fn halt_in_tr(self) -> bool {
-        self.0.get_bit(3)
-    }
-
-    /// Sets the Halt IN TR bit.
-    ///
-    /// This bit is RW1S.
-    pub fn set_halt_in_tr(&mut self) {
-        self.0.set_bit(3, true);
-    }
-
-    /// Returns the DbC Run Change bit.
-    #[must_use]
-    pub fn dbc_run_change(self) -> bool {
-        self.0.get_bit(4)
-    }
-
-    /// Clears the DbC Run Change bit.
-    pub fn clear_dbc_run_change(&mut self) {
-        self.0.set_bit(4, true);
-    }
+    ro_bit!(0, dbc_run, "DbC Run");
+    rw_bit!(1, link_status_event_enable, "Link Status Event Enable");
+    rw1s_bit!(2, halt_out_tr, "Halt OUT TR");
+    rw1s_bit!(3, halt_in_tr, "Halt IN TR");
+    rw1c_bit!(4, dbc_run_change, "DbC Run Change");
 
     /// Returns the value of the Debug Max Burst Size field.
     #[must_use]
@@ -275,16 +227,7 @@ impl Control {
         self.0.get_bits(24..=30).try_into().unwrap()
     }
 
-    /// Returns the Debug Capability Enable bit.
-    #[must_use]
-    pub fn debug_capability_enable(self) -> bool {
-        self.0.get_bit(31)
-    }
-
-    /// Sets the Debug Capability Enable bit.
-    pub fn set_debug_capability_enable(&mut self, b: bool) {
-        self.0.set_bit(31, b);
-    }
+    rw_bit!(31, debug_capability_enable, "Debug Capability Enable");
 }
 impl_debug_from_methods! {
     Control {
@@ -304,17 +247,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Status(u32);
 impl Status {
-    /// Returns the Event Ring Not Empty bit.
-    #[must_use]
-    pub fn event_ring_not_empty(self) -> bool {
-        self.0.get_bit(0)
-    }
-
-    /// Returns the DbC System Bus Reset bit.
-    #[must_use]
-    pub fn dbc_system_bus_reset(self) -> bool {
-        self.0.get_bit(1)
-    }
+    ro_bit!(0, event_ring_not_empty, "Event Ring Not Empty");
+    ro_bit!(1, dbc_system_bus_reset, "DbC System Bus Reset");
 
     /// Returns the value of the Debug Port Number field.
     #[must_use]
@@ -335,28 +269,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortStatusAndControl(u32);
 impl PortStatusAndControl {
-    /// Returns the Current Connect Status bit.
-    #[must_use]
-    pub fn current_connect_status(self) -> bool {
-        self.0.get_bit(0)
-    }
-
-    /// Returns the Port Enabled/Disabled bit.
-    #[must_use]
-    pub fn port_enabled_disabled(self) -> bool {
-        self.0.get_bit(1)
-    }
-
-    /// Sets the Port Enabled/Disabled bit.
-    pub fn set_port_enabled_disabled(&mut self, b: bool) {
-        self.0.set_bit(1, b);
-    }
-
-    /// Returns the Port Reset bit.
-    #[must_use]
-    pub fn port_reset(self) -> bool {
-        self.0.get_bit(4)
-    }
+    ro_bit!(0, current_connect_status, "Current Connect Status");
+    rw_bit!(1, port_enabled_disabled, "Port Enabled/Disabled");
+    ro_bit!(4, port_reset, "Port Reset");
 
     /// Returns the value of the Port Link State field.
     #[must_use]
@@ -370,49 +285,10 @@ impl PortStatusAndControl {
         self.0.get_bits(10..=13).try_into().unwrap()
     }
 
-    /// Returns the Connect Status Change bit.
-    #[must_use]
-    pub fn connect_status_change(self) -> bool {
-        self.0.get_bit(17)
-    }
-
-    /// Clears the Connect Status Change bit.
-    pub fn clear_connect_status_change(&mut self) {
-        self.0.set_bit(17, true);
-    }
-
-    /// Returns the Port Reset Change bit.
-    #[must_use]
-    pub fn port_reset_change(self) -> bool {
-        self.0.get_bit(21)
-    }
-
-    /// Clears the Port Reset Change bit.
-    pub fn clear_port_reset_change(&mut self) {
-        self.0.set_bit(21, true);
-    }
-
-    /// Returns the Port Link Status Change bit.
-    #[must_use]
-    pub fn port_link_status_change(self) -> bool {
-        self.0.get_bit(22)
-    }
-
-    /// Clears the Port Link Status Change bit.
-    pub fn clear_port_link_status_change(&mut self) {
-        self.0.set_bit(22, true);
-    }
-
-    /// Returns the Port Config Error Change bit.
-    #[must_use]
-    pub fn port_config_error_change(self) -> bool {
-        self.0.get_bit(23)
-    }
-
-    /// Clears the Port Config Error Change bit.
-    pub fn clear_port_config_error_change(&mut self) {
-        self.0.set_bit(23, true);
-    }
+    rw1c_bit!(17, connect_status_change, "Connect Status Change");
+    rw1c_bit!(21, port_reset_change, "Port Reset Change");
+    rw1c_bit!(22, port_link_status_change, "Port Link Status Change");
+    rw1c_bit!(23, port_config_error_change, "Port Config Error Change");
 }
 impl_debug_from_methods! {
     PortStatusAndControl {

@@ -88,8 +88,13 @@ impl HciExtendedPowerManagement {
     }
 
     /// Sets the `PME_En` bit.
-    pub fn set_pme_en(&mut self, b: bool) {
-        self.0[1].set_bit(8, b);
+    pub fn set_pme_en(&mut self) {
+        self.0[1].set_bit(8, true);
+    }
+
+    /// Clears the `PME_En` bit.
+    pub fn clear_pme_en(&mut self) {
+        self.0[1].set_bit(8, false);
     }
 
     /// Returns the value of the `PowerState` field.

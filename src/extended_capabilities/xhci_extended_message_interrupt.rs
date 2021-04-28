@@ -33,16 +33,7 @@ where
 #[derive(Copy, Clone)]
 pub struct MessageControl(u16);
 impl MessageControl {
-    /// Returns the MSI-X Enable bit.
-    #[must_use]
-    pub fn msi_x_enable(self) -> bool {
-        self.0.get_bit(15)
-    }
-
-    /// Sets the MSI-X Enable bit.
-    pub fn set_msi_x_enable(&mut self, b: bool) {
-        self.0.set_bit(15, b);
-    }
+    rw_bit!(15, msi_x_enable, "MSI-X Enable");
 
     /// Returns the value of the Table Size field.
     #[must_use]

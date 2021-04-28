@@ -3,7 +3,6 @@
 use super::ExtendedCapability;
 use accessor::Mapper;
 use accessor::Single;
-use bit_field::BitField;
 
 /// USB Legacy Support Capability.
 #[derive(Debug)]
@@ -55,27 +54,8 @@ where
 #[derive(Copy, Clone)]
 pub struct LegSup(u32);
 impl LegSup {
-    /// Returns the value of the HC BIOS Owned Semaphore bit.
-    #[must_use]
-    pub fn hc_bios_owned_semaphore(self) -> bool {
-        self.0.get_bit(16)
-    }
-
-    /// Sets the value of the HC BIOS Owned Semaphore bit.
-    pub fn set_hc_bios_owned_semaphore(&mut self, b: bool) {
-        self.0.set_bit(16, b);
-    }
-
-    /// Returns the value of the HC OS Owned Semaphore bit.
-    #[must_use]
-    pub fn hc_os_owned_semaphore(self) -> bool {
-        self.0.get_bit(24)
-    }
-
-    /// Gets the value of the HC OS Owned Semaphore bit.
-    pub fn set_hc_os_owned_semaphore(&mut self, b: bool) {
-        self.0.set_bit(24, b);
-    }
+    rw_bit!(16, hc_bios_owned_semaphore, "HC BIOS Owned Semaphore");
+    rw_bit!(24, hc_os_owned_semaphore, "HC OS Owned Semaphore");
 }
 impl_debug_from_methods! {
     LegSup {
@@ -89,105 +69,20 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct UsbLegacySupportControlStatus(u32);
 impl UsbLegacySupportControlStatus {
-    /// Returns the USB SMI Enable bit.
-    #[must_use]
-    pub fn usb_smi_enable(self) -> bool {
-        self.0.get_bit(0)
-    }
-
-    /// Sets the USB SMI Enable bit.
-    pub fn set_usb_smi_enable(&mut self, b: bool) {
-        self.0.set_bit(0, b);
-    }
-
-    /// Returns the SMI on Host System Error Enable bit.
-    #[must_use]
-    pub fn smi_on_host_system_error_enable(self) -> bool {
-        self.0.get_bit(4)
-    }
-
-    /// Sets the SMI on Host System Error Enable bit.
-    pub fn set_smi_on_host_system_error_enable(&mut self, b: bool) {
-        self.0.set_bit(4, b);
-    }
-
-    /// Returns the SMI on OS Ownership Enable bit.
-    #[must_use]
-    pub fn smi_on_os_ownership_enable(self) -> bool {
-        self.0.get_bit(13)
-    }
-
-    /// Sets the SMI on OS Ownership Enable bit.
-    pub fn set_smi_on_os_ownership_enable(&mut self, b: bool) {
-        self.0.set_bit(13, b);
-    }
-
-    /// Returns the SMI on PCI Command Enable bit.
-    #[must_use]
-    pub fn smi_on_pci_command_enable(self) -> bool {
-        self.0.get_bit(14)
-    }
-
-    /// Sets the SMI on PCI Command Enable bit.
-    pub fn set_smi_on_pci_command_enable(&mut self, b: bool) {
-        self.0.set_bit(14, b);
-    }
-
-    /// Returns the SMI on BAR Enable bit.
-    #[must_use]
-    pub fn smi_on_bar_enable(self) -> bool {
-        self.0.get_bit(15)
-    }
-
-    /// Sets the SMI on BAR Enable bit.
-    pub fn set_smi_on_bar_enable(&mut self, b: bool) {
-        self.0.set_bit(15, b);
-    }
-
-    /// Returns the SMI on Event Interrupt bit.
-    #[must_use]
-    pub fn smi_on_event_interrupt(self) -> bool {
-        self.0.get_bit(16)
-    }
-
-    /// Returns the SMI on Host System Error bit.
-    #[must_use]
-    pub fn smi_on_host_system_error(self) -> bool {
-        self.0.get_bit(20)
-    }
-
-    /// Returns the SMI on OS Ownership Change bit.
-    #[must_use]
-    pub fn smi_on_os_ownership_change(self) -> bool {
-        self.0.get_bit(29)
-    }
-
-    /// Clears the SMI on OS Ownership Change bit.
-    pub fn clear_smi_on_os_ownership(&mut self) {
-        self.0.set_bit(29, true);
-    }
-
-    /// Returns the SMI on PCI Command bit.
-    #[must_use]
-    pub fn smi_on_pci_command(self) -> bool {
-        self.0.get_bit(30)
-    }
-
-    /// Clears the SMI on PCI Command bit.
-    pub fn clear_smi_on_pci_command(&mut self) {
-        self.0.set_bit(30, true);
-    }
-
-    /// Returns the SMI on BAR bit.
-    #[must_use]
-    pub fn smi_on_bar(self) -> bool {
-        self.0.get_bit(31)
-    }
-
-    /// Clears the SMI on BAR bit.
-    pub fn clear_smi_on_bar(&mut self) {
-        self.0.set_bit(31, true);
-    }
+    rw_bit!(0, usb_smi_enable, "USB SMI Enable");
+    rw_bit!(
+        4,
+        smi_on_host_system_error_enable,
+        "SMI on Host System Error Enable"
+    );
+    rw_bit!(13, smi_on_os_ownership_enable, "SMI on OS Ownership Enable");
+    rw_bit!(14, smi_on_pci_command_enable, "SMI on PCI Command Enable");
+    rw_bit!(15, smi_on_bar_enable, "SMI on BAR Enable");
+    ro_bit!(16, smi_on_event_interrupt, "SMI on Event Interrupt");
+    ro_bit!(20, smi_on_host_system_error, "SMI on Host System Error");
+    rw1c_bit!(29, smi_on_os_ownership_change, "SMI on OS Ownership Change");
+    rw1c_bit!(30, smi_on_pci_command, "SMI on PCI Command");
+    rw1c_bit!(31, smi_on_bar, "SMI on BAR");
 }
 impl_debug_from_methods! {
     UsbLegacySupportControlStatus {

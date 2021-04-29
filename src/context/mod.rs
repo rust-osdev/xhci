@@ -2,7 +2,7 @@
 //!
 //! The size of each Context type is the same as the actual Context size.
 //!
-//! In order to handle Contexts with methods regardless of Context's size, all methods are
+//! To handle Contexts with methods regardless of Context's size, all methods are
 //! implemented on traits.
 //!
 //! # Examples

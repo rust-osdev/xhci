@@ -212,6 +212,7 @@ impl<const N: usize> Slot<N> {
     /// # Panics
     ///
     /// This method panics if the Slot State represents Reserved.
+    #[must_use]
     pub fn slot_state(self) -> SlotState {
         let v = self.0[3].get_bits(27..=31);
         let s = FromPrimitive::from_u32(v);
@@ -240,6 +241,7 @@ impl<const N: usize> Endpoint<N> {
     /// # Panics
     ///
     /// This method panics if the Endpoint State represents Reserved.
+    #[must_use]
     pub fn endpoint_state(self) -> EndpointState {
         let v = self.0[0].get_bits(0..=2);
         let s = FromPrimitive::from_u32(v);
@@ -265,6 +267,7 @@ impl<const N: usize> Endpoint<N> {
 
     rw_field!([1](1..=2), error_count, "Error Count", u8);
     /// Returns Endpoint Type.
+    #[must_use]
     pub fn endpoint_type(self) -> EndpointType {
         let v = self.0[1].get_bits(3..=5);
         let t = FromPrimitive::from_u32(v);

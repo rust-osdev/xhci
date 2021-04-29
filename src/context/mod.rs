@@ -1,7 +1,25 @@
-//! The xHC Contexts.
+//! The xHCI Contexts.
+//!
+//! The size of each Context type is the same as the actual Context size.
 //!
 //! In order to handle Contexts with methods regardless of Context's size, all methods are
 //! implemented on traits.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use xhci::{context, context::InputHandler};
+//!
+//! let mut input = context::Input::new_32byte();
+//! let input_control = input.control_mut();
+//! input_control.set_add_context_flag(0);
+//! input_control.set_add_context_flag(1);
+//!
+//! # let port_id = 3;
+//! let slot = device.slot_mut();
+//! slot.set_context_entries(1);
+//! slot.set_root_hub_port_number(port_id);
+//! ```
 
 #[macro_use]
 mod macros;

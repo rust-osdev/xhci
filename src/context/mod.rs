@@ -8,63 +8,53 @@ use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
-macro_rules! impl_context {
-    ($ty:ident,$name:expr) => {
-        impl $ty<8> {
-            #[doc = "Creates an empty 32 byte"]
-            #[doc = $name]
-            #[doc = "Context."]
-            #[must_use]
-            pub const fn new_32byte() -> Self {
-                Self::new()
-            }
-        }
-        impl $ty<16> {
-            #[doc = "Creates an empty 64 byte"]
-            #[doc = $name]
-            #[doc = "Context."]
-            #[must_use]
-            pub const fn new_64byte() -> Self {
-                Self::new()
-            }
-        }
-        impl Default for $ty<8> {
-            fn default() -> Self {
-                Self::new()
-            }
-        }
-        impl Default for $ty<16> {
-            fn default() -> Self {
-                Self::new()
-            }
-        }
-
-        paste::paste! {
-            #[doc = "32 byte version of"]
-            #[doc = $name]
-            #[doc = "Context."]
-            pub type [<$ty 32Byte>] = $ty<8>;
-            #[doc = "64 byte version of"]
-            #[doc = $name]
-            #[doc = "Context."]
-            pub type [<$ty 64Byte>] = $ty<16>;
-        }
-    };
-}
-
 /// The number of Endpoint Contexts in a Device Context.
 pub const NUM_OF_ENDPOINT_CONTEXTS: usize = 31;
+
+/// 32 byte Input Context.
+pub type Input32Byte = Input<8>;
+/// 64 byte Input Context.
+pub type Input64Byte = Input<16>;
+
+/// 32 byte Input Control Context.
+pub type InputControl32Byte = InputControl<8>;
+/// 64 byte Input Control Context.
+pub type InputControl64Byte = InputControl<16>;
+
+/// 32 byte Device Context.
+pub type Device32Byte = Device<8>;
+/// 64 byte Device Context.
+pub type Device64Byte = Device<16>;
+
+/// 32 byte Slot Context.
+pub type Slot32Byte = Slot<8>;
+/// 64 byte Slot Context.
+pub type Slot64Byte = Slot<16>;
+
+/// 32 byte Endpoint Context.
+pub type Endpoint32Byte = Endpoint<8>;
+/// 64 byte Endpoint Context.
+pub type Endpoint64Byte = Endpoint<16>;
 
 /// Input Context.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Input<const N: usize> {
-    /// Input Control Context.
-    pub control: InputControl<N>,
-    /// Device Context.
-    pub device: Device<N>,
+    control: InputControl<N>,
+    device: Device<N>,
 }
-impl_context!(Input, "Input");
+impl Input32Byte {
+    /// Creates an empty 32 byte Input Context.
+    pub const fn new_32byte() -> Self {
+        Self::new()
+    }
+}
+impl Input64Byte {
+    /// Creates an empty 64 byte Input Context.
+    pub const fn new_64byte() -> Self {
+        Self::new()
+    }
+}
 impl<const N: usize> Input<N> {
     const fn new() -> Self {
         Self {
@@ -73,103 +63,54 @@ impl<const N: usize> Input<N> {
         }
     }
 }
+impl Default for Input<8> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Default for Input<16> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<const N: usize> InputHandler for Input<N> {
+    fn control(&self) -> &dyn InputControlHandler {
+        &self.control
+    }
+
+    fn control_mut(&mut self) -> &mut dyn InputControlHandler {
+        &mut self.control
+    }
+
+    fn device(&self) -> &dyn DeviceHandler {
+        &self.device
+    }
+
+    fn device_mut(&mut self) -> &mut dyn DeviceHandler {
+        &mut self.device
+    }
+}
+
+/// A trait to handle Input Context.
+pub trait InputHandler {
+    /// Returns a handler of Input Control Context.
+    fn control(&self) -> &dyn InputControlHandler;
+
+    /// Returns a mutable handler of Input Control Context.
+    fn control_mut(&mut self) -> &mut dyn InputControlHandler;
+
+    /// Returns a handler of Device Context.
+    fn device(&self) -> &dyn DeviceHandler;
+
+    /// Returns a mutable handler of Device Context.
+    fn device_mut(&mut self) -> &mut dyn DeviceHandler;
+}
 
 /// Input Control Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
-impl_context!(InputControl, "Input Control");
 impl<const N: usize> InputControl<N> {
-    /// Returns the `i`th Drop Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i < 2 || i > 31`.
-    #[must_use]
-    pub fn drop_context_flag(self, i: usize) -> bool {
-        Self::ensure_drop_context_index_within_range(i);
-
-        self.0[0].get_bit(i)
-    }
-
-    /// Sets the `i`th Drop Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i < 2 || i > 31`.
-    pub fn set_drop_context_flag(&mut self, i: usize) -> &mut Self {
-        Self::ensure_drop_context_index_within_range(i);
-
-        self.0[0].set_bit(i, true);
-        self
-    }
-
-    /// Clears the `i`th Drop Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i < 2 || i > 31`.
-    pub fn clear_drop_context_flag(&mut self, i: usize) -> &mut Self {
-        Self::ensure_drop_context_index_within_range(i);
-
-        self.0[0].set_bit(i, false);
-        self
-    }
-
-    /// Returns the `i`th Add Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i > 31`.
-    #[must_use]
-    pub fn add_context_flag(self, i: usize) -> bool {
-        Self::ensure_add_context_index_within_range(i);
-
-        self.0[1].get_bit(i)
-    }
-
-    /// Sets the `i`th Add Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i > 31`.
-    pub fn set_add_context_flag(&mut self, i: usize) -> &mut Self {
-        Self::ensure_add_context_index_within_range(i);
-
-        self.0[1].set_bit(i, true);
-        self
-    }
-
-    /// Clears the `i`th Add Context flag. `i` starts from 0.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `i > 31`.
-    pub fn clear_add_context_flag(&mut self, i: usize) -> &mut Self {
-        Self::ensure_add_context_index_within_range(i);
-
-        self.0[1].set_bit(i, false);
-        self
-    }
-
-    rw_field!([7](0..=7), configuration_value, "Configuration Value", u8);
-    rw_field!([7](8..=15), interface_number, "Interface Number", u8);
-    rw_field!([7](16..=23), alternate_setting, "Alternate Setting", u8);
-
-    fn ensure_drop_context_index_within_range(i: usize) {
-        assert!(
-            (2..=31).contains(&i),
-            "The index of Drop Context flag must be within 2..=31."
-        );
-    }
-
-    fn ensure_add_context_index_within_range(i: usize) {
-        assert!(
-            i <= 31,
-            "The index of Add Context flag must be less than 32."
-        )
-    }
-
     const fn new() -> Self {
         Self([0; N])
     }
@@ -184,17 +125,106 @@ impl<const N: usize> AsMut<[u32]> for InputControl<N> {
         &mut self.0
     }
 }
+impl<const N: usize> InputControlHandler for InputControl<N> {}
+
+/// A trait to handle Input Control Context.
+pub trait InputControlHandler: AsRef<[u32]> + AsMut<[u32]> {
+    /// Returns the `i`th Drop Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i < 2 || i > 31`.
+    #[must_use]
+    fn drop_context_flag(&self, i: usize) -> bool {
+        self.ensure_drop_context_index_within_range(i);
+
+        self.as_ref()[0].get_bit(i)
+    }
+
+    /// Sets the `i`th Drop Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i < 2 || i > 31`.
+    fn set_drop_context_flag(&mut self, i: usize) {
+        self.ensure_drop_context_index_within_range(i);
+
+        self.as_mut()[0].set_bit(i, true);
+    }
+
+    /// Clears the `i`th Drop Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i < 2 || i > 31`.
+    fn clear_drop_context_flag(&mut self, i: usize) {
+        self.ensure_drop_context_index_within_range(i);
+
+        self.as_mut()[0].set_bit(i, false);
+    }
+
+    /// Returns the `i`th Add Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i > 31`.
+    #[must_use]
+    fn add_context_flag(&self, i: usize) -> bool {
+        self.ensure_add_context_index_within_range(i);
+
+        self.as_ref()[1].get_bit(i)
+    }
+
+    /// Sets the `i`th Add Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i > 31`.
+    fn set_add_context_flag(&mut self, i: usize) {
+        self.ensure_add_context_index_within_range(i);
+
+        self.as_mut()[1].set_bit(i, true);
+    }
+
+    /// Clears the `i`th Add Context flag. `i` starts from 0.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `i > 31`.
+    fn clear_add_context_flag(&mut self, i: usize) {
+        self.ensure_add_context_index_within_range(i);
+
+        self.as_mut()[1].set_bit(i, false);
+    }
+
+    rw_field_cx!([7](0..=7), configuration_value, "Configuration Value", u8);
+    rw_field_cx!([7](8..=15), interface_number, "Interface Number", u8);
+    rw_field_cx!([7](16..=23), alternate_setting, "Alternate Setting", u8);
+
+    #[doc(hidden)]
+    fn ensure_drop_context_index_within_range(&self, i: usize) {
+        assert!(
+            (2..=31).contains(&i),
+            "The index of Drop Context flag must be within 2..=31."
+        );
+    }
+
+    #[doc(hidden)]
+    fn ensure_add_context_index_within_range(&self, i: usize) {
+        assert!(
+            i <= 31,
+            "The index of Add Context flag must be less than 32."
+        )
+    }
+}
 
 /// Device Context.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Device<const N: usize> {
-    /// Slot Context.
-    pub slot: Slot<N>,
-    /// Endpoint Contexts.
-    pub endpoints: [Endpoint<N>; NUM_OF_ENDPOINT_CONTEXTS],
+    slot: Slot<N>,
+    endpoints: [Endpoint<N>; NUM_OF_ENDPOINT_CONTEXTS],
 }
-impl_context!(Device, "Device");
 impl<const N: usize> Device<N> {
     const fn new() -> Self {
         Self {
@@ -202,53 +232,67 @@ impl<const N: usize> Device<N> {
             endpoints: [Endpoint::new(); NUM_OF_ENDPOINT_CONTEXTS],
         }
     }
+
+    fn assert_dci(dci: usize) {
+        assert_ne!(
+            dci, 0,
+            "Call `DeviceHandler::slot` to get a handler of Slot Context.`"
+        );
+        assert!(dci <= 31, "DCI must be less than 32.");
+    }
+}
+impl<const N: usize> DeviceHandler for Device<N> {
+    fn slot(&self) -> &dyn SlotHandler {
+        &self.slot
+    }
+
+    fn slot_mut(&mut self) -> &mut dyn SlotHandler {
+        &mut self.slot
+    }
+
+    fn endpoint(&self, dci: usize) -> &dyn EndpointHandler {
+        Self::assert_dci(dci);
+
+        &self.endpoints[dci - 1]
+    }
+
+    fn endpoint_mut(&mut self, dci: usize) -> &mut dyn EndpointHandler {
+        Self::assert_dci(dci);
+
+        &mut self.endpoints[dci - 1]
+    }
+}
+
+/// A trait to handle Device Context.
+pub trait DeviceHandler {
+    /// Returns a handler of Slot Context.
+    fn slot(&self) -> &dyn SlotHandler;
+
+    /// Returns a mutable handler of Slot Context.
+    fn slot_mut(&mut self) -> &mut dyn SlotHandler;
+
+    /// Returns a handler of Endpoint Context.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `dci > 31 || dci == 0`. Call [`DeviceHandler::slot`] if you want a
+    /// handler of Slot Context.
+    fn endpoint(&self, dci: usize) -> &dyn EndpointHandler;
+
+    /// Returns a mutable handler of Endpoint Context.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `dci > 31 || dci == 0`. Call [`DeviceHandler::slot_mut`] if you want
+    /// a mutable handler of Slot Context.
+    fn endpoint_mut(&mut self, dci: usize) -> &mut dyn EndpointHandler;
 }
 
 /// Slot Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
-impl_context!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
-    rw_field!([0](0..=19), route_string, "Route String", u32);
-    rw_field!([0](20..=23), speed, "Speed", u8);
-    rw_bit!([0](25), multi_tt, "Multi-TT");
-    rw_bit!([0](26), hub, "Hub");
-    rw_field!([0](27..=31), context_entries, "Context Entries", u8);
-
-    rw_field!([1](0..=15), max_exit_latency, "Max Exit Latency", u16);
-    rw_field!(
-        [1](16..=23),
-        root_hub_port_number,
-        "Root Hub Port Number",
-        u8
-    );
-    rw_field!([1](24..=31), number_of_ports, "Number of Ports", u8);
-
-    rw_field!([2](0..=7), parent_hub_slot_id, "Parent Hub Slot ID", u8);
-    rw_field!([2](8..=15), parent_port_number, "Parent Port Number", u8);
-    rw_field!([2](16..=17), tt_think_time, "TT Think Time", u8);
-    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
-
-    rw_field!([3](0..=7), usb_device_address, "USB Device Address", u8);
-    /// Returns Slot State.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the Slot State represents Reserved.
-    #[must_use]
-    pub fn slot_state(self) -> SlotState {
-        let v = self.0[3].get_bits(27..=31);
-        let s = FromPrimitive::from_u32(v);
-        s.expect("Slot State represents Reserved.")
-    }
-
-    /// Sets Slot State.
-    pub fn set_slot_state(&mut self, state: SlotState) -> &mut Self {
-        self.0[3].set_bits(27..=31, state as _);
-        self
-    }
-
     const fn new() -> Self {
         Self([0; N])
     }
@@ -263,96 +307,54 @@ impl<const N: usize> AsMut<[u32]> for Slot<N> {
         &mut self.0
     }
 }
+impl<const N: usize> SlotHandler for Slot<N> {}
+
+/// A trait to handle Slot Context.
+pub trait SlotHandler: AsRef<[u32]> + AsMut<[u32]> {
+    rw_field_cx!([0](0..=19), route_string, "Route String", u32);
+    rw_field_cx!([0](20..=23), speed, "Speed", u8);
+    rw_bit_cx!([0](25), multi_tt, "Multi-TT");
+    rw_bit_cx!([0](26), hub, "Hub");
+    rw_field_cx!([0](27..=31), context_entries, "Context Entries", u8);
+
+    rw_field_cx!([1](0..=15), max_exit_latency, "Max Exit Latency", u16);
+    rw_field_cx!(
+        [1](16..=23),
+        root_hub_port_number,
+        "Root Hub Port Number",
+        u8
+    );
+    rw_field_cx!([1](24..=31), number_of_ports, "Number of Ports", u8);
+
+    rw_field_cx!([2](0..=7), parent_hub_slot_id, "Parent Hub Slot ID", u8);
+    rw_field_cx!([2](8..=15), parent_port_number, "Parent Port Number", u8);
+    rw_field_cx!([2](16..=17), tt_think_time, "TT Think Time", u8);
+    rw_field_cx!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+
+    rw_field_cx!([3](0..=7), usb_device_address, "USB Device Address", u8);
+    /// Returns Slot State.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the Slot State represents Reserved.
+    #[must_use]
+    fn slot_state(&self) -> SlotState {
+        let v = self.as_ref()[3].get_bits(27..=31);
+        let s = FromPrimitive::from_u32(v);
+        s.expect("Slot State represents Reserved.")
+    }
+
+    /// Sets Slot State.
+    fn set_slot_state(&mut self, state: SlotState) {
+        self.as_mut()[3].set_bits(27..=31, state as _);
+    }
+}
 
 /// Endpoint Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);
-impl_context!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
-    /// Returns Endpoint State.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the Endpoint State represents Reserved.
-    #[must_use]
-    pub fn endpoint_state(self) -> EndpointState {
-        let v = self.0[0].get_bits(0..=2);
-        let s = FromPrimitive::from_u32(v);
-        s.expect("Endpoint State represents Reserved.")
-    }
-
-    /// Sets Endpoint State.
-    pub fn set_endpoint_state(&mut self, s: EndpointState) -> &mut Self {
-        self.0[0].set_bits(0..=2, s as _);
-        self
-    }
-
-    rw_field!([0](8..=9), mult, "Mult", u8);
-    rw_field!([0](10..=14), max_primary_streams, "Max Primary Streams", u8);
-    rw_bit!([0](15), linear_stream_array, "Linear Stream Array");
-    rw_field!([0](16..=23), interval, "Interval", u8);
-    rw_field!(
-        [0](24..=31),
-        max_endpoint_service_time_interval_payload_high,
-        "Max Endpoint Service Time Interval Payload High",
-        u8
-    );
-
-    rw_field!([1](1..=2), error_count, "Error Count", u8);
-    /// Returns Endpoint Type.
-    #[must_use]
-    pub fn endpoint_type(self) -> EndpointType {
-        let v = self.0[1].get_bits(3..=5);
-        let t = FromPrimitive::from_u32(v);
-        t.expect("Invalid Endpoint Type.")
-    }
-
-    /// Sets Endpoint Type.
-    pub fn set_endpoint_type(&mut self, t: EndpointType) -> &mut Self {
-        self.0[1].set_bits(3..=5, t as _);
-        self
-    }
-
-    rw_bit!([1](7), host_initiate_disable, "Host Initiate Disable");
-    rw_field!([1](8..=15), max_burst_size, "Max Burst Size", u8);
-    rw_field!([1](16..=31), max_packet_size, "Max Packet Size", u16);
-
-    rw_bit!([2](0), dequeue_cycle_state, "Dequeue Cycle State");
-
-    /// Returns the TR Dequeue Pointer.
-    #[must_use]
-    pub fn tr_dequeue_pointer(self) -> u64 {
-        let l: u64 = self.0[2].into();
-        let u: u64 = self.0[3].into();
-
-        (u << 32) | l
-    }
-
-    /// Sets the TR Dequeue Pointer.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `addr` is not 64-byte aligned.
-    pub fn set_tr_dequeue_pointer(&mut self, a: u64) -> &mut Self {
-        assert_eq!(a % 64, 0, "TR Dequeue Pointer must be 64-byte aligned.");
-
-        let l: u32 = a.get_bits(0..32).try_into().unwrap();
-        let u: u32 = a.get_bits(32..64).try_into().unwrap();
-
-        self.0[2] = l;
-        self.0[3] = u;
-        self
-    }
-
-    rw_field!([4](0..=15), average_trb_length, "Average TRB Length", u16);
-    rw_field!(
-        [4](16..=31),
-        max_endpoint_service_time_interval_payload_low,
-        "Max Endpoint Service Time Interval Payload Low",
-        u16
-    );
-
     const fn new() -> Self {
         Self([0; N])
     }
@@ -366,6 +368,90 @@ impl<const N: usize> AsMut<[u32]> for Endpoint<N> {
     fn as_mut(&mut self) -> &mut [u32] {
         &mut self.0
     }
+}
+impl<const N: usize> EndpointHandler for Endpoint<N> {}
+
+/// A trait to handle Endpoint Context.
+pub trait EndpointHandler: AsRef<[u32]> + AsMut<[u32]> {
+    /// Returns Endpoint State.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the Endpoint State represents Reserved.
+    #[must_use]
+    fn endpoint_state(&self) -> EndpointState {
+        let v = self.as_ref()[0].get_bits(0..=2);
+        let s = FromPrimitive::from_u32(v);
+        s.expect("Endpoint State represents Reserved.")
+    }
+
+    /// Sets Endpoint State.
+    fn set_endpoint_state(&mut self, s: EndpointState) {
+        self.as_mut()[0].set_bits(0..=2, s as _);
+    }
+
+    rw_field_cx!([0](8..=9), mult, "Mult", u8);
+    rw_field_cx!([0](10..=14), max_primary_streams, "Max Primary Streams", u8);
+    rw_bit_cx!([0](15), linear_stream_array, "Linear Stream Array");
+    rw_field_cx!([0](16..=23), interval, "Interval", u8);
+    rw_field_cx!(
+        [0](24..=31),
+        max_endpoint_service_time_interval_payload_high,
+        "Max Endpoint Service Time Interval Payload High",
+        u8
+    );
+
+    rw_field_cx!([1](1..=2), error_count, "Error Count", u8);
+    /// Returns Endpoint Type.
+    #[must_use]
+    fn endpoint_type(&self) -> EndpointType {
+        let v = self.as_ref()[1].get_bits(3..=5);
+        let t = FromPrimitive::from_u32(v);
+        t.expect("Invalid Endpoint Type.")
+    }
+
+    /// Sets Endpoint Type.
+    fn set_endpoint_type(&mut self, t: EndpointType) {
+        self.as_mut()[1].set_bits(3..=5, t as _);
+    }
+
+    rw_bit_cx!([1](7), host_initiate_disable, "Host Initiate Disable");
+    rw_field_cx!([1](8..=15), max_burst_size, "Max Burst Size", u8);
+    rw_field_cx!([1](16..=31), max_packet_size, "Max Packet Size", u16);
+
+    rw_bit_cx!([2](0), dequeue_cycle_state, "Dequeue Cycle State");
+
+    /// Returns the TR Dequeue Pointer.
+    #[must_use]
+    fn tr_dequeue_pointer(&self) -> u64 {
+        let l: u64 = self.as_ref()[2].into();
+        let u: u64 = self.as_ref()[3].into();
+
+        (u << 32) | l
+    }
+
+    /// Sets the TR Dequeue Pointer.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `addr` is not 64-byte aligned.
+    fn set_tr_dequeue_pointer(&mut self, a: u64) {
+        assert_eq!(a % 64, 0, "TR Dequeue Pointer must be 64-byte aligned.");
+
+        let l: u32 = a.get_bits(0..32).try_into().unwrap();
+        let u: u32 = a.get_bits(32..64).try_into().unwrap();
+
+        self.as_mut()[2] = l;
+        self.as_mut()[3] = u;
+    }
+
+    rw_field_cx!([4](0..=15), average_trb_length, "Average TRB Length", u16);
+    rw_field_cx!(
+        [4](16..=31),
+        max_endpoint_service_time_interval_payload_low,
+        "Max Endpoint Service Time Interval Payload Low",
+        u16
+    );
 }
 
 /// Slot State.

@@ -75,7 +75,7 @@ macro_rules! impl_debug_from_methods {
 }
 
 macro_rules! bit_getter {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         #[doc = "Returns the"]
         #[doc = $name]
         #[doc = "bit."]
@@ -88,7 +88,7 @@ macro_rules! bit_getter {
 }
 
 macro_rules! bit_modifier {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         paste::paste! {
             #[doc = "Sets the"]
             #[doc = $name]
@@ -110,26 +110,26 @@ macro_rules! bit_modifier {
 }
 
 macro_rules! ro_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         bit_getter!($bit, $method, $name);
     };
 }
 
 macro_rules! wo_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         bit_modifier!($bit, $method, $name);
     };
 }
 
 macro_rules! rw_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         bit_getter!($bit, $method, $name);
         bit_modifier!($bit, $method, $name);
     };
 }
 
 macro_rules! rw1c_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         bit_getter!($bit, $method, $name);
         paste::paste! {
             #[doc = "Clears the"]
@@ -144,7 +144,7 @@ macro_rules! rw1c_bit {
 }
 
 macro_rules! w1s_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         paste::paste! {
             #[doc = "Sets the"]
             #[doc = $name]
@@ -158,7 +158,7 @@ macro_rules! w1s_bit {
 }
 
 macro_rules! rw1s_bit {
-    ($bit:expr,$method:ident,$name:expr) => {
+    ($bit:literal,$method:ident,$name:literal) => {
         bit_getter!($bit, $method, $name);
         w1s_bit!($bit, $method, $name);
     };

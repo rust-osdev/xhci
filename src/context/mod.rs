@@ -43,36 +43,13 @@ pub struct Input<const N: usize> {
     control: InputControl<N>,
     device: Device<N>,
 }
-impl Input32Byte {
-    /// Creates an empty 32 byte Input Context.
-    #[must_use]
-    pub const fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl Input64Byte {
-    /// Creates an empty 64 byte Input Context.
-    #[must_use]
-    pub const fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(Input, "Input");
 impl<const N: usize> Input<N> {
     const fn new() -> Self {
         Self {
             control: InputControl::new(),
             device: Device::new(),
         }
-    }
-}
-impl Default for Input<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for Input<16> {
-    fn default() -> Self {
-        Self::new()
     }
 }
 impl<const N: usize> InputHandler for Input<N> {
@@ -112,6 +89,7 @@ pub trait InputHandler {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
+impl_constructor!(InputControl, "Input Control");
 impl<const N: usize> InputControl<N> {
     const fn new() -> Self {
         Self([0; N])
@@ -227,6 +205,7 @@ pub struct Device<const N: usize> {
     slot: Slot<N>,
     endpoints: [Endpoint<N>; NUM_OF_ENDPOINT_CONTEXTS],
 }
+impl_constructor!(Device, "Device");
 impl<const N: usize> Device<N> {
     const fn new() -> Self {
         Self {
@@ -294,6 +273,7 @@ pub trait DeviceHandler {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
+impl_constructor!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
     const fn new() -> Self {
         Self([0; N])
@@ -356,6 +336,7 @@ pub trait SlotHandler: AsRef<[u32]> + AsMut<[u32]> {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);
+impl_constructor!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
     const fn new() -> Self {
         Self([0; N])

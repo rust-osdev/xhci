@@ -75,3 +75,38 @@ macro_rules! rw_field_cx {
         field_setter_cx!([$offset]($range), $method, $name, $ty);
     };
 }
+
+macro_rules! impl_constructor {
+    ($name:ident,$full:expr) => {
+        paste::paste! {
+            impl [<$name 32Byte>]{
+                #[doc = "Creates an empty 32 byte"]
+                #[doc = $full]
+                #[doc = "Context."]
+                #[must_use]
+                pub const fn new_32byte()->Self{
+                    Self::new()
+                }
+             }
+            impl [<$name 64Byte>]{
+                #[doc = "Creates an empty 64 byte"]
+                #[doc = $full]
+                #[doc = "Context."]
+                #[must_use]
+                pub const fn new_64byte()->Self{
+                    Self::new()
+                }
+            }
+            impl Default for [<$name 32Byte>] {
+                fn default()->Self{
+                    Self::new()
+                }
+            }
+            impl Default for [<$name 64Byte>]{
+                fn default()->Self{
+                    Self::new()
+                }
+            }
+        }
+    };
+}

@@ -3,8 +3,24 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 
-macro_rules! impl_default {
-    ($ty:ident) => {
+macro_rules! impl_constructor {
+    ($ty:ident,$name:expr) => {
+        impl $ty<8> {
+            #[doc = "Creates an empty 32 byte"]
+            #[doc = $name]
+            #[doc = "Context."]
+            pub const fn new_32byte() -> Self {
+                Self::new()
+            }
+        }
+        impl $ty<16> {
+            #[doc = "Creates an empty 64 byte"]
+            #[doc = $name]
+            #[doc = "Context."]
+            pub const fn new_64byte() -> Self {
+                Self::new()
+            }
+        }
         impl Default for $ty<8> {
             fn default() -> Self {
                 Self::new()
@@ -30,18 +46,7 @@ pub struct Input<const N: usize> {
     /// Device Context.
     pub device: Device<N>,
 }
-impl Input<8> {
-    /// Creates an empty 32 bytes Input Context.
-    pub const fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl Input<16> {
-    /// Creates an empty 64 bytes Input Context.
-    pub const fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(Input, "Input");
 impl<const N: usize> Input<N> {
     const fn new() -> Self {
         Self {
@@ -50,24 +55,12 @@ impl<const N: usize> Input<N> {
         }
     }
 }
-impl_default!(Input);
 
 /// Input Control Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
-impl InputControl<8> {
-    /// Creates an empty 32 bytes Input Control Context.
-    pub fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl InputControl<16> {
-    /// Creates an empty 64 bytes Input Control Context.
-    pub fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(InputControl, "Input Control");
 impl<const N: usize> InputControl<N> {
     /// Returns the `i`th Drop Context flag. `i` starts from 0.
     ///
@@ -183,7 +176,6 @@ impl<const N: usize> InputControl<N> {
         Self([0; N])
     }
 }
-impl_default!(InputControl);
 
 /// Device Context.
 #[repr(C)]
@@ -194,18 +186,7 @@ pub struct Device<const N: usize> {
     /// Endpoint Contexts.
     pub endpoints: [Endpoint<N>; NUM_OF_ENDPOINT_CONTEXTS],
 }
-impl Device<8> {
-    /// Creates an empty 32 byte Device Context.
-    pub const fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl Device<16> {
-    /// Creates an empty 64 byte Device Context.
-    pub const fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(Device, "Device");
 impl<const N: usize> Device<N> {
     const fn new() -> Self {
         Self {
@@ -214,50 +195,25 @@ impl<const N: usize> Device<N> {
         }
     }
 }
-impl_default!(Device);
 
 /// Slot Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
-impl Slot<8> {
-    /// Creates an empty 32 byte Slot Context.
-    pub const fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl Slot<16> {
-    /// Creates an empty 64 byte Slot Context.
-    pub const fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
     const fn new() -> Self {
         Self([0; N])
     }
 }
-impl_default!(Slot);
 
 /// Endpoint Context.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);
-impl Endpoint<8> {
-    /// Creates an empty 32 byte Endpoint Context.
-    pub const fn new_32byte() -> Self {
-        Self::new()
-    }
-}
-impl Endpoint<16> {
-    /// Creates an empty 64 byte Endpoint Context.
-    pub const fn new_64byte() -> Self {
-        Self::new()
-    }
-}
+impl_constructor!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
     const fn new() -> Self {
         Self([0; N])
     }
 }
-impl_default!(Endpoint);

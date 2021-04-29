@@ -76,37 +76,33 @@ macro_rules! rw_field_cx {
     };
 }
 
-macro_rules! impl_constructor {
-    ($name:ident,$full:expr) => {
+macro_rules! impl_constructor_for_bytes {
+    ($name:ident,$full:literal,$bytes:literal) => {
         paste::paste! {
-            impl [<$name 32Byte>]{
-                #[doc = "Creates an empty 32 byte"]
+            impl [<$name $bytes Byte>]{
+                #[doc = "Creates an empty"]
+                #[doc = $bytes]
+                #[doc = "byte"]
                 #[doc = $full]
                 #[doc = "Context."]
                 #[must_use]
-                pub const fn new_32byte()->Self{
-                    Self::new()
-                }
-             }
-            impl [<$name 64Byte>]{
-                #[doc = "Creates an empty 64 byte"]
-                #[doc = $full]
-                #[doc = "Context."]
-                #[must_use]
-                pub const fn new_64byte()->Self{
+                pub const fn [<new_ $bytes byte>]()->Self{
                     Self::new()
                 }
             }
-            impl Default for [<$name 32Byte>] {
+            impl Default for [<$name $bytes Byte>]{
                 fn default()->Self{
                     Self::new()
                 }
             }
-            impl Default for [<$name 64Byte>]{
-                fn default()->Self{
-                    Self::new()
-                }
-            }
+        }
+    };
+}
+macro_rules! impl_constructor {
+    ($name:ident,$full:literal) => {
+        paste::paste! {
+            impl_constructor_for_bytes!($name,$full,"32");
+            impl_constructor_for_bytes!($name,$full,"64");
         }
     };
 }

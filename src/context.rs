@@ -1,7 +1,6 @@
 //! The xHC Contexts.
 
 use bit_field::BitField;
-use core::convert::TryInto;
 
 macro_rules! impl_constructor {
     ($ty:ident,$name:expr) => {
@@ -136,41 +135,9 @@ impl<const N: usize> InputControl<N> {
         self
     }
 
-    /// Returns the value of the Configuration Value field.
-    #[must_use]
-    pub fn configuration_value(self) -> u8 {
-        self.0[7].get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Sets the value of the Configuration Value field.
-    pub fn set_configuration_value(&mut self, value: u8) -> &mut Self {
-        self.0[7].set_bits(0..=7, value.into());
-        self
-    }
-
-    /// Returns the value of the Interface Number field.
-    #[must_use]
-    pub fn interface_number(self) -> u8 {
-        self.0[7].get_bits(8..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Interface Number field.
-    pub fn set_interface_number(&mut self, number: u8) -> &mut Self {
-        self.0[7].set_bits(8..=15, number.into());
-        self
-    }
-
-    /// Returns the value of the Alternate Setting field.
-    #[must_use]
-    pub fn alternate_setting(self) -> u8 {
-        self.0[7].get_bits(16..=23).try_into().unwrap()
-    }
-
-    /// Sets the value of the Alternate Setting field.
-    pub fn set_alternate_setting(&mut self, setting: u8) -> &mut Self {
-        self.0[7].set_bits(16..=23, setting.into());
-        self
-    }
+    rw_field!([7](0..=7), configuration_value, "Configuration Value", u8);
+    rw_field!([7](8..=15), interface_number, "Interface Number", u8);
+    rw_field!([7](16..=23), alternate_setting, "Alternate Setting", u8);
 
     fn ensure_drop_context_index_within_range(i: usize) {
         assert!(

@@ -438,8 +438,9 @@ impl PortPowerManagementStatusAndControlRegister {
     }
 
     /// Sets the value of the Port Test Control field.
-    pub fn set_port_test_control(&mut self, m: TestMode) {
+    pub fn set_port_test_control(&mut self, m: TestMode) -> &mut Self {
         self.0.set_bits(28..=31, m as _);
+        self
     }
 }
 impl_debug_from_methods! {

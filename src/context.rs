@@ -243,6 +243,7 @@ impl<const N: usize> Endpoint<N> {
     rw_bit!([2](0), dequeue_cycle_state, "Dequeue Cycle State");
 
     /// Returns the TR Dequeue Pointer.
+    #[must_use]
     pub fn tr_dequeue_pointer(self) -> u64 {
         let l: u64 = self.0[2].into();
         let u: u64 = self.0[3].into();

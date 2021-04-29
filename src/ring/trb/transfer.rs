@@ -29,50 +29,52 @@ allowed! {
 }
 impl Allowed {
     /// Sets the value of the Interrupt On Completion field.
-    // Unavoidable because the match arms has to be the same return types.
-    #[allow(clippy::too_many_lines)]
     pub fn set_interrupt_on_completion(&mut self, ioc: bool) {
-        match self {
-            Allowed::Normal(ref mut n) => {
-                n.set_interrupt_on_completion(ioc);
-            }
-            Allowed::SetupStage(ref mut s) => {
-                s.set_interrupt_on_completion(ioc);
-            }
-            Allowed::DataStage(ref mut d) => {
-                d.set_interrupt_on_completion(ioc);
-            }
-            Allowed::StatusStage(ref mut s) => {
-                s.set_interrupt_on_completion(ioc);
-            }
-            Allowed::Isoch(ref mut i) => {
-                i.set_interrupt_on_completion(ioc);
-            }
-            Allowed::Link(ref mut l) => {
-                l.set_interrupt_on_completion(ioc);
-            }
-            Allowed::EventData(ref mut e) => {
-                e.set_interrupt_on_completion(ioc);
-            }
-            Allowed::Noop(ref mut n) => {
-                n.set_interrupt_on_completion(ioc);
-            }
+        macro_rules! arm{
+            ($($variant:ident),*)=>{
+                match self {
+                    $(Self::$variant(ref mut x)=>{
+                        x.set_interrupt_on_completion(ioc);
+                    },)*
+                }
+            };
         }
+
+        arm!(
+            Normal,
+            SetupStage,
+            DataStage,
+            StatusStage,
+            Isoch,
+            Link,
+            EventData,
+            Noop
+        );
     }
 
     /// Returns the value of the Interrupt On Completion field.
     #[must_use]
     pub fn interrupt_on_completion(&self) -> bool {
-        match self {
-            Allowed::Normal(n) => n.interrupt_on_completion(),
-            Allowed::SetupStage(s) => s.interrupt_on_completion(),
-            Allowed::DataStage(d) => d.interrupt_on_completion(),
-            Allowed::StatusStage(s) => s.interrupt_on_completion(),
-            Allowed::Isoch(i) => i.interrupt_on_completion(),
-            Allowed::Link(l) => l.interrupt_on_completion(),
-            Allowed::EventData(e) => e.interrupt_on_completion(),
-            Allowed::Noop(n) => n.interrupt_on_completion(),
+        macro_rules! arm{
+            ($($variant:ident),*)=>{
+                match self {
+                    $(Self::$variant(x)=>{
+                        x.interrupt_on_completion()
+                   },)*
+                }
+            };
         }
+
+        arm!(
+            Normal,
+            SetupStage,
+            DataStage,
+            StatusStage,
+            Isoch,
+            Link,
+            EventData,
+            Noop
+        )
     }
 }
 

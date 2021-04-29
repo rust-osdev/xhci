@@ -1,3 +1,17 @@
+macro_rules! impl_debug_from_methods_cx {
+    ($name:ident {
+        $($method:ident),*$(,)?
+    }) => {
+        impl<const N:usize> core::fmt::Debug for $name<N> {
+            fn fmt(&self, f:&mut core::fmt::Formatter<'_>) -> core::fmt::Result{
+                f.debug_struct(core::stringify!($name))
+                    $(.field(core::stringify!($method), &self.$method()))*
+                    .finish()
+            }
+        }
+    };
+}
+
 macro_rules! bit_getter_cx {
     ([$offset:literal]($bit:literal),$method:ident,$name:literal) => {
         #[doc = "Returns the"]

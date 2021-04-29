@@ -28,6 +28,7 @@ mod macros;
 
 use bit_field::BitField;
 use core::convert::TryInto;
+use core::fmt;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -114,7 +115,7 @@ pub trait InputHandler {
 ///
 /// Refer to [`InputControlHandler`] for the available methods.
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
 impl_constructor!(InputControl, "Input Control");
 impl<const N: usize> InputControl<N> {
@@ -133,6 +134,17 @@ impl<const N: usize> AsMut<[u32]> for InputControl<N> {
     }
 }
 impl<const N: usize> InputControlHandler for InputControl<N> {}
+impl<const N: usize> fmt::Debug for InputControl<N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InputControl")
+            .field("Drop Context flags", &self.0[0])
+            .field("Add Context flags", &self.0[1])
+            .field("configuration_value", &self.configuration_value())
+            .field("interface_number", &self.interface_number())
+            .field("alternate_setting", &self.alternate_setting())
+            .finish()
+    }
+}
 
 /// A trait to handle Input Control Context.
 pub trait InputControlHandler: AsRef<[u32]> + AsMut<[u32]> {
@@ -302,7 +314,7 @@ pub trait DeviceHandler {
 ///
 /// Refer to [`SlotHandler`] for the available methods.
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
 impl_constructor!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
@@ -321,6 +333,24 @@ impl<const N: usize> AsMut<[u32]> for Slot<N> {
     }
 }
 impl<const N: usize> SlotHandler for Slot<N> {}
+impl_debug_from_methods_cx! {
+    Slot {
+        route_string,
+        speed,
+        multi_tt,
+        hub,
+        context_entries,
+        max_exit_latency,
+        root_hub_port_number,
+        number_of_ports,
+        parent_hub_slot_id,
+        parent_port_number,
+        tt_think_time,
+        interrupter_target,
+        usb_device_address,
+        slot_state,
+    }
+}
 
 /// A trait to handle Slot Context.
 pub trait SlotHandler: AsRef<[u32]> + AsMut<[u32]> {
@@ -367,7 +397,7 @@ pub trait SlotHandler: AsRef<[u32]> + AsMut<[u32]> {
 ///
 /// Refer to [`EndpointHandler`] for the available methods.
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);
 impl_constructor!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
@@ -386,6 +416,25 @@ impl<const N: usize> AsMut<[u32]> for Endpoint<N> {
     }
 }
 impl<const N: usize> EndpointHandler for Endpoint<N> {}
+impl_debug_from_methods_cx! {
+    Endpoint {
+        endpoint_state,
+        mult,
+        max_primary_streams,
+        linear_stream_array,
+        interval,
+        max_endpoint_service_time_interval_payload_high,
+        error_count,
+        endpoint_type,
+        host_initiate_disable,
+        max_burst_size,
+        max_packet_size,
+        dequeue_cycle_state,
+        tr_dequeue_pointer,
+        average_trb_length,
+        max_endpoint_service_time_interval_payload_low,
+    }
+}
 
 /// A trait to handle Endpoint Context.
 pub trait EndpointHandler: AsRef<[u32]> + AsMut<[u32]> {

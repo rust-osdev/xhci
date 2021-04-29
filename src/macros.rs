@@ -31,17 +31,19 @@ macro_rules! bit_modifier {
             #[doc = "Sets the"]
             #[doc = $name]
             #[doc = "bit."]
-            pub fn [<set_ $method>](&mut self){
+            pub fn [<set_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
+                self
             }
 
             #[doc = "Clears the"]
             #[doc = $name]
             #[doc = "bit."]
-            pub fn [<clear_ $method>](&mut self){
+            pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,false);
+                self
             }
         }
     };
@@ -73,9 +75,10 @@ macro_rules! rw1c_bit {
             #[doc = "Clears the"]
             #[doc = $name]
             #[doc = "bit."]
-            pub fn [<clear_ $method>](&mut self){
+            pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
+                self
             }
         }
     };
@@ -87,9 +90,10 @@ macro_rules! w1s_bit {
             #[doc = "Sets the"]
             #[doc = $name]
             #[doc = "bit."]
-            pub fn [<set_ $method>](&mut self){
+            pub fn [<set_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
+                self
             }
         }
     };

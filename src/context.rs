@@ -5,7 +5,7 @@ use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
-macro_rules! impl_constructor {
+macro_rules! impl_context {
     ($ty:ident,$name:expr) => {
         impl $ty<8> {
             #[doc = "Creates an empty 32 byte"]
@@ -35,6 +35,17 @@ macro_rules! impl_constructor {
                 Self::new()
             }
         }
+
+        paste::paste! {
+            #[doc = "32 byte version of"]
+            #[doc = $name]
+            #[doc = "Context."]
+            pub type [<$ty 32Byte>] = $ty<8>;
+            #[doc = "64 byte version of"]
+            #[doc = $name]
+            #[doc = "Context."]
+            pub type [<$ty 64Byte>] = $ty<16>;
+        }
     };
 }
 
@@ -50,7 +61,7 @@ pub struct Input<const N: usize> {
     /// Device Context.
     pub device: Device<N>,
 }
-impl_constructor!(Input, "Input");
+impl_context!(Input, "Input");
 impl<const N: usize> Input<N> {
     const fn new() -> Self {
         Self {
@@ -64,7 +75,7 @@ impl<const N: usize> Input<N> {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
-impl_constructor!(InputControl, "Input Control");
+impl_context!(InputControl, "Input Control");
 impl<const N: usize> InputControl<N> {
     /// Returns the `i`th Drop Context flag. `i` starts from 0.
     ///
@@ -170,7 +181,7 @@ pub struct Device<const N: usize> {
     /// Endpoint Contexts.
     pub endpoints: [Endpoint<N>; NUM_OF_ENDPOINT_CONTEXTS],
 }
-impl_constructor!(Device, "Device");
+impl_context!(Device, "Device");
 impl<const N: usize> Device<N> {
     const fn new() -> Self {
         Self {
@@ -184,7 +195,7 @@ impl<const N: usize> Device<N> {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
-impl_constructor!(Slot, "Slot");
+impl_context!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
     rw_field!([0](0..=19), route_string, "Route String", u32);
     rw_field!([0](20..=23), speed, "Speed", u8);
@@ -234,7 +245,7 @@ impl<const N: usize> Slot<N> {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);
-impl_constructor!(Endpoint, "Endpoint");
+impl_context!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
     /// Returns Endpoint State.
     ///

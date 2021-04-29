@@ -167,7 +167,7 @@ impl<const N: usize> InputControl<N> {
 
     fn ensure_drop_context_index_within_range(i: usize) {
         assert!(
-            i >= 2 && i <= 31,
+            (2..=31).contains(&i),
             "The index of Drop Context flag must be within 2..=31."
         );
     }

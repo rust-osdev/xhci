@@ -214,35 +214,24 @@ impl_debug_from_methods! {
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
     ro_bit!(0, addressing_capability, "64-bit Addressing Capability");
-
     ro_bit!(1, bw_negotiation_capability, "BW Negotiation Capability");
-
     ro_bit!(2, context_size, "Context Size");
-
     ro_bit!(3, port_power_control, "Port Power Control");
-
     ro_bit!(4, port_indicators, "Port Indicators");
-
     ro_bit!(5, light_hc_reset_capability, "Light HC Reset Capability");
-
     ro_bit!(
         6,
         latency_tolerance_messaging_capability,
         "Latency Tolerance Messaging Capability"
     );
-
     ro_bit!(7, no_secondary_sid_support, "No Secondary SID Support");
-
     ro_bit!(8, parse_all_event_data, "Parse All Event Data");
-
     ro_bit!(
         9,
         stopped_short_packet_capability,
         "Stopped - Short Packet Capability"
     );
-
     ro_bit!(10, stopped_edtla_capability, "Stopped EDTLA Capability");
-
     ro_bit!(
         11,
         contiguous_frame_id_capability,
@@ -313,51 +302,42 @@ impl RuntimeRegisterSpaceOffset {
 pub struct CapabilityParameters2(u32);
 impl CapabilityParameters2 {
     ro_bit!(0, u3_entry_capability, "U3 Entry Capability");
-
     ro_bit!(
         1,
         configure_endpoint_command_max_exit_latency_too_large_capability,
         "Configure Endpoint Command Max Exit Latency Too Large Capability"
     );
-
     ro_bit!(
         2,
         force_save_context_capability,
         "Force Save Context Capability"
     );
-
     ro_bit!(
         3,
         compliance_transition_capability,
         "Compliance Transition Capability"
     );
-
     ro_bit!(
         4,
         large_esit_payload_capability,
         "Large ESIT Payload Capability"
     );
-
     ro_bit!(
         5,
         configuration_information_capability,
         "Configuration Information Capability"
     );
-
     ro_bit!(6, extended_tbc_capability, "Extended TBC Capability");
-
     ro_bit!(
         7,
         extended_tbc_trb_status_capability,
         "Extended TBC TRB Status Capability"
     );
-
     ro_bit!(
         8,
         get_set_extended_property_capability,
         "Get/Set Extended Property Capability"
     );
-
     ro_bit!(
         9,
         virtualization_based_trusted_io_capability,

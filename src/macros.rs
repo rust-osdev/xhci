@@ -105,3 +105,46 @@ macro_rules! rw1s_bit {
         w1s_bit!($bit, $method, $name);
     };
 }
+
+macro_rules! field_getter {
+    ($range:expr,$method:ident,$name:literal,$ty:ty) => {
+        #[doc = "Returns the value of the"]
+        #[doc = $name]
+        #[doc = "field."]
+        #[must_use]
+        pub fn $method(self) -> $ty {
+            use bit_field::BitField;
+            use core::convert::TryInto;
+            self.0.get_bits($range).try_into().unwrap()
+        }
+    };
+}
+
+macro_rules! field_setter {
+    ($range:expr,$method:ident,$name:literal,$ty:ty) => {
+        paste::paste! {
+            #[doc = "Sets the value of the"]
+            #[doc = $name]
+            #[doc = "field."]
+            pub fn [<set_ $method>](&mut self,value:$ty) -> &mut Self {
+                use bit_field::BitField;
+                use core::convert::TryInto;
+                self.0.set_bits($range,value.try_into().unwrap());
+                self
+            }
+        }
+    };
+}
+
+macro_rules! ro_field {
+    ($range:expr,$method:ident,$name:literal,$ty:ty) => {
+        field_getter!($range, $method, $name, $ty);
+    };
+}
+
+macro_rules! rw_field {
+    ($range:expr,$method:ident,$name:literal,$ty:ty) => {
+        field_getter!($range, $method, $name, $ty);
+        field_setter!($range, $method, $name, $ty);
+    };
+}

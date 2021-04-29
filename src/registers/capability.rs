@@ -2,7 +2,6 @@
 
 use accessor::Mapper;
 use bit_field::BitField;
-use core::convert::TryInto;
 
 /// Host Controller Capability Registers
 #[derive(Debug)]
@@ -105,23 +104,9 @@ impl InterfaceVersionNumber {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters1(u32);
 impl StructuralParameters1 {
-    /// Returns the number of available device slots.
-    #[must_use]
-    pub fn number_of_device_slots(self) -> u8 {
-        self.0.get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Returns the number of interrupts implemented on HC.
-    #[must_use]
-    pub fn number_of_interrupts(self) -> u16 {
-        self.0.get_bits(8..=18).try_into().unwrap()
-    }
-
-    /// Returns the number of ports.
-    #[must_use]
-    pub fn number_of_ports(self) -> u8 {
-        self.0.get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!(0..=7, number_of_device_slots, "Number of Device Slots", u8);
+    ro_field!(8..=18, number_of_interrupts, "Number of Interrupts", u16);
+    ro_field!(24..=31, number_of_ports, "Number of Ports", u8);
 }
 impl_debug_from_methods! {
     StructuralParameters1{
@@ -136,11 +121,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters2(u32);
 impl StructuralParameters2 {
-    /// Returns the value of the Isochronous Scheduling Threshold field.
-    #[must_use]
-    pub fn isochronous_scheduling_threshold(self) -> u8 {
-        self.0.get_bits(0..=3).try_into().unwrap()
-    }
+    ro_field!(
+        0..=3,
+        isochronous_scheduling_threshold,
+        "Isochronous Scheduling Threshold",
+        u8
+    );
 
     /// Returns the maximum number of the elements the Event Ring Segment Table can contain.
     ///
@@ -188,17 +174,13 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters3(u32);
 impl StructuralParameters3 {
-    /// Returns the value of the U1 Device Exit Latency field.
-    #[must_use]
-    pub fn u1_device_exit_latency(self) -> u8 {
-        self.0.get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Returns the value of the U2 Device Exit Latency field.
-    #[must_use]
-    pub fn u2_device_exit_latency(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
+    ro_field!(0..=7, u1_device_exit_latency, "U1 Device Exit Latency", u8);
+    ro_field!(
+        16..=31,
+        u2_device_exit_latency,
+        "U2 Device Exit Latency",
+        u16
+    );
 }
 impl_debug_from_methods! {
     StructuralParameters3{
@@ -237,20 +219,18 @@ impl CapabilityParameters1 {
         contiguous_frame_id_capability,
         "Contiguous Frame ID Capability"
     );
-
-    /// Returns the value of the Maximum Primary Stream Array Size field.
-    #[must_use]
-    pub fn maximum_primary_stream_array_size(self) -> u8 {
-        self.0.get_bits(12..=15).try_into().unwrap()
-    }
-
-    /// Returns the offset of the xHCI extended capability list from the MMIO base. If this value is
-    /// zero, the list does not exist.
-    /// The base address can be calculated by `(MMIO base) + (xECP) << 2`
-    #[must_use]
-    pub fn xhci_extended_capabilities_pointer(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
+    ro_field!(
+        12..=15,
+        maximum_primary_stream_array_size,
+        "Maximum Primary Stream Array Size",
+        u8
+    );
+    ro_field!(
+        16..=31,
+        xhci_extended_capabilities_pointer,
+        "xHCI Extended Capabilities Pointer",
+        u16
+    );
 }
 impl_debug_from_methods! {
     CapabilityParameters1 {

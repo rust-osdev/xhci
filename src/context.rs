@@ -3,6 +3,21 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 
+macro_rules! impl_default {
+    ($ty:ident) => {
+        impl Default for $ty<8> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+        impl Default for $ty<16> {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+    };
+}
+
 /// The number of Endpoint Contexts in a Device Context.
 pub const NUM_OF_ENDPOINT_CONTEXTS: usize = 31;
 
@@ -35,16 +50,7 @@ impl<const N: usize> Input<N> {
         }
     }
 }
-impl Default for Input<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for Input<16> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl_default!(Input);
 
 /// Input Control Context.
 #[repr(transparent)]
@@ -177,16 +183,7 @@ impl<const N: usize> InputControl<N> {
         Self([0; N])
     }
 }
-impl Default for InputControl<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for InputControl<16> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl_default!(InputControl);
 
 /// Device Context.
 #[repr(C)]
@@ -217,16 +214,7 @@ impl<const N: usize> Device<N> {
         }
     }
 }
-impl Default for Device<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for Device<16> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl_default!(Device);
 
 /// Slot Context.
 #[repr(transparent)]
@@ -249,16 +237,7 @@ impl<const N: usize> Slot<N> {
         Self([0; N])
     }
 }
-impl Default for Slot<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for Slot<16> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl_default!(Slot);
 
 /// Endpoint Context.
 #[repr(transparent)]
@@ -281,13 +260,4 @@ impl<const N: usize> Endpoint<N> {
         Self([0; N])
     }
 }
-impl Default for Endpoint<8> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl Default for Endpoint<16> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl_default!(Endpoint);

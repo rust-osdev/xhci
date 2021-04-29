@@ -183,6 +183,30 @@ impl<const N: usize> Device<N> {
 pub struct Slot<const N: usize>([u32; N]);
 impl_constructor!(Slot, "Slot");
 impl<const N: usize> Slot<N> {
+    rw_field!([0](0..=19), route_string, "Route String", u32);
+    rw_field!([0](20..=23), speed, "Speed", u8);
+    rw_bit!([0](25), multi_tt, "Multi-TT");
+    rw_bit!([0](26), hub, "Hub");
+    rw_field!([0](27..=31), context_entries, "Context Entries", u8);
+
+    rw_field!([1](0..=15), max_exit_latency, "Max Exit Latency", u16);
+    rw_field!(
+        [1](16..=23),
+        root_hub_port_number,
+        "Root Hub Port Number",
+        u8
+    );
+    rw_field!([1](24..=31), number_of_ports, "Number of Ports", u8);
+
+    rw_field!([2](0..=7), parent_hub_slot_id, "Parent Hub Slot ID", u8);
+    rw_field!([2](8..=15), parent_port_number, "Parent Port Number", u8);
+    rw_field!([2](16..=17), tt_think_time, "TT Think Time", u8);
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+
+    rw_field!([3](0..=7), usb_device_address, "USB Device Address", u8);
+    // TODO: Define `SlotState` enum.
+    rw_field!([3](27..=31), slot_state, "Slot State", u8);
+
     const fn new() -> Self {
         Self([0; N])
     }

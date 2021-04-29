@@ -74,7 +74,7 @@ impl_debug_from_methods! {
     }
 }
 
-/// PMESR_BSE Register.
+/// `PMESR_BSE` Register.
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct PmesrBse(u8);

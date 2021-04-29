@@ -235,8 +235,23 @@ impl<const N: usize> Slot<N> {
 pub struct Endpoint<const N: usize>([u32; N]);
 impl_constructor!(Endpoint, "Endpoint");
 impl<const N: usize> Endpoint<N> {
-    // TODO: Define `EndpointState` enum.
-    rw_field!([0](0..=2), endpoint_state, "Endpoint State", u8);
+    /// Returns Endpoint State.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the Endpoint State represents Reserved.
+    pub fn endpoint_state(self) -> EndpointState {
+        let v = self.0[0].get_bits(0..=2);
+        let s = FromPrimitive::from_u32(v);
+        s.expect("Endpoint State represents Reserved.")
+    }
+
+    /// Sets Endpoint State.
+    pub fn set_endpoint_state(&mut self, s: EndpointState) -> &mut Self {
+        self.0[0].set_bits(0..=2, s as _);
+        self
+    }
+
     rw_field!([0](8..=9), mult, "Mult", u8);
     rw_field!([0](10..=14), max_primary_streams, "Max Primary Streams", u8);
     rw_bit!([0](15), linear_stream_array, "Linear Stream Array");
@@ -306,4 +321,22 @@ pub enum SlotState {
     Addressed = 2,
     /// Configured.
     Configured = 3,
+}
+
+/// Endpoint State.
+///
+/// The descriptions of each variant are taken from Table 6-8 of eXtensible Host Controller Interface for Universal Serial Bus(xHCI) Requirements Specification May2019 Revision 1.2.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+pub enum EndpointState {
+    /// The endpoint is not operational.
+    Disabled = 0,
+    /// The endpoint is operational, either waiting for a doorbell ring or processing TDs.
+    Running = 1,
+    /// The endpoint is halted due to a Halt condition detected on the USB.
+    Halted = 2,
+    /// The endpoint is not running due to a Stop Endpoint Command or recovering from a Halt
+    /// condition.
+    Stopped = 3,
+    /// The endpoint is not running due to a TRB Erorr.
+    Error = 4,
 }

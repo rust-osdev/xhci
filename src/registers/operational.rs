@@ -428,64 +428,51 @@ impl_debug_from_methods! {
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct PortPowerManagementStatusAndControlRegister(u32);
+/// **These methods are only valid for USB3.**
 impl PortPowerManagementStatusAndControlRegister {
     /// Returns the value of the U1 Timeout field.
-    ///
-    /// **This field is USB3 only.**
     #[must_use]
     pub fn u1_timeout(self) -> u8 {
         self.0.get_bits(0..=7).try_into().unwrap()
     }
 
     /// Sets the value of the U1 Timeout field.
-    ///
-    /// **This field is USB3 only.**
     pub fn set_u1_timeout(&mut self, timeout: u8) {
         self.0.set_bits(0..=7, timeout.into());
     }
 
     /// Returns the value of the U2 Timeout field.
-    ///
-    /// **This field is USB3 only.**
     #[must_use]
     pub fn u2_timeout(self) -> u8 {
         self.0.get_bits(8..=15).try_into().unwrap()
     }
 
     /// Sets the value of the U2 Timeout field.
-    ///
-    /// **This field is USB3 only.**
     pub fn set_u2_timeout(&mut self, timeout: u8) {
         self.0.set_bits(8..=15, timeout.into());
     }
 
     /// Returns the value of the Force Link PM Accept bit.
-    ///
-    /// **This field is USB3 only.**
     #[must_use]
     pub fn force_link_pm_accept(self) -> bool {
         self.0.get_bit(16)
     }
 
     /// Sets the value of the Force Link PM Accept bit.
-    ///
-    /// **This field is USB3 only.**
     pub fn set_force_link_pm_accept(&mut self) {
         self.0.set_bit(16, true);
     }
 
     /// Clears the Force Link PM Accept bit.
-    ///
-    /// **This field is USB3 only.**
     pub fn clear_force_link_pm_accept(&mut self) {
         self.0.set_bit(16, false);
     }
-
+}
+/// **These methods are only valid for USB2.**
+impl PortPowerManagementStatusAndControlRegister {
     /// Returns the value of the L1 Status field.
     ///
     /// This field returns [`None`] if the value means `Reserved`.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn l1_status(self) -> Option<L1Status> {
         let s = self.0.get_bits(0..=2);
@@ -493,75 +480,55 @@ impl PortPowerManagementStatusAndControlRegister {
     }
 
     /// Returns the value of the Remote Wake Enable field.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn remote_wake_enable(self) -> bool {
         self.0.get_bit(3)
     }
 
     /// Sets the value of the Remote Wake Enable field.
-    ///
-    /// **This field is USB2 only.**
     pub fn set_remote_wake_enable(&mut self) {
         self.0.set_bit(3, true);
     }
 
     /// Clears the Remote Wake Enable bit.
-    ///
-    /// **This field is USB2 only.**
     pub fn clear_remote_wake_enable(&mut self) {
         self.0.set_bit(3, false);
     }
 
     /// Returns the value of the Best Effort Service Latency field.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn best_effort_service_latency(self) -> u8 {
         self.0.get_bits(4..=7).try_into().unwrap()
     }
 
     /// Sets the value of the Best Effort Service Latency field.
-    ///
-    /// **This field is USB2 only.**
     pub fn set_best_effort_service_latency(&mut self, l: u8) {
         self.0.set_bits(4..=7, l.into());
     }
 
     /// Returns the value of the L1 Device Slot field.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn l1_device_slot(self) -> u8 {
         self.0.get_bits(8..=15).try_into().unwrap()
     }
 
     /// Sets the value of the L1 Device Slot field.
-    ///
-    /// **This field is USB2 only.**
     pub fn set_l1_device_slot(&mut self, slot: u8) {
         self.0.set_bits(8..=15, slot.into());
     }
 
     /// Returns the value of the Hardware LPM Enable field.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn hardware_lpm_enable(self) -> bool {
         self.0.get_bit(16)
     }
 
     /// Sets the value of the Hardware LPM Enable field.
-    ///
-    /// **This field is USB2 only.**
     pub fn set_hardware_lpm_enable(&mut self) {
         self.0.set_bit(16, true);
     }
 
     /// Clears the Hardware LPM Enable bit.
-    ///
-    /// **This field is USB2 only.**
     pub fn clear_hardware_lpm_enable(&mut self) {
         self.0.set_bit(16, false);
     }
@@ -569,8 +536,6 @@ impl PortPowerManagementStatusAndControlRegister {
     /// Returns the value of the Port Test Control field.
     ///
     /// This field returns [`None`] if the value means `Reserved`.
-    ///
-    /// **This field is USB2 only.**
     #[must_use]
     pub fn port_test_control(self) -> Option<TestMode> {
         let t = self.0.get_bits(28..=31);
@@ -578,8 +543,6 @@ impl PortPowerManagementStatusAndControlRegister {
     }
 
     /// Sets the value of the Port Test Control field.
-    ///
-    /// **This field is USB2 only.**
     pub fn set_port_test_control(&mut self, m: TestMode) {
         self.0.set_bits(28..=31, m as _);
     }

@@ -1,5 +1,8 @@
 //! The xHC Contexts.
 
+#[macro_use]
+mod macros;
+
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;

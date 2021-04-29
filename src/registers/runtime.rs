@@ -2,9 +2,7 @@
 
 use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
-use bit_field::BitField;
 use core::convert::TryFrom;
-use core::convert::TryInto;
 
 /// Runtime Registers
 ///
@@ -46,11 +44,7 @@ where
 #[derive(Copy, Clone)]
 pub struct MicroframeIndexRegister(u32);
 impl MicroframeIndexRegister {
-    /// Returns the value of the Microframe Index field.
-    #[must_use]
-    pub fn microframe_index(self) -> u16 {
-        self.0.get_bits(0..=13).try_into().unwrap()
-    }
+    ro_field!(0..=13, microframe_index, "Microframe Index", u16);
 }
 impl_debug_from_methods! {
     MicroframeIndexRegister {
@@ -122,27 +116,18 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct InterrupterModerationRegister(u32);
 impl InterrupterModerationRegister {
-    /// Returns the value of the Interrupt Moderation Interval field.
-    #[must_use]
-    pub fn interrupt_moderation_interval(self) -> u16 {
-        self.0.get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Interrupt Moderation Interval field.
-    pub fn set_interrupt_moderation_interval(&mut self, interval: u16) {
-        self.0.set_bits(0..=15, interval.into());
-    }
-
-    /// Returns the value of the Interrupt Moderation Counter field.
-    #[must_use]
-    pub fn interrupt_moderation_counter(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Interrupt Moderation Counter field.
-    pub fn set_interrupt_moderation_counter(&mut self, counter: u16) {
-        self.0.set_bits(16..=31, counter.into());
-    }
+    rw_field!(
+        0..=15,
+        interrupt_moderation_interval,
+        "Interrupt Moderation Interval",
+        u16
+    );
+    rw_field!(
+        16..=31,
+        interrupt_moderation_counter,
+        "Interrupt Moderation Counter",
+        u16
+    );
 }
 impl_debug_from_methods! {
     InterrupterModerationRegister{
@@ -186,17 +171,12 @@ impl EventRingSegmentTableBaseAddressRegister {
 #[derive(Copy, Clone)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
-    /// Returns the value of the Dequeue ERST Segment Index field.
-    #[must_use]
-    pub fn dequeue_erst_segment_index(self) -> u8 {
-        self.0.get_bits(0..=2).try_into().unwrap()
-    }
-
-    /// Sets the value of the Dequeue ERST Segment Index field.
-    pub fn set_dequeue_erst_segment_index(&mut self, i: u8) {
-        self.0.set_bits(0..=2, i.into());
-    }
-
+    rw_field!(
+        0..=2,
+        dequeue_erst_segment_index,
+        "Dequeue ERST Segment Index",
+        u8
+    );
     rw1c_bit!(3, event_handler_busy, "Event Handler Busy");
 
     /// Returns the address of the current Event Ring Dequeue Pointer.

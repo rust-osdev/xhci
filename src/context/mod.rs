@@ -2,8 +2,9 @@
 //!
 //! The size of each Context type is the same as the actual Context size.
 //!
-//! To handle Contexts with methods regardless of Context's size, all methods are
-//! implemented on traits. Refer to the documentation of traits for the available methods.
+//! To make it possible to make a reference to Contexts regardless of Context's size, all Contexts
+//! implement handler traits that implement methods to access and modify fields. Refer to the
+//! documentation of each trait for the available methods.
 //!
 //! # Examples
 //!
@@ -16,6 +17,7 @@
 //! input_control.set_add_context_flag(1);
 //!
 //! # let port_id = 3;
+//! let device = input.device_mut();
 //! let slot = device.slot_mut();
 //! slot.set_context_entries(1);
 //! slot.set_root_hub_port_number(port_id);

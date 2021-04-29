@@ -60,6 +60,8 @@ pub type Endpoint32Byte = Endpoint<8>;
 pub type Endpoint64Byte = Endpoint<16>;
 
 /// Input Context.
+///
+/// Refer to [`InputHandler`] for the available methods.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Input<const N: usize> {
@@ -109,6 +111,8 @@ pub trait InputHandler {
 }
 
 /// Input Control Context.
+///
+/// Refer to [`InputControlHandler`] for the available methods.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct InputControl<const N: usize>([u32; N]);
@@ -222,6 +226,8 @@ pub trait InputControlHandler: AsRef<[u32]> + AsMut<[u32]> {
 }
 
 /// Device Context.
+///
+/// Refer to [`DeviceHandler`] for the available methods.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Device<const N: usize> {
@@ -293,6 +299,8 @@ pub trait DeviceHandler {
 }
 
 /// Slot Context.
+///
+/// Refer to [`SlotHandler`] for the available methods.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Slot<const N: usize>([u32; N]);
@@ -356,6 +364,8 @@ pub trait SlotHandler: AsRef<[u32]> + AsMut<[u32]> {
 }
 
 /// Endpoint Context.
+///
+/// Refer to [`EndpointHandler`] for the available methods.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Endpoint<const N: usize>([u32; N]);

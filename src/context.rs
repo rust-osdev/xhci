@@ -1,8 +1,9 @@
 //! The xHC Contexts.
 
-use core::convert::TryInto;
-
 use bit_field::BitField;
+use core::convert::TryInto;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 macro_rules! impl_constructor {
     ($ty:ident,$name:expr) => {
@@ -206,8 +207,22 @@ impl<const N: usize> Slot<N> {
     rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
 
     rw_field!([3](0..=7), usb_device_address, "USB Device Address", u8);
-    // TODO: Define `SlotState` enum.
-    rw_field!([3](27..=31), slot_state, "Slot State", u8);
+    /// Returns Slot State.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the Slot State represents Reserved.
+    pub fn slot_state(self) -> SlotState {
+        let v = self.0[3].get_bits(27..=31);
+        let s = FromPrimitive::from_u32(v);
+        s.expect("Slot State represents Reserved.")
+    }
+
+    /// Sets Slot State.
+    pub fn set_slot_state(&mut self, state: SlotState) -> &mut Self {
+        self.0[3].set_bits(27..=31, state as _);
+        self
+    }
 
     const fn new() -> Self {
         Self([0; N])
@@ -278,4 +293,17 @@ impl<const N: usize> Endpoint<N> {
     const fn new() -> Self {
         Self([0; N])
     }
+}
+
+/// Slot State.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+pub enum SlotState {
+    /// Disabled/Enabled.
+    DisabledEnabled = 0,
+    /// Default.
+    Default = 1,
+    /// Addressed.
+    Addressed = 2,
+    /// Configured.
+    Configured = 3,
 }

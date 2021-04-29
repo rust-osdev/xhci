@@ -3,147 +3,21 @@
 use super::ExtendedCapability;
 use accessor::Mapper;
 use accessor::Single;
-use bit_field::BitField;
-use core::convert::TryInto;
 
 /// HCI Extended Power Management Capability.
-#[derive(Copy, Clone)]
-#[repr(transparent)]
-pub struct HciExtendedPowerManagement([u32; 2]);
-impl HciExtendedPowerManagement {
-    /// Returns the value of the `PME_Support` field.
-    #[must_use]
-    pub fn pme_support(self) -> u8 {
-        self.0[0].get_bits(27..=31).try_into().unwrap()
-    }
-
-    /// Returns the `D2_Support` bit.
-    #[must_use]
-    pub fn d2_support(self) -> bool {
-        self.0[0].get_bit(26)
-    }
-
-    /// Returns the `D1_Support` bit.
-    #[must_use]
-    pub fn d1_support(self) -> bool {
-        self.0[0].get_bit(25)
-    }
-
-    /// Returns the value of the `Aux_Current` field.
-    #[must_use]
-    pub fn aux_current(self) -> u8 {
-        self.0[0].get_bits(22..=24).try_into().unwrap()
-    }
-
-    /// Returns the DSI bit.
-    #[must_use]
-    pub fn dsi(self) -> bool {
-        self.0[0].get_bit(21)
-    }
-
-    /// Returns the PME Clock bit.
-    #[must_use]
-    pub fn pme_clock(self) -> bool {
-        self.0[0].get_bit(19)
-    }
-
-    /// Returns the value of the Version field.
-    #[must_use]
-    pub fn version(self) -> u8 {
-        self.0[0].get_bits(16..=18).try_into().unwrap()
-    }
-
-    /// Returns the `PME_Status` bit.
-    #[must_use]
-    pub fn pme_status(self) -> bool {
-        self.0[1].get_bit(15)
-    }
-
-    /// Clears the `PME_Status` bit.
-    pub fn clear_pme_status(&mut self) {
-        self.0[1].set_bit(15, true);
-    }
-
-    /// Returns the value of the `Data_Scale` field.
-    #[must_use]
-    pub fn data_scale(self) -> u8 {
-        self.0[1].get_bits(13..=14).try_into().unwrap()
-    }
-
-    /// Returns the value of the `Data_Select` field.
-    #[must_use]
-    pub fn data_select(self) -> u8 {
-        self.0[1].get_bits(9..=12).try_into().unwrap()
-    }
-
-    /// Sets the value of the `Data_Select` field.
-    pub fn set_data_select(&mut self, data_select: u8) {
-        self.0[1].set_bits(9..=12, data_select.into());
-    }
-
-    /// Returns the `PME_En` bit.
-    #[must_use]
-    pub fn pme_en(self) -> bool {
-        self.0[1].get_bit(8)
-    }
-
-    /// Sets the `PME_En` bit.
-    pub fn set_pme_en(&mut self) {
-        self.0[1].set_bit(8, true);
-    }
-
-    /// Clears the `PME_En` bit.
-    pub fn clear_pme_en(&mut self) {
-        self.0[1].set_bit(8, false);
-    }
-
-    /// Returns the value of the `PowerState` field.
-    #[must_use]
-    pub fn power_state(self) -> u8 {
-        self.0[1].get_bits(0..=1).try_into().unwrap()
-    }
-
-    /// Sets the value of the `PowerState` field.
-    pub fn set_power_state(&mut self, s: u8) {
-        self.0[1].set_bits(0..=1, s.into());
-    }
-
-    /// Returns the `BPCC_En` bit.
-    #[must_use]
-    pub fn bpcc_en(self) -> bool {
-        self.0[1].get_bit(23)
-    }
-
-    /// Returns the `B2_B3` bit.
-    #[must_use]
-    pub fn b2_b3(self) -> bool {
-        self.0[1].get_bit(22)
-    }
-
-    /// Returns the Data field.
-    #[must_use]
-    pub fn data(self) -> u8 {
-        self.0[1].get_bits(24..=31).try_into().unwrap()
-    }
-}
-impl_debug_from_methods! {
-    HciExtendedPowerManagement {
-        pme_support,
-        d2_support,
-        d1_support,
-        aux_current,
-        dsi,
-        pme_clock,
-        version,
-        pme_status,
-        data_scale,
-        data_select,
-        pme_en,
-        power_state,
-        bpcc_en,
-        b2_b3,
-        data,
-    }
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct HciExtendedPowerManagement {
+    _id: u8,
+    _next: u8,
+    /// Power Management Capabilities.
+    pub pmc: PowerManagementCapabilities,
+    /// Power Management Control Status Register.
+    pub pmcsr: PowerManagementControlStatusRegister,
+    /// PMESR_BSE.
+    pub pmcsr_bse: PmesrBse,
+    /// Data.
+    pub data: Data,
 }
 impl<M> From<Single<HciExtendedPowerManagement, M>> for ExtendedCapability<M>
 where
@@ -151,5 +25,77 @@ where
 {
     fn from(h: Single<HciExtendedPowerManagement, M>) -> Self {
         ExtendedCapability::HciExtendedPowerManagementCapability(h)
+    }
+}
+
+/// Power Management Capabilities.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PowerManagementCapabilities(u16);
+impl PowerManagementCapabilities {
+    ro_field!(11..=15, pme_support, "PME_Support", u8);
+    ro_bit!(10, d2_support, "D2_Support");
+    ro_bit!(9, d1_support, "D1_Support");
+    ro_field!(6..=8, aux_current, "Aux_Current", u8);
+    ro_bit!(5, dsi, "DSI");
+    ro_bit!(3, pme_clock, "PME Clock");
+    ro_field!(0..=2, version, "Version", u8);
+}
+impl_debug_from_methods! {
+    PowerManagementCapabilities {
+        pme_support,
+        d2_support,
+        d1_support,
+        aux_current,
+        dsi,
+        pme_clock,
+        version,
+    }
+}
+
+/// Power Management Control/Status Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PowerManagementControlStatusRegister(u16);
+impl PowerManagementControlStatusRegister {
+    rw1c_bit!(15, pme_status, "PME_Status");
+    ro_field!(13..=14, data_scale, "Data_Scale", u8);
+    rw_field!(9..=12, data_select, "Data_Select", u8);
+    rw_bit!(8, pme_en, "PME_En");
+    rw_field!(0..=1, power_state, "PowerState", u8);
+}
+impl_debug_from_methods! {
+    PowerManagementControlStatusRegister {
+        pme_status,
+        data_scale,
+        data_select,
+        pme_en,
+        power_state,
+    }
+}
+
+/// PMESR_BSE Register.
+#[repr(transparent)]
+#[derive(Copy, Clone)]
+pub struct PmesrBse(u8);
+impl PmesrBse {
+    ro_bit!(7, bpcc_en, "BPCC_En");
+    ro_bit!(6, b2_b3, "B2_B3");
+}
+impl_debug_from_methods! {
+    PmesrBse {
+        bpcc_en,
+        b2_b3,
+    }
+}
+
+/// Data.
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
+pub struct Data(u8);
+impl Data {
+    /// Returns the wrapped data.
+    pub fn get(self) -> u8 {
+        self.0
     }
 }

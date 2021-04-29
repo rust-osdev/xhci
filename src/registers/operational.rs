@@ -3,6 +3,7 @@
 use super::capability::{Capability, CapabilityRegistersLength};
 use accessor::Mapper;
 use bit_field::BitField;
+use core::convert::TryFrom;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
@@ -261,17 +262,12 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 #[derive(Copy, Clone)]
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
-    /// Returns the value of the Max Device Slots Enabled field.
-    #[must_use]
-    pub fn max_device_slots_enabled(self) -> u8 {
-        self.0.get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Sets the value of the Max Device Slots Enabled field.
-    pub fn set_max_device_slots_enabled(&mut self, s: u8) {
-        self.0.set_bits(0..=7, s.into());
-    }
-
+    rw_field!(
+        0..=7,
+        max_device_slots_enabled,
+        "Max Device Slots Enabled",
+        u8
+    );
     rw_bit!(8, u3_entry_enable, "U3 Entry Enable");
     rw_bit!(
         9,
@@ -338,38 +334,15 @@ impl PortStatusAndControlRegister {
     rw1c_bit!(1, port_enabled_disabled, "Port Enabled/Disabled");
     ro_bit!(3, over_current_active, "Over-current Active");
     rw1s_bit!(4, port_reset, "Port Reset");
-
-    /// Returns the value of the Port Link State field.
-    #[must_use]
-    pub fn port_link_state(self) -> u8 {
-        self.0.get_bits(5..=8).try_into().unwrap()
-    }
-
-    /// Sets the value of the Port Link State field.
-    pub fn set_port_link_state(&mut self, state: u8) {
-        self.0.set_bits(5..=8, state.into());
-    }
-
+    rw_field!(5..=8, port_link_state, "Port Link State", u8);
     rw_bit!(9, port_power, "Port Power");
-
-    /// Returns the value of the Port Speed field.
-    #[must_use]
-    pub fn port_speed(self) -> u8 {
-        self.0.get_bits(10..=13).try_into().unwrap()
-    }
-
-    /// Returns the value of the Port Indicator Control field.
-    #[must_use]
-    pub fn port_indicator_control(self) -> PortIndicator {
-        let i = FromPrimitive::from_u32(self.0.get_bits(14..=15));
-        i.expect("The indicator must be less than 4.")
-    }
-
-    /// Sets the value of the Port Indicator Control field.
-    pub fn set_port_indicator_control(&mut self, i: PortIndicator) {
-        self.0.set_bits(14..=15, i as _);
-    }
-
+    ro_field!(10..=13, port_speed, "Port Speed", u8);
+    rw_field!(
+        14..=15,
+        port_indicator_control,
+        "Port Indicator Control",
+        PortIndicator
+    );
     rw_bit!(
         16,
         port_link_state_write_strobe,
@@ -568,28 +541,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortLinkInfoRegister(u32);
 impl PortLinkInfoRegister {
-    /// Returns the value of the Link Error Count field.
-    #[must_use]
-    pub fn link_error_count(self) -> u16 {
-        self.0.get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Link Error Count field.
-    pub fn set_link_error_count(&mut self, c: u16) {
-        self.0.set_bits(0..=15, c.into());
-    }
-
-    /// Returns the value of the Rx Lane Count field.
-    #[must_use]
-    pub fn rx_lane_count(self) -> u8 {
-        self.0.get_bits(16..=19).try_into().unwrap()
-    }
-
-    /// Returns the value of the Tx Lane Count field.
-    #[must_use]
-    pub fn tx_lane_count(self) -> u8 {
-        self.0.get_bits(20..=23).try_into().unwrap()
-    }
+    rw_field!(0..=15, link_error_count, "Link Error Count", u16);
+    ro_field!(16..=19, rx_lane_count, "Rx Lane Count", u8);
+    ro_field!(20..=23, tx_lane_count, "Tx Lane Count", u8);
 }
 impl_debug_from_methods! {
     PortLinkInfoRegister{
@@ -606,38 +560,19 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortHardwareLpmControlRegister(u32);
 impl PortHardwareLpmControlRegister {
-    /// Returns the value of the Host Initiated Resume Duration Mode field.
-    #[must_use]
-    pub fn host_initiated_resume_duration_mode(self) -> u8 {
-        self.0.get_bits(0..=1).try_into().unwrap()
-    }
-
-    /// Sets the value of the Host Initiated Resume Duration Mode field.
-    pub fn set_host_initiated_resume_duration_mode(&mut self, mode: u8) {
-        self.0.set_bits(0..=1, mode.into());
-    }
-
-    /// Returns the value of the L1 Timeout field.
-    #[must_use]
-    pub fn l1_timeout(self) -> u8 {
-        self.0.get_bits(2..=9).try_into().unwrap()
-    }
-
-    /// Sets the value of the L1 Timeout field.
-    pub fn set_l1_timeout(&mut self, timeout: u8) {
-        self.0.set_bits(2..=9, timeout.into());
-    }
-
-    /// Returns the value of the Best Effort Service Latency Deep field.
-    #[must_use]
-    pub fn best_effort_service_latency_deep(self) -> u8 {
-        self.0.get_bits(10..=13).try_into().unwrap()
-    }
-
-    /// Sets the value of the Best Effort Service Latency Deep field.
-    pub fn set_best_effort_service_latency_deep(&mut self, latency: u8) {
-        self.0.set_bits(10..=13, latency.into());
-    }
+    rw_field!(
+        0..=1,
+        host_initiated_resume_duration_mode,
+        "Host Initiated Resume Duration Mode",
+        u8
+    );
+    rw_field!(2..=9, l1_timeout, "L1 Timeout", u8);
+    rw_field!(
+        10..=13,
+        best_effort_service_latency_deep,
+        "Best Effort Service Latency Depp",
+        u8
+    );
 }
 impl_debug_from_methods! {
     PortHardwareLpmControlRegister {
@@ -658,6 +593,17 @@ pub enum PortIndicator {
     Green = 2,
     /// Undefined.
     Undefined = 3,
+}
+impl TryFrom<u32> for PortIndicator {
+    type Error = u32;
+    fn try_from(x: u32) -> Result<Self, Self::Error> {
+        FromPrimitive::from_u32(x).ok_or(x)
+    }
+}
+impl From<PortIndicator> for u32 {
+    fn from(i: PortIndicator) -> Self {
+        i as _
+    }
 }
 
 /// A type returned by [`PortPowerManagementStatusAndControlRegister::l1_status`].

@@ -171,6 +171,16 @@ impl<const N: usize> InputControl<N> {
         Self([0; N])
     }
 }
+impl<const N: usize> AsRef<[u32]> for InputControl<N> {
+    fn as_ref(&self) -> &[u32] {
+        &self.0
+    }
+}
+impl<const N: usize> AsMut<[u32]> for InputControl<N> {
+    fn as_mut(&mut self) -> &mut [u32] {
+        &mut self.0
+    }
+}
 
 /// Device Context.
 #[repr(C)]
@@ -238,6 +248,16 @@ impl<const N: usize> Slot<N> {
 
     const fn new() -> Self {
         Self([0; N])
+    }
+}
+impl<const N: usize> AsRef<[u32]> for Slot<N> {
+    fn as_ref(&self) -> &[u32] {
+        &self.0
+    }
+}
+impl<const N: usize> AsMut<[u32]> for Slot<N> {
+    fn as_mut(&mut self) -> &mut [u32] {
+        &mut self.0
     }
 }
 
@@ -332,6 +352,16 @@ impl<const N: usize> Endpoint<N> {
 
     const fn new() -> Self {
         Self([0; N])
+    }
+}
+impl<const N: usize> AsRef<[u32]> for Endpoint<N> {
+    fn as_ref(&self) -> &[u32] {
+        &self.0
+    }
+}
+impl<const N: usize> AsMut<[u32]> for Endpoint<N> {
+    fn as_mut(&mut self) -> &mut [u32] {
+        &mut self.0
     }
 }
 

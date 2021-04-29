@@ -1,4 +1,7 @@
 //! The xHC Contexts.
+//!
+//! In order to handle Contexts with methods regardless of Context's size, all methods are
+//! implemented on traits.
 
 #[macro_use]
 mod macros;

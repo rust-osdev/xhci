@@ -45,12 +45,14 @@ pub struct Input<const N: usize> {
 }
 impl Input32Byte {
     /// Creates an empty 32 byte Input Context.
+    #[must_use]
     pub const fn new_32byte() -> Self {
         Self::new()
     }
 }
 impl Input64Byte {
     /// Creates an empty 64 byte Input Context.
+    #[must_use]
     pub const fn new_64byte() -> Self {
         Self::new()
     }

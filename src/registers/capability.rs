@@ -240,7 +240,7 @@ impl CapabilityParameters1 {
 
     /// Returns the value of the Maximum Primary Stream Array Size field.
     #[must_use]
-    pub fn max_primary_stream_array_size(self) -> u8 {
+    pub fn maximum_primary_stream_array_size(self) -> u8 {
         self.0.get_bits(12..=15).try_into().unwrap()
     }
 
@@ -266,7 +266,7 @@ impl_debug_from_methods! {
         stopped_short_packet_capability,
         stopped_edtla_capability,
         contiguous_frame_id_capability,
-        max_primary_stream_array_size,
+        maximum_primary_stream_array_size,
         xhci_extended_capabilities_pointer
     }
 }

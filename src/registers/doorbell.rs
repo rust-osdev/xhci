@@ -2,11 +2,7 @@
 
 use super::capability::Capability;
 use accessor::Mapper;
-use bit_field::BitField;
-use core::{
-    convert::{TryFrom, TryInto},
-    fmt,
-};
+use core::{convert::TryFrom, fmt};
 
 /// The element of the Doorbell Array.
 #[repr(transparent)]
@@ -39,27 +35,9 @@ impl Register {
             mapper,
         )
     }
-    /// Get a doorbell target.
-    #[must_use]
-    pub fn doorbell_target(self) -> u8 {
-        self.0.get_bits(0..=7).try_into().unwrap()
-    }
 
-    /// Set a doorbell target.
-    pub fn set_doorbell_target(&mut self, target: u8) {
-        self.0.set_bits(0..=7, target.into());
-    }
-
-    /// Get a Doorbell Stream ID.
-    #[must_use]
-    pub fn doorbell_stream_id(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Set a Doorbell Stream ID.
-    pub fn set_doorbell_stream_id(&mut self, id: u16) {
-        self.0.set_bits(16..=31, id.into());
-    }
+    rw_field!(0..=7, doorbell_target, "Doorbell Target", u8);
+    rw_field!(16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
 }
 impl fmt::Debug for Register {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

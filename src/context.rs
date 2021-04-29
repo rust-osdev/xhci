@@ -9,6 +9,7 @@ macro_rules! impl_constructor {
             #[doc = "Creates an empty 32 byte"]
             #[doc = $name]
             #[doc = "Context."]
+            #[must_use]
             pub const fn new_32byte() -> Self {
                 Self::new()
             }
@@ -17,6 +18,7 @@ macro_rules! impl_constructor {
             #[doc = "Creates an empty 64 byte"]
             #[doc = $name]
             #[doc = "Context."]
+            #[must_use]
             pub const fn new_64byte() -> Self {
                 Self::new()
             }
@@ -67,6 +69,7 @@ impl<const N: usize> InputControl<N> {
     /// # Panics
     ///
     /// This method panics if `i < 2 || i > 31`.
+    #[must_use]
     pub fn drop_context_flag(self, i: usize) -> bool {
         Self::ensure_drop_context_index_within_range(i);
 
@@ -100,6 +103,7 @@ impl<const N: usize> InputControl<N> {
     /// # Panics
     ///
     /// This method panics if `i > 31`.
+    #[must_use]
     pub fn add_context_flag(self, i: usize) -> bool {
         Self::ensure_add_context_index_within_range(i);
 
@@ -129,6 +133,7 @@ impl<const N: usize> InputControl<N> {
     }
 
     /// Returns the value of the Configuration Value field.
+    #[must_use]
     pub fn configuration_value(self) -> u8 {
         self.0[7].get_bits(0..=7).try_into().unwrap()
     }
@@ -139,6 +144,7 @@ impl<const N: usize> InputControl<N> {
     }
 
     /// Returns the value of the Interface Number field.
+    #[must_use]
     pub fn interface_number(self) -> u8 {
         self.0[7].get_bits(8..=15).try_into().unwrap()
     }
@@ -149,6 +155,7 @@ impl<const N: usize> InputControl<N> {
     }
 
     /// Returns the value of the Alternate Setting field.
+    #[must_use]
     pub fn alternate_setting(self) -> u8 {
         self.0[7].get_bits(16..=23).try_into().unwrap()
     }

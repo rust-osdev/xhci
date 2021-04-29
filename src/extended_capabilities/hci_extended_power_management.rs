@@ -95,6 +95,7 @@ impl_debug_from_methods! {
 pub struct Data(u8);
 impl Data {
     /// Returns the wrapped data.
+    #[must_use]
     pub fn get(self) -> u8 {
         self.0
     }

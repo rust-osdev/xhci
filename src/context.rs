@@ -264,8 +264,19 @@ impl<const N: usize> Endpoint<N> {
     );
 
     rw_field!([1](1..=2), error_count, "Error Count", u8);
-    // TODO: Define `EndpointType` enum.
-    rw_field!([1](3..=5), endpoint_type, "Endpoint Type", u8);
+    /// Returns Endpoint Type.
+    pub fn endpoint_type(self) -> EndpointType {
+        let v = self.0[1].get_bits(3..=5);
+        let t = FromPrimitive::from_u32(v);
+        t.expect("Invalid Endpoint Type.")
+    }
+
+    /// Sets Endpoint Type.
+    pub fn set_endpoint_type(&mut self, t: EndpointType) -> &mut Self {
+        self.0[1].set_bits(3..=5, t as _);
+        self
+    }
+
     rw_bit!([1](7), host_initiate_disable, "Host Initiate Disable");
     rw_field!([1](8..=15), max_burst_size, "Max Burst Size", u8);
     rw_field!([1](16..=31), max_packet_size, "Max Packet Size", u16);
@@ -339,4 +350,25 @@ pub enum EndpointState {
     Stopped = 3,
     /// The endpoint is not running due to a TRB Erorr.
     Error = 4,
+}
+
+/// Endpoint Type.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive)]
+pub enum EndpointType {
+    /// Not Valid.
+    NotValid = 0,
+    /// Isoch Out.
+    IsochOut = 1,
+    /// Bulk Out.
+    BulkOut = 2,
+    /// Interrupt Out.
+    InterruptOut = 3,
+    /// Control Bidirectional.
+    Control = 4,
+    /// Isoch In.
+    IsochIn = 5,
+    /// Bulk In.
+    BulkIn = 6,
+    /// Interrupt In.
+    InterruptIn = 7,
 }

@@ -8,6 +8,7 @@
 - `set_xxx(true_or_false)` methods of the Registers and the Extended Capabilities are split into `set_xxx()` and `clear_xxx()`.
 - `CapabilityParameters1::max_primary_stream_array_size` is renamed to `CapabilityParameters1::maximum_primary_stream_array_size`.
 - Bit setter and clearer now return mutable references to `Self`.
+- `extended_capabilities::HciExtendedPowerManagement` is rewritten so that it contains members.
 
 ## 0.6.0 - 2021-04-27
 ### Added

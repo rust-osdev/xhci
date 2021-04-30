@@ -185,7 +185,7 @@ impl DeviceNotificationControl {
         self
     }
 
-    /// Clears the `ith` bit of the Notification Enable field. `i` starts from 0.
+    /// Clears the `i`th bit of the Notification Enable field. `i` starts from 0.
     ///
     /// # Panics
     ///

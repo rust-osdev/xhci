@@ -369,7 +369,7 @@ impl PortStatusAndControlRegister {
     rw_bit!(
         27,
         wake_on_over_current_enable,
-        "Wake on Over Current Enable"
+        "Wake on Over-Current Enable"
     );
     ro_bit!(30, device_removable, "Device Removable");
     rw1s_bit!(31, warm_port_reset, "Warm Port Reset");

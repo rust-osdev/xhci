@@ -533,7 +533,7 @@ impl From<PortIndicator> for u32 {
     }
 }
 
-/// A type returned by [`PortPowerManagementStatusAndControlRegister::l1_status`].
+/// L1 Status.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum L1Status {
     /// The L1 Status field shall be ignored by software.
@@ -548,7 +548,7 @@ pub enum L1Status {
     TimeOutOrError = 4,
 }
 
-/// A type returned by [`PortPowerManagementStatusAndControlRegister::port_test_control`].
+/// Test Mode.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum TestMode {
     /// Test mode not enabled.

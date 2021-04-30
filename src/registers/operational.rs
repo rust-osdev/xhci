@@ -90,7 +90,11 @@ impl UsbCommandRegister {
     rw_bit!(11, enable_u3_mfindex_stop, "Enable U3 MFINDEX Stop");
     rw_bit!(13, cem_enable, "CEM Enable");
     ro_bit!(14, extended_tbc_enable, "Extended TBC Enable");
-    ro_bit!(15, extended_tbc_status_enable, "Extended TBC Status Enable");
+    ro_bit!(
+        15,
+        extended_tbc_trb_status_enable,
+        "Extended TBC TRB Status Enable"
+    );
     rw_bit!(16, vtio_enable, "VTIO Enable");
 }
 impl_debug_from_methods! {
@@ -106,7 +110,7 @@ impl_debug_from_methods! {
         enable_u3_mfindex_stop,
         cem_enable,
         extended_tbc_enable,
-        extended_tbc_status_enable,
+        extended_tbc_trb_status_enable,
         vtio_enable,
     }
 }

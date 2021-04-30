@@ -9,6 +9,7 @@
 - `CapabilityParameters1::max_primary_stream_array_size` is renamed to `CapabilityParameters1::maximum_primary_stream_array_size`.
 - Bit setter and clearer now return mutable references to `Self`.
 - `extended_capabilities::HciExtendedPowerManagement` is rewritten so that it contains members.
+- `context` module is rewritten.
 
 ## 0.6.0 - 2021-04-27
 ### Added

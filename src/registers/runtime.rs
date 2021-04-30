@@ -164,7 +164,7 @@ impl EventRingSegmentTableBaseAddressRegister {
         self.0
     }
 
-    /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
+    /// Sets the base address of the Event Ring Segment Table. It must be 64 byte aligned.
     ///
     /// # Panics
     ///

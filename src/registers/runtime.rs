@@ -143,6 +143,7 @@ impl_debug_from_methods! {
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
     /// Returns the number of segments the Event Ring Segment Table supports.
+    #[must_use]
     pub fn get(self) -> u16 {
         self.0.try_into().unwrap()
     }

@@ -152,6 +152,12 @@ impl EventRingSegmentTableSizeRegister {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
+    /// Returns the base address of the Event Ring Segment Table.
+    #[must_use]
+    pub fn get(self) -> u64 {
+        self.0
+    }
+
     /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
     ///
     /// # Panics

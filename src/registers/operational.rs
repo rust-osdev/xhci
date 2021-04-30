@@ -482,7 +482,7 @@ impl_debug_from_methods! {
 
 /// Port Hardware LPM Control Register
 ///
-/// **This register is onlyvalid for USB2 and is reserved for USB3.**
+/// **This register is only valid for USB2 and is reserved for USB3.**
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct PortHardwareLpmControlRegister(u32);

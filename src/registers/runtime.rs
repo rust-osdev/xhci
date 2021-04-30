@@ -3,6 +3,7 @@
 use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
 use core::convert::TryFrom;
+use core::convert::TryInto;
 
 /// Runtime Registers
 ///
@@ -141,6 +142,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
+    /// Returns the number of segments the Event Ring Segment Table supports.
+    #[must_use]
+    pub fn get(self) -> u16 {
+        self.0.try_into().unwrap()
+    }
+
     /// Sets the number of segments the Event Ring Segment Table supports.
     pub fn set(&mut self, s: u16) {
         self.0 = s.into();
@@ -152,7 +159,13 @@ impl EventRingSegmentTableSizeRegister {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
-    /// Sets the address of the Event Ring Segment Table. It must be 64 byte aligned.
+    /// Returns the base address of the Event Ring Segment Table.
+    #[must_use]
+    pub fn get(self) -> u64 {
+        self.0
+    }
+
+    /// Sets the base address of the Event Ring Segment Table. It must be 64 byte aligned.
     ///
     /// # Panics
     ///

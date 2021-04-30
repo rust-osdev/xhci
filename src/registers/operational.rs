@@ -90,7 +90,11 @@ impl UsbCommandRegister {
     rw_bit!(11, enable_u3_mfindex_stop, "Enable U3 MFINDEX Stop");
     rw_bit!(13, cem_enable, "CEM Enable");
     ro_bit!(14, extended_tbc_enable, "Extended TBC Enable");
-    ro_bit!(15, extended_tbc_status_enable, "Extended TBC Status Enable");
+    ro_bit!(
+        15,
+        extended_tbc_trb_status_enable,
+        "Extended TBC TRB Status Enable"
+    );
     rw_bit!(16, vtio_enable, "VTIO Enable");
 }
 impl_debug_from_methods! {
@@ -106,7 +110,7 @@ impl_debug_from_methods! {
         enable_u3_mfindex_stop,
         cem_enable,
         extended_tbc_enable,
-        extended_tbc_status_enable,
+        extended_tbc_trb_status_enable,
         vtio_enable,
     }
 }
@@ -181,7 +185,7 @@ impl DeviceNotificationControl {
         self
     }
 
-    /// Clears the `ith` bit of the Notification Enable field. `i` starts from 0.
+    /// Clears the `i`th bit of the Notification Enable field. `i` starts from 0.
     ///
     /// # Panics
     ///
@@ -355,7 +359,7 @@ impl PortStatusAndControlRegister {
         "Port Enabled/Disabled Change"
     );
     rw1c_bit!(19, warm_port_reset_change, "Warm Port Reset Change");
-    rw1c_bit!(20, over_current_change, "Over Current Change");
+    rw1c_bit!(20, over_current_change, "Over-Current Change");
     rw1c_bit!(21, port_reset_change, "Port Reset Change");
     rw1c_bit!(22, port_link_state_change, "Port Link State Change");
     rw1c_bit!(23, port_config_error_change, "Port Config Error Change");
@@ -365,7 +369,7 @@ impl PortStatusAndControlRegister {
     rw_bit!(
         27,
         wake_on_over_current_enable,
-        "Wake on Over Current Enable"
+        "Wake on Over-Current Enable"
     );
     ro_bit!(30, device_removable, "Device Removable");
     rw1s_bit!(31, warm_port_reset, "Warm Port Reset");
@@ -478,7 +482,7 @@ impl_debug_from_methods! {
 
 /// Port Hardware LPM Control Register
 ///
-/// **This register is onlyvalid for USB2 and is reserved for USB3.**
+/// **This register is only valid for USB2 and is reserved for USB3.**
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct PortHardwareLpmControlRegister(u32);
@@ -529,7 +533,7 @@ impl From<PortIndicator> for u32 {
     }
 }
 
-/// A type returned by [`PortPowerManagementStatusAndControlRegister::l1_status`].
+/// L1 Status.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum L1Status {
     /// The L1 Status field shall be ignored by software.
@@ -544,7 +548,7 @@ pub enum L1Status {
     TimeOutOrError = 4,
 }
 
-/// A type returned by [`PortPowerManagementStatusAndControlRegister::port_test_control`].
+/// Test Mode.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, FromPrimitive)]
 pub enum TestMode {
     /// Test mode not enabled.

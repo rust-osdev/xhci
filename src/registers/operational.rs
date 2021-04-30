@@ -359,7 +359,7 @@ impl PortStatusAndControlRegister {
         "Port Enabled/Disabled Change"
     );
     rw1c_bit!(19, warm_port_reset_change, "Warm Port Reset Change");
-    rw1c_bit!(20, over_current_change, "Over Current Change");
+    rw1c_bit!(20, over_current_change, "Over-Current Change");
     rw1c_bit!(21, port_reset_change, "Port Reset Change");
     rw1c_bit!(22, port_link_state_change, "Port Link State Change");
     rw1c_bit!(23, port_config_error_change, "Port Config Error Change");

@@ -3,6 +3,7 @@
 use super::capability::RuntimeRegisterSpaceOffset;
 use accessor::Mapper;
 use core::convert::TryFrom;
+use core::convert::TryInto;
 
 /// Runtime Registers
 ///
@@ -141,6 +142,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
+    /// Returns the number of segments the Event Ring Segment Table supports.
+    pub fn get(self) -> u16 {
+        self.0.try_into().unwrap()
+    }
+
     /// Sets the number of segments the Event Ring Segment Table supports.
     pub fn set(&mut self, s: u16) {
         self.0 = s.into();

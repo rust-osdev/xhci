@@ -40,18 +40,7 @@ macro_rules! add_trb {
                 self.0
             }
 
-            /// Returns the value of the Cycle Bit.
-            #[must_use]
-            pub fn cycle_bit(&self) -> bool {
-                self.0[3].get_bit(0)
-            }
-
-            /// Sets the value of the Cycle Bit.
-            pub fn set_cycle_bit(&mut self, b: bool) -> &mut Self {
-                use bit_field::BitField;
-                self.0[3].set_bit(0, b);
-                self
-            }
+            rw_bit!([3](0), cycle_bit, "Cycle bit");
 
             fn set_trb_type(&mut self) -> &mut Self {
                 use crate::ring::trb::Type;
@@ -123,11 +112,23 @@ macro_rules! allowed {
             }
         impl Allowed{
             /// Sets the value of the Cycle Bit.
-            pub fn set_cycle_bit(&mut self,b:bool)->&mut Self{
+            pub fn set_cycle_bit(&mut self)->&mut Self{
                 match self{
                     $(
                         Self::$variant(ref mut v) => {
-                            v.set_cycle_bit(b);
+                            v.set_cycle_bit();
+                        }
+                    ),+
+                }
+                self
+            }
+
+            /// Clears the value of the Cycle Bit.
+            pub fn clear_cycle_bit(&mut self)->&mut Self{
+                match self{
+                    $(
+                        Self::$variant(ref mut v) => {
+                            v.clear_cycle_bit();
                         }
                     ),+
                 }
@@ -205,53 +206,10 @@ impl Link {
         (u << 32) | l
     }
 
-    /// Sets the value of the Interrupter Target field.
-    pub fn set_interrupter_target(&mut self, t: u32) -> &mut Self {
-        self.0[2].set_bits(22..=31, t);
-        self
-    }
-
-    /// Returns the value of the Interrupter Target field.
-    #[must_use]
-    pub fn interrupter_target(&self) -> u32 {
-        self.0[2].get_bits(22..=31)
-    }
-
-    /// Sets the value of the Toggle Cycle field.
-    pub fn set_toggle_cycle(&mut self, c: bool) -> &mut Self {
-        self.0[3].set_bit(1, c);
-        self
-    }
-
-    /// Returns the value of the Toggle Cycle field.
-    #[must_use]
-    pub fn toggle_cycle(&self) -> bool {
-        self.0[3].get_bit(1)
-    }
-
-    /// Sets the value of the Chain bit field.
-    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
-        self.0[3].set_bit(4, b);
-        self
-    }
-
-    /// Returns the value of the Chain bit field.
-    #[must_use]
-    pub fn chain_bit(&self) -> bool {
-        self.0[3].get_bit(4)
-    }
-
-    /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-        self.0[3].set_bit(5, ioc);
-        self
-    }
-
-    /// Returns the value of the Interrupt On Completion field.
-    #[must_use]
-    pub fn interrupt_on_completion(&self) -> bool {
-        self.0[3].get_bit(5)
-    }
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u32);
+    rw_bit!([3](1), toggle_cycle, "Toggle Cycle");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](5), interrupt_on_completion, "Interrupt On Completion");
 }
 impl_debug_for_trb!(Link {
     ring_segment_pointer,

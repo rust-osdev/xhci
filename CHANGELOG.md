@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.8.0 - 2021-05-12
+### Changed
 - The most part of `trb` module is rewritten.
     - `set_xxx(true_or_false)` methods are split into `set_xxx()` and `clear_xxx()`.
     - Bit setters, bit clearers, and field setters now return mutable references to `Self`

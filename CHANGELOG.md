@@ -5,6 +5,7 @@
     - `set_xxx(true_or_false)` methods are split into `set_xxx()` and `clear_xxx()`.
     - Bit setters, bit clearers, and field setters now return mutable references to `Self`
     - `transfer::SetupStage::set_trb_transfer_length` is removed.
+- Missing members and accessors of TRBs are added.
 
 ## 0.7.0 - 2021-05-12
 ### Added

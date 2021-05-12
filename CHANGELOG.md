@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.8.1 - 2021-05-12
 ### Fixed
 - The members of `XhciLocalMemory` are now public.
 

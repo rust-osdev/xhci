@@ -13,8 +13,10 @@ pub struct XhciLocalMemory<M>
 where
     M: Mapper + Clone,
 {
-    header: Single<Header, M>,
-    memory: Array<u8, M>,
+    /// The header of this Capability.
+    pub header: Single<Header, M>,
+    /// The Local Memory.
+    pub memory: Array<u8, M>,
 }
 impl<M> XhciLocalMemory<M>
 where

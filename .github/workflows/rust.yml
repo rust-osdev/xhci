@@ -17,6 +17,9 @@ jobs:
     - name: Install clippy and rustfmt
       run: rustup component add clippy rustfmt
 
+    - name: Print the version of `rustc`
+      run: rustc --version
+
     - name: Run rustfmt with check mode
       run: |
         shopt -s globstar

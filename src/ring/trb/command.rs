@@ -51,33 +51,13 @@ impl_debug_for_trb!(Noop {});
 
 add_trb_with_default!(EnableSlot, "Enable Slot Command TRB", Type::EnableSlot);
 impl EnableSlot {
-    /// Sets the value of the Slot Type field.
-    pub fn set_slot_type(&mut self, t: u8) -> &mut Self {
-        self.0[3].set_bits(16..=20, t.into());
-        self
-    }
-
-    /// Returns the value of the Slot Type field.
-    #[must_use]
-    pub fn slot_type(&self) -> u8 {
-        self.0[3].get_bits(16..=20).try_into().unwrap()
-    }
+    rw_field!([3](16..=20), slot_type, "Slot Type", u8);
 }
 impl_debug_for_trb!(EnableSlot { slot_type });
 
 add_trb_with_default!(DisableSlot, "Disable Slot Command TRB", Type::DisableSlot);
 impl DisableSlot {
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(DisableSlot { slot_id });
 
@@ -116,29 +96,12 @@ impl AddressDevice {
         (u << 32) | l
     }
 
-    /// Sets the value of the Block Set Address Request field.
-    pub fn set_block_set_address_request(&mut self, r: bool) -> &mut Self {
-        self.0[3].set_bit(9, r);
-        self
-    }
-
-    /// Returns the value of the Block Set Address Request.
-    #[must_use]
-    pub fn block_set_address_request(&self) -> bool {
-        self.0[3].get_bit(9)
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_bit!(
+        [3](9),
+        block_set_address_request,
+        "Block Set Address Request"
+    );
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(AddressDevice {
     input_context_pointer,
@@ -181,29 +144,8 @@ impl ConfigureEndpoint {
         (u << 32) | l
     }
 
-    /// Sets the value of the Deconfigure field.
-    pub fn set_deconfigure(&mut self, d: bool) -> &mut Self {
-        self.0[3].set_bit(9, d);
-        self
-    }
-
-    /// Returns the value of the Deconfigure field.
-    #[must_use]
-    pub fn deconfigure(&self) -> bool {
-        self.0[3].get_bit(9)
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_bit!([3](9), deconfigure, "Deconfigure");
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ConfigureEndpoint {
     input_context_pointer,
@@ -245,18 +187,7 @@ impl EvaluateContext {
 
         (u << 32) | l
     }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(EvaluateContext {
     input_context_pointer,
@@ -269,41 +200,9 @@ add_trb_with_default!(
     Type::ResetEndpoint
 );
 impl ResetEndpoint {
-    /// Sets the value of the Transfer State Preserve field.
-    pub fn set_transfer_state_preserve(&mut self, tsp: bool) -> &mut Self {
-        self.0[3].set_bit(9, tsp);
-        self
-    }
-
-    /// Returns the value of the Transfer State Preserve field.
-    #[must_use]
-    pub fn transfer_state_preserve(&self) -> bool {
-        self.0[3].get_bit(9)
-    }
-
-    /// Sets the value of the Endpoint ID field.
-    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(16..=20, i.into());
-        self
-    }
-
-    /// Returns the value of the Endpoint ID.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(16..=20).try_into().unwrap()
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_bit!([3](9), transfer_state_preserve, "Transfer State Preserve");
+    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ResetEndpoint {
     transfer_state_preserve,
@@ -317,41 +216,9 @@ add_trb_with_default!(
     Type::StopEndpoint
 );
 impl StopEndpoint {
-    /// Sets the value of the Endpoint ID field.
-    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(16..=20, i.into());
-        self
-    }
-
-    /// Returns the value of the Endpoint ID field.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(16..=20).try_into().unwrap()
-    }
-
-    /// Sets the value of the Suspend field.
-    pub fn set_suspend(&mut self, s: bool) -> &mut Self {
-        self.0[3].set_bit(23, s);
-        self
-    }
-
-    /// Returns the value of the Suspend field.
-    #[must_use]
-    pub fn suspend(&self) -> bool {
-        self.0[3].get_bit(23)
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_bit!([3](23), suspend, "Suspend");
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(StopEndpoint {
     endpoint_id,
@@ -365,29 +232,8 @@ add_trb_with_default!(
     Type::SetTrDequeuePointer
 );
 impl SetTrDequeuePointer {
-    /// Sets the value of the Dequeue Cycle State field.
-    pub fn set_dequeue_cycle_state(&mut self, s: bool) -> &mut Self {
-        self.0[0].set_bit(0, s);
-        self
-    }
-
-    /// Returns the value of the Dequeue Cycle state field.
-    #[must_use]
-    pub fn dequeue_cycle_state(&self) -> bool {
-        self.0[0].get_bit(0)
-    }
-
-    /// Sets the value of the Stream Context Type field.
-    pub fn set_stream_context_type(&mut self, t: u8) -> &mut Self {
-        self.0[0].set_bits(1..=3, t.into());
-        self
-    }
-
-    /// Returns the value of the Stream Context Type field.
-    #[must_use]
-    pub fn stream_context_type(&self) -> u8 {
-        self.0[0].get_bits(1..=3).try_into().unwrap()
-    }
+    rw_bit!([0](0), dequeue_cycle_state, "Dequeue Cycle State");
+    rw_field!([0](1..=3), stream_context_type, "Stream Context Type", u8);
 
     /// Sets the value of the New TR Dequeue Pointer field.
     ///
@@ -418,41 +264,9 @@ impl SetTrDequeuePointer {
         ((u << 32) | l) & 0xffff_fff0
     }
 
-    /// Sets the value of the Stream ID field.
-    pub fn set_stream_id(&mut self, i: u16) -> &mut Self {
-        self.0[2].set_bits(16..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Stream ID field.
-    #[must_use]
-    pub fn stream_id(&self) -> u16 {
-        self.0[2].get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Endpoint ID field.
-    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(16..=20, i.into());
-        self
-    }
-
-    /// Returns the value of the Endpoint ID field.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(16..=20).try_into().unwrap()
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([2](16..=31), stream_id, "Stream ID", u16);
+    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(SetTrDequeuePointer {
     dequeue_cycle_state,
@@ -465,17 +279,7 @@ impl_debug_for_trb!(SetTrDequeuePointer {
 
 add_trb_with_default!(ResetDevice, "Reset Device Command TRB", Type::ResetDevice);
 impl ResetDevice {
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ResetDevice { slot_id });
 
@@ -507,29 +311,13 @@ impl ForceEvent {
         (u << 32) | l
     }
 
-    /// Sets the value of the VF Interrupter Target field.
-    pub fn set_vf_interrupter_target(&mut self, t: u16) -> &mut Self {
-        self.0[2].set_bits(22..=31, t.into());
-        self
-    }
-
-    /// Returns the value of the VF Interrupter Target field.
-    #[must_use]
-    pub fn vf_interrupter_target(&self) -> u16 {
-        self.0[2].get_bits(22..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the VF ID field.
-    pub fn set_vf_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(16..=23, i.into());
-        self
-    }
-
-    /// Returns the value of the VF ID field.
-    #[must_use]
-    pub fn vf_id(&self) -> u8 {
-        self.0[3].get_bits(16..=23).try_into().unwrap()
-    }
+    rw_field!(
+        [2](22..=31),
+        vf_interrupter_target,
+        "VF Interrupter Target",
+        u16
+    );
+    rw_field!([3](16..=23), vf_id, "VF ID", u8);
 }
 impl_debug_for_trb!(ForceEvent {
     event_trb_pointer,
@@ -543,17 +331,7 @@ add_trb_with_default!(
     Type::NegotiateBandwidth
 );
 impl NegotiateBandwidth {
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(NegotiateBandwidth { slot_id });
 
@@ -563,17 +341,12 @@ add_trb_with_default!(
     Type::SetLatencyToleranceValue
 );
 impl SetLatencyToleranceValue {
-    /// Sets the value of the Best Effort Latency Tolerance Value field.
-    pub fn set_best_effort_latency_tolerance_value(&mut self, v: u16) -> &mut Self {
-        self.0[3].set_bits(16..=27, v.into());
-        self
-    }
-
-    /// Returns the value of the Best Effort Latency Tolerance Value field.
-    #[must_use]
-    pub fn best_effort_latency_tolerance_value(&self) -> u16 {
-        self.0[3].get_bits(16..=27).try_into().unwrap()
-    }
+    rw_field!(
+        [3](16..=27),
+        best_effort_latency_tolerance_value,
+        "Best Effort Latency Tolerance Value",
+        u16
+    );
 }
 impl_debug_for_trb!(SetLatencyToleranceValue {
     best_effort_latency_tolerance_value
@@ -613,30 +386,8 @@ impl GetPortBandwidth {
 
         (u << 32) | l
     }
-
-    /// Sets the value of the Dev Speed field.
-    pub fn set_dev_speed(&mut self, s: u8) -> &mut Self {
-        self.0[3].set_bits(16..=19, s.into());
-        self
-    }
-
-    /// Returns the value of the Dev Speed field.
-    #[must_use]
-    pub fn dev_speed(&self) -> u8 {
-        self.0[3].get_bits(16..=19).try_into().unwrap()
-    }
-
-    /// Sets the value of the Hub Slot ID field.
-    pub fn set_hub_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Hub Slot ID field.
-    #[must_use]
-    pub fn hub_slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!([3](16..=19), dev_speed, "Dev Speed", u8);
+    rw_field!([3](24..=31), hub_slot_id, "Hub Slot ID", u8);
 }
 impl_debug_for_trb!(GetPortBandwidth {
     port_bandwidth_context_pointer,
@@ -646,17 +397,7 @@ impl_debug_for_trb!(GetPortBandwidth {
 
 add_trb_with_default!(ForceHeader, "Force Header Command TRB", Type::ForceHeader);
 impl ForceHeader {
-    /// Sets the value of the Packet Type field.
-    pub fn set_packet_type(&mut self, t: u8) -> &mut Self {
-        self.0[0].set_bits(0..=4, t.into());
-        self
-    }
-
-    /// Returns the value of the Packet Type field.
-    #[must_use]
-    pub fn packet_type(&self) -> u8 {
-        self.0[0].get_bits(0..=4).try_into().unwrap()
-    }
+    rw_field!([0](0..=4), packet_type, "Packet Type", u8);
 
     /// Sets the value of the Header Info field.
     ///
@@ -681,17 +422,12 @@ impl ForceHeader {
         [self.0[0] & 0xffff_ffe0, self.0[1], self.0[2]]
     }
 
-    /// Sets the value of the Root Hub Port Number.
-    pub fn set_root_hub_port_number(&mut self, n: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, n.into());
-        self
-    }
-
-    /// Returns the value of the Root Hub Port Number.
-    #[must_use]
-    pub fn root_hub_port_number(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!(
+        [3](24..=31),
+        root_hub_port_number,
+        "Root Hub Port Number",
+        u8
+    );
 }
 impl_debug_for_trb!(ForceHeader {
     packet_type,
@@ -734,53 +470,15 @@ impl GetExtendedProperty {
         (u << 32) | l
     }
 
-    /// Sets the value of the Extended Capability Identifier field.
-    pub fn set_extended_capability_identifier(&mut self, eci: u16) -> &mut Self {
-        self.0[2].set_bits(0..=15, eci.into());
-        self
-    }
-
-    /// Returns the value of the Extended Capability Identifier field.
-    #[must_use]
-    pub fn extended_capability_identifier(&self) -> u16 {
-        self.0[2].get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Command Sub Type field.
-    pub fn set_command_sub_type(&mut self, t: u8) -> &mut Self {
-        self.0[3].set_bits(16..=18, t.into());
-        self
-    }
-
-    /// Returns the value of the Command Sub Type field.
-    #[must_use]
-    pub fn command_sub_type(&self) -> u8 {
-        self.0[3].get_bits(16..=18).try_into().unwrap()
-    }
-
-    /// Sets the value of the Endpoint ID field.
-    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(19..=23, i.into());
-        self
-    }
-
-    /// Returns the value of the Endpoint ID field.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(19..=23).try_into().unwrap()
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!(
+        [2](0..=15),
+        extended_capability_identifier,
+        "Extended Capability Identifier",
+        u16
+    );
+    rw_field!([3](16..=18), command_sub_type, "Command Sub Type", u8);
+    rw_field!([3](19..=23), endpoint_id, "Endpoint ID", u8);
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(GetExtendedProperty {
     extended_property_context_pointer,
@@ -796,65 +494,21 @@ add_trb_with_default!(
     Type::SetExtendedProperty
 );
 impl SetExtendedProperty {
-    /// Sets the value of the Extended Capability Identifier field.
-    pub fn set_extended_capability_identifier(&mut self, eci: u16) -> &mut Self {
-        self.0[2].set_bits(0..=15, eci.into());
-        self
-    }
-
-    /// Returns the value of the Extended Capability Identifier field.
-    #[must_use]
-    pub fn extended_capability_identifier(&self) -> u16 {
-        self.0[2].get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Capability Parameter field.
-    pub fn set_capability_parameter(&mut self, p: u8) -> &mut Self {
-        self.0[2].set_bits(15..=23, p.into());
-        self
-    }
-
-    /// Returns the value of the Capability Parameter field.
-    #[must_use]
-    pub fn capability_parameter(&self) -> u8 {
-        self.0[2].get_bits(15..=23).try_into().unwrap()
-    }
-
-    /// Sets the value of the Command Sub Type field.
-    pub fn set_command_sub_type(&mut self, t: u8) -> &mut Self {
-        self.0[3].set_bits(16..=18, t.into());
-        self
-    }
-
-    /// Returns the value of the Command Sub Type field.
-    #[must_use]
-    pub fn command_sub_type(&self) -> u8 {
-        self.0[3].get_bits(16..=18).try_into().unwrap()
-    }
-
-    /// Sets the value of the Endpoint ID field.
-    pub fn set_endpoint_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(19..=23, i.into());
-        self
-    }
-
-    /// Returns the value of the Endpoint ID field.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(19..=23).try_into().unwrap()
-    }
-
-    /// Sets the value of the Slot ID field.
-    pub fn set_slot_id(&mut self, i: u8) -> &mut Self {
-        self.0[3].set_bits(24..=31, i.into());
-        self
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    rw_field!(
+        [2](0..=15),
+        extended_capability_identifier,
+        "Extended Cpaability Identifier",
+        u16
+    );
+    rw_field!(
+        [2](16..=23),
+        capability_parameter,
+        "Capability Parameter",
+        u8
+    );
+    rw_field!([3](16..=18), command_sub_type, "Command Sub Type", u8);
+    rw_field!([3](19..=23), endpoint_id, "Endpoint ID", u8);
+    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(SetExtendedProperty {
     extended_capability_identifier,

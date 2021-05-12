@@ -102,11 +102,7 @@ reserved!(PortStatusChange(Type::PortStatusChange){
     [3]16..=31
 });
 impl PortStatusChange {
-    /// Returns the value of the Port ID field.
-    #[must_use]
-    pub fn port_id(&self) -> u8 {
-        self.0[0].get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!([0](24..=31), port_id, "Port ID", u8);
 }
 impl_debug_for_event_trb!(PortStatusChange { port_id });
 
@@ -126,29 +122,10 @@ impl TransferEvent {
         (u << 32) | l
     }
 
-    /// Returns the value of the TRB Transfer Length field.
-    #[must_use]
-    pub fn trb_transfer_length(&self) -> u32 {
-        self.0[2].get_bits(0..=23)
-    }
-
-    /// Returns the value of the Event Data field.
-    #[must_use]
-    pub fn event_data(&self) -> bool {
-        self.0[3].get_bit(2)
-    }
-
-    /// Returns the value of the Endpoint ID field.
-    #[must_use]
-    pub fn endpoint_id(&self) -> u8 {
-        self.0[3].get_bits(16..=20).try_into().unwrap()
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!([2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
+    ro_bit!([3](2), event_data, "Event Data");
+    ro_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
+    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(TransferEvent {
     trb_pointer,
@@ -177,23 +154,14 @@ impl CommandCompletion {
         (u << 32) | l
     }
 
-    /// Returns the value of the Command Completion Parameter field.
-    #[must_use]
-    pub fn command_completion_parameter(&self) -> u32 {
-        self.0[2].get_bits(0..=23)
-    }
-
-    /// Returns the value of the VF (Virtual Function) ID field.
-    #[must_use]
-    pub fn vf_id(&self) -> u8 {
-        self.0[3].get_bits(16..=23).try_into().unwrap()
-    }
-
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!(
+        [2](0..=23),
+        command_completion_parameter,
+        "Command Completion Parameter",
+        u32
+    );
+    ro_field!([3](16..=23), vf_id, "VF ID", u8);
+    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(CommandCompletion {
     command_trb_pointer,
@@ -215,11 +183,7 @@ reserved!(BandwidthRequest(Type::BandwidthRequest){
     [3]16..=23
 });
 impl BandwidthRequest {
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(BandwidthRequest { slot_id });
 
@@ -231,13 +195,15 @@ reserved!(Doorbell(Type::Doorbell){
     [3]1..=9
 });
 impl Doorbell {
-    /// Returns the value of the DB Reason field.
-    #[must_use]
-    pub fn db_reason(&self) -> u8 {
-        self.0[0].get_bits(0..=4).try_into().unwrap()
-    }
+    ro_field!([0](0..=4), db_reason, "DB Reason", u8);
+    ro_field!([3](16..=23), vf_id, "VF ID", u8);
+    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
-impl_debug_for_event_trb!(Doorbell { db_reason });
+impl_debug_for_event_trb!(Doorbell {
+    db_reason,
+    vf_id,
+    slot_id
+});
 
 event!(
     HostController,
@@ -266,11 +232,7 @@ reserved!(DeviceNotification(Type::DeviceNotification){
     [3]16..=31
 });
 impl DeviceNotification {
-    /// Returns the value of the Notification Type field.
-    #[must_use]
-    pub fn notification_type(&self) -> u8 {
-        self.0[0].get_bits(4..=7).try_into().unwrap()
-    }
+    ro_field!([0](4..=7), notification_type, "Notification Type", u8);
 
     /// Returns the value of the Device Notification Data field.
     #[must_use]
@@ -281,11 +243,7 @@ impl DeviceNotification {
         ((u << 32) | l) >> 8
     }
 
-    /// Returns the value of the Slot ID field.
-    #[must_use]
-    pub fn slot_id(&self) -> u8 {
-        self.0[3].get_bits(24..=31).try_into().unwrap()
-    }
+    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(DeviceNotification {
     notification_type,

@@ -29,12 +29,36 @@ allowed! {
 }
 impl Allowed {
     /// Sets the value of the Interrupt On Completion field.
-    pub fn set_interrupt_on_completion(&mut self, ioc: bool) {
+    pub fn set_interrupt_on_completion(&mut self) {
         macro_rules! arm{
             ($($variant:ident),*)=>{
                 match self {
                     $(Self::$variant(ref mut x)=>{
-                        x.set_interrupt_on_completion(ioc);
+                        x.set_interrupt_on_completion();
+                    },)*
+                }
+            };
+        }
+
+        arm!(
+            Normal,
+            SetupStage,
+            DataStage,
+            StatusStage,
+            Isoch,
+            Link,
+            EventData,
+            Noop
+        );
+    }
+
+    /// Clears the Interrupt On Completion bit.
+    pub fn clear_interrupt_on_completion(&mut self) {
+        macro_rules! arm{
+            ($($variant:ident),*)=>{
+                match self {
+                    $(Self::$variant(ref mut x)=>{
+                        x.clear_interrupt_on_completion();
                     },)*
                 }
             };
@@ -60,7 +84,7 @@ impl Allowed {
                 match self {
                     $(Self::$variant(x)=>{
                         x.interrupt_on_completion()
-                   },)*
+                    },)*
                 }
             };
         }
@@ -81,17 +105,7 @@ impl Allowed {
 macro_rules! interrupt_on_completion {
     ($name:ident) => {
         impl $name {
-            /// Sets the value of the Interrupt On Completion field.
-            pub fn set_interrupt_on_completion(&mut self, ioc: bool) -> &mut Self {
-                self.0[3].set_bit(5, ioc);
-                self
-            }
-
-            /// Returns the value of the Interrupt On Completion field.
-            #[must_use]
-            pub fn interrupt_on_completion(&self) -> bool {
-                self.0[3].get_bit(5)
-            }
+            rw_bit!([3](5), interrupt_on_completion, "Interrupt On Completion");
         }
     };
 }
@@ -114,7 +128,7 @@ macro_rules! impl_debug_for_transfer_trb{
         });
     };
     ($name:ident {
-        $($method:ident),*
+        $($method:ident),*$(,)?
     })=>{
         impl_debug_for_trb!($name{
             interrupt_on_completion,
@@ -144,93 +158,57 @@ impl Normal {
         (l << 32) | u
     }
 
-    /// Sets the value of the TRB Transfer Length field.
-    pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
-        self.0[2].set_bits(0..=16, l);
-        self
-    }
-
-    /// Returns the value of the TRB Transfer Length field.
-    #[must_use]
-    pub fn trb_transfer_length(&self) -> u32 {
-        self.0[2].get_bits(0..=16)
+    rw_field!([2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!([2](17..=21), td_size, "TD Size", u8);
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        [3](2),
+        interrupt_on_short_packet,
+        "Interrupt-on Short Packet"
+    );
+    rw_bit!([3](3), no_snoop, "No Snoop");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](6), immediate_data, "Immediate Data");
+    rw_bit!([3](9), block_event_interrupt, "Block Event Interrupt");
+}
+impl_debug_for_transfer_trb! {
+    Normal {
+        data_buffer_pointer,
+        trb_transfer_length,
+        td_size,
+        interrupter_target,
+        cycle_bit,
+        evaluate_next_trb,
+        interrupt_on_short_packet,
+        no_snoop,
+        chain_bit,
+        interrupt_on_completion,
+        immediate_data,
+        block_event_interrupt,
     }
 }
-impl_debug_for_transfer_trb!(Normal {
-    data_buffer_pointer,
-    trb_transfer_length
-});
 
 transfer_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
 impl SetupStage {
     /// Creates a new Setup Stage TRB.
     ///
-    /// This method sets the value of the TRB Type and the Immediate Data field properly. All the
+    /// This method sets the value of the TRB Type, TRB Transfer Length, and the Immediate Data field properly. All the
     /// other fields are set to 0.
     #[must_use]
     pub fn new() -> Self {
-        *Self([0; 4]).set_trb_type().set_idt()
+        *Self([0; 4])
+            .set_trb_type()
+            .set_idt()
+            .set_trb_transfer_length()
     }
 
-    /// Sets the value of the `bmRequestType` field.
-    pub fn set_request_type(&mut self, t: u8) -> &mut Self {
-        self.0[0].set_bits(0..=7, t.into());
-        self
-    }
-
-    /// Returns the value of the `bmRequestType` field.
-    #[must_use]
-    pub fn request_type(&self) -> u8 {
-        self.0[0].get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Sets the value of the bRequest field.
-    pub fn set_request(&mut self, r: u8) -> &mut Self {
-        self.0[0].set_bits(8..=15, r.into());
-        self
-    }
-
-    /// Returns the value of the bRequest field.
-    #[must_use]
-    pub fn request(&self) -> u8 {
-        self.0[0].get_bits(8..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the wValue field.
-    pub fn set_value(&mut self, v: u16) -> &mut Self {
-        self.0[0].set_bits(16..=31, v.into());
-        self
-    }
-
-    /// Returns the value of the wValue field.
-    #[must_use]
-    pub fn value(&self) -> u16 {
-        self.0[0].get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the wLength field.
-    pub fn set_length(&mut self, l: u16) -> &mut Self {
-        self.0[1].set_bits(16..=31, l.into());
-        self
-    }
-
-    /// Returns the value of the wLength field.
-    #[must_use]
-    pub fn length(&self) -> u16 {
-        self.0[1].get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the TRB Transfer Length field.
-    pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
-        self.0[2].set_bits(0..=16, l);
-        self
-    }
-
-    /// Returns the value of the TRB Transfer Length field.
-    #[must_use]
-    pub fn trb_transfer_length(&self) -> u32 {
-        self.0[2].get_bits(0..=16)
-    }
+    rw_field!([0](0..=7), request_type, "bmRequestType", u8);
+    rw_field!([0](8..=15), request, "bRequest", u8);
+    rw_field!([0](16..=31), value, "wValue", u16);
+    rw_field!([1](0..=15), index, "wIndex", u16);
+    rw_field!([1](16..=31), length, "wLength", u16);
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
 
     /// Sets the value of the Transfer Type field.
     pub fn set_transfer_type(&mut self, t: TransferType) -> &mut Self {
@@ -252,6 +230,11 @@ impl SetupStage {
         self.0[3].set_bit(6, true);
         self
     }
+
+    fn set_trb_transfer_length(&mut self) -> &mut Self {
+        self.0[2].set_bits(0..=16, 8);
+        self
+    }
 }
 impl Default for SetupStage {
     fn default() -> Self {
@@ -262,9 +245,10 @@ impl_debug_for_transfer_trb!(SetupStage {
     request_type,
     request,
     value,
+    index,
     length,
-    trb_transfer_length,
-    transfer_type
+    interrupt_on_completion,
+    transfer_type,
 });
 
 transfer_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
@@ -288,17 +272,18 @@ impl DataStage {
         (u << 32) | l
     }
 
-    /// Sets the value of the TRB Tranfer Length field.
-    pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
-        self.0[2].set_bits(0..=16, l);
-        self
-    }
-
-    /// Returns the value of the TRB Transfer Length field.
-    #[must_use]
-    pub fn trb_transfer_length(&self) -> u32 {
-        self.0[2].get_bits(0..=16)
-    }
+    rw_field!([2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!([2](17..=21), td_size, "TD Size", u8);
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        [3](2),
+        interrupt_on_short_packet,
+        "Interrupt-on Short Packet"
+    );
+    rw_bit!([3](3), no_snoop, "No Snoop");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](6), immediate_data, "Immediate Data");
 
     /// Sets the value of the Direction field.
     pub fn set_direction(&mut self, d: Direction) -> &mut Self {
@@ -315,11 +300,33 @@ impl DataStage {
 impl_debug_for_transfer_trb!(DataStage {
     data_buffer_pointer,
     trb_transfer_length,
+    td_size,
+    interrupter_target,
+    evaluate_next_trb,
+    interrupt_on_short_packet,
+    no_snoop,
+    chain_bit,
+    interrupt_on_completion,
+    immediate_data,
     direction
 });
 
 transfer_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
-impl_debug_for_transfer_trb!(StatusStage {});
+impl StatusStage {
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](16), direction, "Direction");
+}
+impl_debug_for_transfer_trb! {
+    StatusStage {
+        interrupter_target,
+        evaluate_next_trb,
+        chain_bit,
+        interrupt_on_completion,
+        direction,
+    }
+}
 
 transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
 impl Isoch {
@@ -342,161 +349,28 @@ impl Isoch {
         (u << 32) | l
     }
 
-    /// Sets the value of the TRB Transfer Length field.
-    pub fn set_trb_transfer_length(&mut self, l: u32) -> &mut Self {
-        self.0[2].set_bits(0..=16, l);
-        self
-    }
-
-    /// Returns the value of the TRB Transfer Length field.
-    #[must_use]
-    pub fn trb_transfer_length(&self) -> u32 {
-        self.0[2].get_bits(0..=16)
-    }
-
-    /// Sets the value of the TD Size/TBC field.
-    pub fn set_td_size_or_tbc(&mut self, t: u8) -> &mut Self {
-        self.0[2].set_bits(17..=21, t.into());
-        self
-    }
-
-    /// Returns the value of the TD Size/TBC field.
-    #[must_use]
-    pub fn td_size_or_tbc(&self) -> u8 {
-        self.0[2].get_bits(17..=21).try_into().unwrap()
-    }
-
-    /// Sets the value of the Interrupter Target.
-    pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {
-        self.0[2].set_bits(22..=31, t.into());
-        self
-    }
-
-    /// Returns the value of the Interrupter Target.
-    #[must_use]
-    pub fn interrupter_target(&self) -> u16 {
-        self.0[2].get_bits(22..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Evaluate Next TRB field.
-    pub fn set_evaluate_next_trb(&mut self, ent: bool) -> &mut Self {
-        self.0[3].set_bit(1, ent);
-        self
-    }
-
-    /// Returns the value of the Evaluate Next TRB field.
-    #[must_use]
-    pub fn evaluate_next_trb(&self) -> bool {
-        self.0[3].get_bit(1)
-    }
-
-    /// Sets the value of the Interrupt-on Short Packet field.
-    pub fn set_interrupt_on_short_packet(&mut self, isp: bool) -> &mut Self {
-        self.0[3].set_bit(2, isp);
-        self
-    }
-
-    /// Returns the value of the Interrupt-on Short Packet field.
-    #[must_use]
-    pub fn interrupt_on_short_packet(&self) -> bool {
-        self.0[3].get_bit(2)
-    }
-
-    /// Sets the value of the No Snoop field.
-    pub fn set_no_snoop(&mut self, s: bool) -> &mut Self {
-        self.0[3].set_bit(3, s);
-        self
-    }
-
-    /// Returns the value of the No Snoop field.
-    #[must_use]
-    pub fn no_snoop(&self) -> bool {
-        self.0[3].get_bit(3)
-    }
-
-    /// Sets the value of the Chain Bit field.
-    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
-        self.0[3].set_bit(4, b);
-        self
-    }
-
-    /// Returns the value of the Chain Bit field.
-    #[must_use]
-    pub fn chain_bit(&self) -> bool {
-        self.0[3].get_bit(4)
-    }
-
-    /// Sets the value of the Immediate Data field.
-    pub fn set_immediate_data(&mut self, idt: bool) -> &mut Self {
-        self.0[3].set_bit(6, idt);
-        self
-    }
-
-    /// Returns the value of the Immediate Data.
-    #[must_use]
-    pub fn immediate_data(&self) -> bool {
-        self.0[3].get_bit(6)
-    }
-
-    /// Sets the value of the Transfer Burst Count field.
-    pub fn set_transfer_burst_count(&mut self, c: u8) -> &mut Self {
-        self.0[3].set_bits(7..=8, c.into());
-        self
-    }
-
-    /// Returns the value of the Transfer Burst Count field.
-    #[must_use]
-    pub fn transfer_burst_count(&self) -> u8 {
-        self.0[3].get_bits(7..=8).try_into().unwrap()
-    }
-
-    /// Sets the value of the Block Event Interrupt field.
-    pub fn set_block_event_interrupt(&mut self, bei: bool) -> &mut Self {
-        self.0[3].set_bit(9, bei);
-        self
-    }
-
-    /// Returns the value of the Block Event Interrupt field.
-    #[must_use]
-    pub fn block_event_interrupt(&self) -> bool {
-        self.0[3].get_bit(9)
-    }
-
-    /// Sets the value of the Transfer Last Burst Packet Count field.
-    pub fn set_transfer_last_burst_packet_count(&mut self, c: u8) -> &mut Self {
-        self.0[3].set_bits(16..=19, c.into());
-        self
-    }
-
-    /// Returns the value of the Transfer Last Burst Packet Count field.
-    #[must_use]
-    pub fn transfer_last_burst_packet_count(&self) -> u8 {
-        self.0[3].get_bits(16..=19).try_into().unwrap()
-    }
-
-    /// Sets the value of the Frame ID field.
-    pub fn set_frame_id(&mut self, id: u16) -> &mut Self {
-        self.0[3].set_bits(20..=30, id.into());
-        self
-    }
-
-    /// Returns the value of the Frame ID field.
-    #[must_use]
-    pub fn frame_id(&self) -> u16 {
-        self.0[3].get_bits(20..=30).try_into().unwrap()
-    }
-
-    /// Sets the value of the Start Isoch ASAP field.
-    pub fn set_start_isoch_asap(&mut self, sia: bool) -> &mut Self {
-        self.0[3].set_bit(31, sia);
-        self
-    }
-
-    /// Returns the value of the Start Isoch ASAP field.
-    #[must_use]
-    pub fn start_isoch_asap(&self) -> bool {
-        self.0[3].get_bit(31)
-    }
+    rw_field!([2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!([2](17..=21), td_size_or_tbc, "TD Size/TBC", u8);
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        [3](2),
+        interrupt_on_short_packet,
+        "Interrupt on Short Packet"
+    );
+    rw_bit!([3](3), no_snoop, "No Snoop");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](6), immediate_data, "Immediate Data");
+    rw_field!([3](7..=8), transfer_burst_count, "Transfer Burst Count", u8);
+    rw_bit!([3](9), block_event_interrupt, "Block Event Interrupt");
+    rw_field!(
+        [3](16..=19),
+        transfer_last_burst_packet_count,
+        "Transfer Last Burst Packet Count",
+        u8
+    );
+    rw_field!([3](20..=30), frame_id, "Frame ID", u16);
+    rw_bit!([3](31), start_isoch_asap, "Start Isoch ASAP");
 }
 impl_debug_for_transfer_trb!(Isoch {
     data_buffer_pointer,
@@ -536,53 +410,10 @@ impl EventData {
         (u << 32) | l
     }
 
-    /// Sets the value of the Interrupter Target field.
-    pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {
-        self.0[2].set_bits(22..=31, t.into());
-        self
-    }
-
-    /// Returns the value of the Interrupter Target field.
-    #[must_use]
-    pub fn interrupter_target(&self) -> u16 {
-        self.0[2].get_bits(22..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Evaluate Next TRB field.
-    pub fn set_evaluate_next_trb(&mut self, ent: bool) -> &mut Self {
-        self.0[3].set_bit(1, ent);
-        self
-    }
-
-    /// Returns the value of the Evaluate Next TRB field.
-    #[must_use]
-    pub fn evaluate_next_trb(&self) -> bool {
-        self.0[3].get_bit(1)
-    }
-
-    /// Sets the value of the Chain Bit field.
-    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
-        self.0[3].set_bit(4, b);
-        self
-    }
-
-    /// Returns the value of the Chain Bit field.
-    #[must_use]
-    pub fn chain_bit(&self) -> bool {
-        self.0[3].get_bit(4)
-    }
-
-    /// Sets the value of the Block Event Interrupt field.
-    pub fn set_block_event_interrupt(&mut self, bei: bool) -> &mut Self {
-        self.0[3].set_bit(9, bei);
-        self
-    }
-
-    /// Returns the value of the Block Event Interrupt field.
-    #[must_use]
-    pub fn block_event_interrupt(&self) -> bool {
-        self.0[3].get_bit(9)
-    }
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!([3](4), chain_bit, "Chain bit");
+    rw_bit!([3](9), block_event_interrupt, "Block Event Interrupt");
 }
 impl_debug_for_transfer_trb!(EventData {
     event_data,
@@ -594,41 +425,9 @@ impl_debug_for_transfer_trb!(EventData {
 
 transfer_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
 impl Noop {
-    /// Sets the value of the Interrupter Target.
-    pub fn set_interrupter_target(&mut self, t: u16) -> &mut Self {
-        self.0[2].set_bits(22..=31, t.into());
-        self
-    }
-
-    /// Returns the value of the Interrupter Target.
-    #[must_use]
-    pub fn interrupter_target(&self) -> u16 {
-        self.0[2].get_bits(22..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Evaluate Next TRB field.
-    pub fn set_evaluate_next_trb(&mut self, ent: bool) -> &mut Self {
-        self.0[3].set_bit(1, ent);
-        self
-    }
-
-    /// Returns the value of the Evaluate Next TRB field.
-    #[must_use]
-    pub fn evaluate_next_trb(&self) -> bool {
-        self.0[3].get_bit(1)
-    }
-
-    /// Sets the value of the Chain Bit field.
-    pub fn set_chain_bit(&mut self, b: bool) -> &mut Self {
-        self.0[3].set_bit(4, b);
-        self
-    }
-
-    /// Returns the value of the Chain Bit field.
-    #[must_use]
-    pub fn chain_bit(&self) -> bool {
-        self.0[3].get_bit(4)
-    }
+    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!([3](4), chain_bit, "Chain bit");
 }
 impl_debug_for_transfer_trb!(Noop {
     interrupter_target,

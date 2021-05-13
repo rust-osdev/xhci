@@ -38,7 +38,6 @@
 
 #![no_std]
 #![deny(
-    warnings,
     rustdoc::all,
     missing_docs,
     elided_lifetimes_in_paths,

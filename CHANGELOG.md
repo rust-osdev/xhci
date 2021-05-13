@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Fixed
+- Outdated code example in `README.md` is fixed.
 
 ## 0.8.2 - 2021-05-13
 ### Removed

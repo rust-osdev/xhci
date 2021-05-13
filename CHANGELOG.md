@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.8.2 - 2021-05-13
 ### Removed
 - `#![deny(warnings)]` is removed from the source code.
 

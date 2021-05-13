@@ -18,6 +18,8 @@ This crate is `#![no_std]` compatible.
 let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
 let o = &mut r.operational;
 
-o.usbcmd.update(|u| u.set_run_stop(true));
+o.usbcmd.update(|u| {
+    u.set_run_stop();
+});
 while o.usbsts.read().hc_halted() {}
 ```

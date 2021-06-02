@@ -12,7 +12,7 @@ Users can use this library to implement a USB device deriver on your own OS.
 
 This crate is `#![no_std]` compatible.
 
-# Examples
+## Examples
 
 ```rust
 let mut r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };

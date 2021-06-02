@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- License and contribution notes are added to the README.
+
 ### Fixed
 - Outdated code example in `README.md` is fixed.
 

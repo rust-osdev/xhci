@@ -118,7 +118,7 @@ macro_rules! rw1c_bit {
             #[doc = "bit."]
             pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
-                self.0[$offset].set_bit($bit,true);
+                self.0[$offset].set_bit($bit,false);
                 self
             }
         }
@@ -131,7 +131,7 @@ macro_rules! rw1c_bit {
             #[doc = "bit."]
             pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
-                self.0.set_bit($bit,true);
+                self.0.set_bit($bit,false);
                 self
             }
         }

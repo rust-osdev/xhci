@@ -243,7 +243,7 @@ pub enum BitRate {
 pub enum PsiType {
     /// Symmetric.
     ///
-    /// single::ReadWrite DSI Dword.
+    /// Single DSI Dword.
     Symmetric = 0,
     /// Asymmetric Rx.
     ///

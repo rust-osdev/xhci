@@ -233,7 +233,7 @@ pub trait InputControlHandler: AsRef<[u32]> + AsMut<[u32]> {
         assert!(
             i <= 31,
             "The index of Add Context flag must be less than 32."
-        )
+        );
     }
 }
 

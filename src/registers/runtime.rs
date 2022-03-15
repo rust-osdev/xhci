@@ -1,6 +1,8 @@
 //! Host Controller Runtime Registers.
 
 use super::capability::RuntimeRegisterSpaceOffset;
+use accessor::array;
+use accessor::single;
 use accessor::Mapper;
 use core::convert::TryFrom;
 use core::convert::TryInto;
@@ -15,7 +17,7 @@ where
     M: Mapper,
 {
     /// Microframe Index Register
-    pub mfindex: accessor::Single<MicroframeIndexRegister, M>,
+    pub mfindex: single::ReadWrite<MicroframeIndexRegister, M>,
 }
 impl<M> Runtime<M>
 where
@@ -35,7 +37,7 @@ where
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap();
 
         Self {
-            mfindex: accessor::Single::new(base, mapper),
+            mfindex: single::ReadWrite::new(base, mapper),
         }
     }
 }
@@ -85,7 +87,7 @@ impl InterruptRegisterSet {
         mmio_base: usize,
         rtoff: RuntimeRegisterSpaceOffset,
         mapper: M,
-    ) -> accessor::Array<Self, M>
+    ) -> array::ReadWrite<Self, M>
     where
         M: Mapper,
     {
@@ -93,7 +95,7 @@ impl InterruptRegisterSet {
 
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
 
-        accessor::Array::new(base, NUM_INTERRUPT_REGISTER_SET, mapper)
+        array::ReadWrite::new(base, NUM_INTERRUPT_REGISTER_SET, mapper)
     }
 }
 

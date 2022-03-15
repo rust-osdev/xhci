@@ -1,6 +1,8 @@
 //! Host Controller Operational Registers
 
 use super::capability::{Capability, CapabilityRegistersLength};
+use accessor::array;
+use accessor::single;
 use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryFrom;
@@ -17,19 +19,19 @@ where
     M: Mapper + Clone,
 {
     /// USB Command Register
-    pub usbcmd: accessor::Single<UsbCommandRegister, M>,
+    pub usbcmd: single::ReadWrite<UsbCommandRegister, M>,
     /// USB Status Register
-    pub usbsts: accessor::Single<UsbStatusRegister, M>,
+    pub usbsts: single::ReadWrite<UsbStatusRegister, M>,
     /// Page Size Register
-    pub pagesize: accessor::Single<PageSizeRegister, M>,
+    pub pagesize: single::ReadWrite<PageSizeRegister, M>,
     /// Device Notification Control
-    pub dnctrl: accessor::Single<DeviceNotificationControl, M>,
+    pub dnctrl: single::ReadWrite<DeviceNotificationControl, M>,
     /// Command Ring Control Register
-    pub crcr: accessor::Single<CommandRingControlRegister, M>,
+    pub crcr: single::ReadWrite<CommandRingControlRegister, M>,
     /// Device Context Base Address Array Pointer Register
-    pub dcbaap: accessor::Single<DeviceContextBaseAddressArrayPointerRegister, M>,
+    pub dcbaap: single::ReadWrite<DeviceContextBaseAddressArrayPointerRegister, M>,
     /// Configure Register
-    pub config: accessor::Single<ConfigureRegister, M>,
+    pub config: single::ReadWrite<ConfigureRegister, M>,
 }
 impl<M> Operational<M>
 where
@@ -54,7 +56,7 @@ where
 
         macro_rules! m {
             ($offset:expr) => {
-                accessor::Single::new(base + $offset, mapper.clone())
+                single::ReadWrite::new(base + $offset, mapper.clone())
             };
         }
 
@@ -315,15 +317,19 @@ impl PortRegisterSet {
         mmio_base: usize,
         capability: &Capability<M2>,
         mapper: M1,
-    ) -> accessor::Array<Self, M1>
+    ) -> array::ReadWrite<Self, M1>
     where
         M1: Mapper,
         M2: Mapper + Clone,
     {
-        let base = mmio_base + usize::from(capability.caplength.read().get()) + 0x400;
-        accessor::Array::new(
+        let base = mmio_base + usize::from(capability.caplength.read_volatile().get()) + 0x400;
+        array::ReadWrite::new(
             base,
-            capability.hcsparams1.read().number_of_ports().into(),
+            capability
+                .hcsparams1
+                .read_volatile()
+                .number_of_ports()
+                .into(),
             mapper,
         )
     }

@@ -1,8 +1,7 @@
 //! USB Legacy Support Capability
 
 use super::ExtendedCapability;
-use accessor::Mapper;
-use accessor::Single;
+use accessor::{single, Mapper};
 
 /// USB Legacy Support Capability.
 #[derive(Debug)]
@@ -11,9 +10,9 @@ where
     M: Mapper + Clone,
 {
     /// The first 4 byte of USB Legacy Support Capability.
-    pub usblegsup: Single<LegSup, M>,
+    pub usblegsup: single::ReadWrite<LegSup, M>,
     /// USB Legacy Support Control/Status.
-    pub usblegctlsts: Single<UsbLegacySupportControlStatus, M>,
+    pub usblegctlsts: single::ReadWrite<UsbLegacySupportControlStatus, M>,
 }
 impl<M> UsbLegacySupport<M>
 where
@@ -31,8 +30,8 @@ where
     ///
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, m: M) -> Self {
-        let usblegsup = Single::new(base, m.clone());
-        let usblegctlsts = Single::new(base, m);
+        let usblegsup = single::ReadWrite::new(base, m.clone());
+        let usblegctlsts = single::ReadWrite::new(base, m);
 
         Self {
             usblegsup,

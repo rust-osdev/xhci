@@ -1,6 +1,7 @@
 //! Doorbell Register
 
 use super::capability::Capability;
+use accessor::array;
 use accessor::Mapper;
 use core::{convert::TryFrom, fmt};
 
@@ -23,15 +24,19 @@ impl Register {
         mmio_base: usize,
         capability: &Capability<M2>,
         mapper: M1,
-    ) -> accessor::Array<Self, M1>
+    ) -> array::ReadWrite<Self, M1>
     where
         M1: Mapper,
         M2: Mapper + Clone,
     {
-        let base = mmio_base + usize::try_from(capability.dboff.read().get()).unwrap();
-        accessor::Array::new(
+        let base = mmio_base + usize::try_from(capability.dboff.read_volatile().get()).unwrap();
+        array::ReadWrite::new(
             base,
-            capability.hcsparams1.read().number_of_device_slots().into(),
+            capability
+                .hcsparams1
+                .read_volatile()
+                .number_of_device_slots()
+                .into(),
             mapper,
         )
     }

@@ -1,8 +1,8 @@
 //! Debug Capability.
 
 use super::ExtendedCapability;
+use accessor::single;
 use accessor::Mapper;
-use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 
@@ -13,27 +13,27 @@ where
     M: Mapper + Clone,
 {
     /// Capability ID.
-    pub dcid: Single<Id, M>,
+    pub dcid: single::ReadWrite<Id, M>,
     /// Doorbell.
-    pub dcdb: Single<Doorbell, M>,
+    pub dcdb: single::ReadWrite<Doorbell, M>,
     /// Event Ring Segment Table Size.
-    pub dcerstsz: Single<EventRingSegmentTableSize, M>,
+    pub dcerstsz: single::ReadWrite<EventRingSegmentTableSize, M>,
     /// Event Ring Segment Table Base Address.
-    pub dcerstba: Single<EventRingSegmentTableBaseAddress, M>,
+    pub dcerstba: single::ReadWrite<EventRingSegmentTableBaseAddress, M>,
     /// Event Ring Dequeue Pointer.
-    pub dcerdp: Single<EventRingDequeuePointer, M>,
+    pub dcerdp: single::ReadWrite<EventRingDequeuePointer, M>,
     /// Control.
-    pub dcctrl: Single<Control, M>,
+    pub dcctrl: single::ReadWrite<Control, M>,
     /// Status.
-    pub dcst: Single<Status, M>,
+    pub dcst: single::ReadWrite<Status, M>,
     /// Port Status and Control.
-    pub dcportsc: Single<PortStatusAndControl, M>,
+    pub dcportsc: single::ReadWrite<PortStatusAndControl, M>,
     /// Debug Capability Context Pointer.
-    pub dccp: Single<ContextPointer, M>,
+    pub dccp: single::ReadWrite<ContextPointer, M>,
     /// Device Descriptor Info Register 1.
-    pub dcddi1: Single<DeviceDescriptorInfo1, M>,
+    pub dcddi1: single::ReadWrite<DeviceDescriptorInfo1, M>,
     /// Device Descriptor Info Register 2.
-    pub dcddi2: Single<DeviceDescriptorInfo2, M>,
+    pub dcddi2: single::ReadWrite<DeviceDescriptorInfo2, M>,
 }
 impl<M> Debug<M>
 where
@@ -52,7 +52,7 @@ where
     pub unsafe fn new(base: usize, mapper: &M) -> Self {
         macro_rules! m {
             ($offset:expr) => {
-                Single::new(base + $offset, mapper.clone())
+                single::ReadWrite::new(base + $offset, mapper.clone())
             };
         }
 

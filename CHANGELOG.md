@@ -3,6 +3,7 @@
 ## Unreleased - ReleaseDate
 ### Added
 - License and contribution notes are added to the README.
+- Dependabot is enabled.
 
 ### Fixed
 - Outdated code example in `README.md` is fixed.

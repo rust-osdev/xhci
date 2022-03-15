@@ -53,8 +53,8 @@
 //! ```
 
 use super::registers::capability::CapabilityParameters1;
+use accessor::single;
 use accessor::Mapper;
-use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 use debug::Debug;
@@ -185,7 +185,7 @@ where
         let current = self.current?;
 
         // SAFETY: `Iter::new` guarantees that `self.current` is the correct address.
-        let h: Header = unsafe { accessor::Single::new(current, self.m.clone()) }.read();
+        let h: Header = unsafe { single::ReadWrite::new(current, self.m.clone()) }.read_volatile();
 
         self.current = if h.next() == 0 {
             None
@@ -217,7 +217,7 @@ where
     /// xHCI Supported Protocol Capability.
     XhciSupportedProtocol(XhciSupportedProtocol<M>),
     /// HCI Extended Power Management Capability.
-    HciExtendedPowerManagementCapability(Single<HciExtendedPowerManagement, M>),
+    HciExtendedPowerManagementCapability(single::ReadWrite<HciExtendedPowerManagement, M>),
     /// xHCI Message Interrupt Capability.
     XhciMessageInterrupt(XhciMessageInterrupt<M>),
     /// xHCI Local Memory Capability.
@@ -225,7 +225,7 @@ where
     /// Debug Capability.
     Debug(Debug<M>),
     /// xHCI Extended Message Interrupt.
-    XhciExtendedMessageInterrupt(Single<XhciExtendedMessageInterrupt, M>),
+    XhciExtendedMessageInterrupt(single::ReadWrite<XhciExtendedMessageInterrupt, M>),
 }
 impl<M> ExtendedCapability<M>
 where
@@ -242,13 +242,13 @@ where
             Ty::UsbLegacySupport => UsbLegacySupport::new(base, m).into(),
             Ty::SupportedProtocol => XhciSupportedProtocol::new(base, m).into(),
             Ty::ExtendedPowerManagement => {
-                Single::<HciExtendedPowerManagement, M>::new(base, m).into()
+                single::ReadWrite::<HciExtendedPowerManagement, M>::new(base, m).into()
             }
             Ty::MessageInterrupt => XhciMessageInterrupt::new(base, m).into(),
             Ty::LocalMemory => XhciLocalMemory::new(base, m)?.into(),
             Ty::UsbDebugCapability => Debug::new(base, &m).into(),
             Ty::ExtendedMessageInterrupt => {
-                Single::<XhciExtendedMessageInterrupt, M>::new(base, m).into()
+                single::ReadWrite::<XhciExtendedMessageInterrupt, M>::new(base, m).into()
             }
         };
 

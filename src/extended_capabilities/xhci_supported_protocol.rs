@@ -1,9 +1,7 @@
 //! xHCI Supported Protocol Capability
 
 use super::ExtendedCapability;
-use accessor::Array;
-use accessor::Mapper;
-use accessor::Single;
+use accessor::{array, single, Mapper};
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
@@ -16,12 +14,12 @@ where
     M: Mapper + Clone,
 {
     /// The first 16 bytes of xHCI Supported Protocol Capability.
-    pub header: Single<Header, M>,
+    pub header: single::ReadWrite<Header, M>,
     /// Protocol Speed IDs.
     ///
     /// This field is `None` is `PSIC == 0`. Refer to 7.2.2.1.2 of the xHCI requirements
     /// specification for more information.
-    pub psis: Option<Array<ProtocolSpeedId, M>>,
+    pub psis: Option<array::ReadWrite<ProtocolSpeedId, M>>,
 }
 impl<M> XhciSupportedProtocol<M>
 where
@@ -37,10 +35,10 @@ where
     ///
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, mapper: M) -> Self {
-        let header: Single<Header, M> = Single::new(base, mapper.clone());
-        let len = header.read().protocol_speed_id_count();
+        let header: single::ReadWrite<Header, M> = single::ReadWrite::new(base, mapper.clone());
+        let len = header.read_volatile().protocol_speed_id_count();
         let psis = if len > 0 {
-            Some(Array::new(base + 0x10, len.into(), mapper))
+            Some(array::ReadWrite::new(base + 0x10, len.into(), mapper))
         } else {
             None
         };
@@ -245,7 +243,7 @@ pub enum BitRate {
 pub enum PsiType {
     /// Symmetric.
     ///
-    /// Single DSI Dword.
+    /// single::ReadWrite DSI Dword.
     Symmetric = 0,
     /// Asymmetric Rx.
     ///

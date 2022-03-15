@@ -1,5 +1,6 @@
 //! Host Controller Capability Registers
 
+use accessor::single;
 use accessor::Mapper;
 use bit_field::BitField;
 
@@ -10,25 +11,25 @@ where
     M: Mapper + Clone,
 {
     /// Capability Registers Length
-    pub caplength: accessor::Single<CapabilityRegistersLength, M>,
+    pub caplength: single::ReadWrite<CapabilityRegistersLength, M>,
     /// Host Controller Interface Version Number
-    pub hciversion: accessor::Single<InterfaceVersionNumber, M>,
+    pub hciversion: single::ReadWrite<InterfaceVersionNumber, M>,
     /// Structural Parameters 1
-    pub hcsparams1: accessor::Single<StructuralParameters1, M>,
+    pub hcsparams1: single::ReadWrite<StructuralParameters1, M>,
     /// Structural Parameters 2
-    pub hcsparams2: accessor::Single<StructuralParameters2, M>,
+    pub hcsparams2: single::ReadWrite<StructuralParameters2, M>,
     /// Structural Parameters 3
-    pub hcsparams3: accessor::Single<StructuralParameters3, M>,
+    pub hcsparams3: single::ReadWrite<StructuralParameters3, M>,
     /// Capability Parameters 1
-    pub hccparams1: accessor::Single<CapabilityParameters1, M>,
+    pub hccparams1: single::ReadWrite<CapabilityParameters1, M>,
     /// Doorbell Offset
-    pub dboff: accessor::Single<DoorbellOffset, M>,
+    pub dboff: single::ReadWrite<DoorbellOffset, M>,
     /// Runtime Register Space Offset
-    pub rtsoff: accessor::Single<RuntimeRegisterSpaceOffset, M>,
+    pub rtsoff: single::ReadWrite<RuntimeRegisterSpaceOffset, M>,
     /// Capability Parameters 2
-    pub hccparams2: accessor::Single<CapabilityParameters2, M>,
+    pub hccparams2: single::ReadWrite<CapabilityParameters2, M>,
     /// Virtualization Based Trusted IO Register Space Offset
-    pub vtiosoff: accessor::Single<VirtualizationBasedTrustedIoRegisterSpaceOffset, M>,
+    pub vtiosoff: single::ReadWrite<VirtualizationBasedTrustedIoRegisterSpaceOffset, M>,
 }
 impl<M> Capability<M>
 where
@@ -50,7 +51,7 @@ where
     {
         macro_rules! m {
             ($offset:expr) => {
-                accessor::Single::new(mmio_base + $offset, mapper.clone())
+                single::ReadWrite::new(mmio_base + $offset, mapper.clone())
             };
         }
 

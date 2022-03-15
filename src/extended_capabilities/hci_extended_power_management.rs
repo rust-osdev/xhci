@@ -1,8 +1,7 @@
 //! HCI Extended Power Management Capability.
 
 use super::ExtendedCapability;
-use accessor::Mapper;
-use accessor::Single;
+use accessor::{single, Mapper};
 
 /// HCI Extended Power Management Capability.
 #[derive(Copy, Clone, Debug)]
@@ -19,11 +18,11 @@ pub struct HciExtendedPowerManagement {
     /// Data.
     pub data: Data,
 }
-impl<M> From<Single<HciExtendedPowerManagement, M>> for ExtendedCapability<M>
+impl<M> From<single::ReadWrite<HciExtendedPowerManagement, M>> for ExtendedCapability<M>
 where
     M: Mapper + Clone,
 {
-    fn from(h: Single<HciExtendedPowerManagement, M>) -> Self {
+    fn from(h: single::ReadWrite<HciExtendedPowerManagement, M>) -> Self {
         ExtendedCapability::HciExtendedPowerManagementCapability(h)
     }
 }

@@ -1,8 +1,8 @@
 //! xHCI Message Interrupt Capability.
 
 use super::ExtendedCapability;
+use accessor::single;
 use accessor::Mapper;
-use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryFrom;
 use core::convert::TryInto;
@@ -14,9 +14,9 @@ where
     M: Mapper,
 {
     /// xHCI Message Interrupt Capability with the 32-bit Message Address.
-    Addr32(Single<Internal<u32>, M>),
+    Addr32(single::ReadWrite<Internal<u32>, M>),
     /// xHCI Message Interrupt Capability with the 64-bit Message Address.
-    Addr64(Single<Internal<u64>, M>),
+    Addr64(single::ReadWrite<Internal<u64>, M>),
 }
 impl<M> XhciMessageInterrupt<M>
 where
@@ -32,12 +32,13 @@ where
     ///
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, mapper: M) -> Self {
-        let control: Single<MessageControl, M> = Single::new(base + 2, mapper.clone());
+        let control: single::ReadWrite<MessageControl, M> =
+            single::ReadWrite::new(base + 2, mapper.clone());
 
-        if control.read().bit64_address_capable() {
-            Self::Addr64(Single::new(base, mapper))
+        if control.read_volatile().bit64_address_capable() {
+            Self::Addr64(single::ReadWrite::new(base, mapper))
         } else {
-            Self::Addr32(Single::new(base, mapper))
+            Self::Addr32(single::ReadWrite::new(base, mapper))
         }
     }
 }

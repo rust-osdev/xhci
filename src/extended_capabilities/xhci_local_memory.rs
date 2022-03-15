@@ -1,9 +1,7 @@
 //! xHCI Local Memory Capability.
 
 use super::ExtendedCapability;
-use accessor::Array;
-use accessor::Mapper;
-use accessor::Single;
+use accessor::{array, single, Mapper};
 use bit_field::BitField;
 use core::convert::TryInto;
 
@@ -14,9 +12,9 @@ where
     M: Mapper + Clone,
 {
     /// The header of this Capability.
-    pub header: Single<Header, M>,
+    pub header: single::ReadWrite<Header, M>,
     /// The Local Memory.
-    pub memory: Array<u8, M>,
+    pub memory: array::ReadWrite<u8, M>,
 }
 impl<M> XhciLocalMemory<M>
 where
@@ -37,11 +35,11 @@ where
     ///
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, mapper: M) -> Option<Self> {
-        let header: Single<Header, M> = Single::new(base, mapper.clone());
-        let size = header.read().size();
+        let header: single::ReadWrite<Header, M> = single::ReadWrite::new(base, mapper.clone());
+        let size = header.read_volatile().size();
 
         if size > 0 {
-            let memory = Array::new(base + 8, (size * 1024).try_into().unwrap(), mapper);
+            let memory = array::ReadWrite::new(base + 8, (size * 1024).try_into().unwrap(), mapper);
 
             Some(Self { header, memory })
         } else {

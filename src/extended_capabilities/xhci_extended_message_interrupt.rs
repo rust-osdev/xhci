@@ -1,8 +1,8 @@
 //! xHCI Extended Message Interrupt Capability.
 
 use super::ExtendedCapability;
+use accessor::single;
 use accessor::Mapper;
-use accessor::Single;
 use bit_field::BitField;
 use core::convert::TryInto;
 
@@ -19,11 +19,11 @@ pub struct XhciExtendedMessageInterrupt {
     /// Table Offset and BIR.
     pub table_offset: TableOffset,
 }
-impl<M> From<Single<XhciExtendedMessageInterrupt, M>> for ExtendedCapability<M>
+impl<M> From<single::ReadWrite<XhciExtendedMessageInterrupt, M>> for ExtendedCapability<M>
 where
     M: Mapper + Clone,
 {
-    fn from(x: Single<XhciExtendedMessageInterrupt, M>) -> Self {
+    fn from(x: single::ReadWrite<XhciExtendedMessageInterrupt, M>) -> Self {
         ExtendedCapability::XhciExtendedMessageInterrupt(x)
     }
 }

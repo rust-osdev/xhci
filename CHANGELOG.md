@@ -7,6 +7,7 @@
 
 ### Fixed
 - Outdated code example in `README.md` is fixed.
+- Removed all the use of deprecated code.
 
 ## 0.8.2 - 2021-05-13
 ### Removed

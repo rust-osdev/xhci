@@ -1,5 +1,6 @@
 //! xHCI registers
 
+use accessor::array;
 use accessor::Mapper;
 
 pub use capability::Capability;
@@ -21,15 +22,15 @@ where
     /// Host Controller Capability Register
     pub capability: Capability<M>,
     /// Doorbell Array
-    pub doorbell: accessor::Array<doorbell::Register, M>,
+    pub doorbell: array::ReadWrite<doorbell::Register, M>,
     /// Host Controller Operational Register
     pub operational: Operational<M>,
     /// Port Register Set Array
-    pub port_register_set: accessor::Array<PortRegisterSet, M>,
+    pub port_register_set: array::ReadWrite<PortRegisterSet, M>,
     /// Runtime Registers
     pub runtime: Runtime<M>,
     /// Interrupt Register Set Array
-    pub interrupt_register_set: accessor::Array<InterruptRegisterSet, M>,
+    pub interrupt_register_set: array::ReadWrite<InterruptRegisterSet, M>,
 }
 impl<M> Registers<M>
 where
@@ -75,11 +76,12 @@ where
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
         let capability = Capability::new(mmio_base, &mapper);
         let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone());
-        let operational = Operational::new(mmio_base, capability.caplength.read(), &mapper);
+        let operational =
+            Operational::new(mmio_base, capability.caplength.read_volatile(), &mapper);
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
-        let runtime = Runtime::new(mmio_base, capability.rtsoff.read(), mapper.clone());
+        let runtime = Runtime::new(mmio_base, capability.rtsoff.read_volatile(), mapper.clone());
         let interrupt_register_set =
-            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read(), mapper);
+            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read_volatile(), mapper);
 
         Self {
             capability,

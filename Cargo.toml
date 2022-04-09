@@ -2,7 +2,7 @@
 name = "xhci"
 version = "0.8.2"
 authors = ["Hiroki Tokunaga <tokusan441@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "A library to handle xHCI"
 repository = "https://github.com/rust-osdev/xhci"

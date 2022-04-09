@@ -5,6 +5,9 @@
 - License and contribution notes are added to the README.
 - Dependabot is enabled.
 
+### Changed
+- Switched to Rust edition 2021.
+
 ### Fixed
 - Outdated code example in `README.md` is fixed.
 - Removed all the use of deprecated code.

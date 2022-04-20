@@ -11,6 +11,7 @@
 ### Fixed
 - Outdated code example in `README.md` is fixed.
 - Removed all the use of deprecated code.
+- Wrong masking in `EventRingDequeuePointerRegister::event_ring_dequeue_pointer` is fixed.
 
 ## 0.8.2 - 2021-05-13
 ### Removed

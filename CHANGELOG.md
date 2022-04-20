@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.8.3 - 2022-04-20
 ### Added
 - License and contribution notes are added to the README.
 - Dependabot is enabled.

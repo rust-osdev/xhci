@@ -1,8 +1,10 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.8.4 - 2022-05-29
 ### Fixed
-- Wrong bit range in `StructuralParameters2::max_scratchpad_buffers` is fixed .
+- Wrong bit range in `StructuralParameters2::max_scratchpad_buffers` is fixed.
 
 ## 0.8.3 - 2022-04-20
 ### Added

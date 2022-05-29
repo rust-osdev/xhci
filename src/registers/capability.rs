@@ -154,7 +154,7 @@ impl StructuralParameters2 {
     }
 
     fn max_scratchpad_buffers_hi(self) -> u32 {
-        self.0.get_bits(20..=25)
+        self.0.get_bits(21..=25)
     }
 
     fn max_scratchpad_buffers_lo(self) -> u32 {

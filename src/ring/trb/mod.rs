@@ -3,6 +3,12 @@
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
+use paste;
+
+pub(super) trait InternalTryFrom<T>: Sized {
+    type Error;
+    fn internal_try_from(raw: [u32; 4]) -> Result<Self, Self::Error>;
+}
 
 macro_rules! reserved{
     ($name:ident($ty:expr) {
@@ -25,7 +31,30 @@ macro_rules! reserved{
                 Ok(Self(raw))
             }
         }
-    }
+    };
+}
+macro_rules! reserved_internal {
+    ($name:ident($ty:expr) {
+        $([$index:expr] $range:expr);* $(;)*
+    })=>{
+        impl InternalTryFrom<[u32;4]> for $name{
+            type Error=[u32;4];
+
+            fn internal_try_from(raw:[u32;4])->Result<Self,Self::Error>{
+                use crate::ring::trb::Type;
+
+                $(if raw[$index].get_bits($range) != 0{
+                    return Err(raw);
+                })*
+
+                if raw[3].get_bits(10..=15)!=$ty as _ {
+                    return Err(raw);
+                }
+
+                Ok(Self(raw))
+            }
+        }
+    };
 }
 macro_rules! add_trb {
     ($name:ident,$full:expr,$ty:expr) => {
@@ -176,6 +205,13 @@ pub mod transfer;
 pub const BYTES: usize = 16;
 
 add_trb_with_default!(Link, "Link TRB", Type::Link);
+reserved_internal!(Link(Type::Link){
+    [0]0..=3;
+    [2]0..=21;
+    [3]2..=3;
+    [3]6..=9;
+    [3]16..=31;
+});
 impl Link {
     /// Sets the value of the Ring Segment Pointer field.
     ///

@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+- Add new functions that can extract source TRB from Event TRB.
+    - `CommandCompletion::get_source_command_trb`
+    - `TranferEvent::get_source_tranfer_trb`
 
 ## 0.8.4 - 2022-05-29
 ### Fixed

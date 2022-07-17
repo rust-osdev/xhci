@@ -1,5 +1,7 @@
 //! Event TRBs.
 
+use super::command::Allowed as CommandTrb;
+use super::transfer::Allowed as TransferTrb;
 use bit_field::BitField;
 use core::convert::{TryFrom, TryInto};
 use num_derive::FromPrimitive;
@@ -31,22 +33,33 @@ impl TryFrom<[u32; 4]> for Allowed {
 
     fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
         macro_rules! try_from {
-            ($name:ident) => {
-                if let Ok(t) = $name::try_from(raw) {
-                    return Ok(Self::$name(t));
+            ($($name:ident),* $(,)?) => {{
+                use super::Type;
+                use num_traits::FromPrimitive;
+                if let Some(ty) = Type::from_u32(raw[3].get_bits(10..15)) {
+                    match ty {
+                        $(
+                            Type::$name => {
+                                if let Ok(t) = $name::try_from(raw) {
+                                    return Ok(Self::$name(t));
+                                }
+                            }
+                        )*
+                        _ => {}
+                    }
                 }
-            };
+            }};
         }
-
-        try_from!(TransferEvent);
-        try_from!(CommandCompletion);
-        try_from!(PortStatusChange);
-        try_from!(BandwidthRequest);
-        try_from!(Doorbell);
-        try_from!(HostController);
-        try_from!(DeviceNotification);
-        try_from!(MfindexWrap);
-
+        try_from!(
+            TransferEvent,
+            CommandCompletion,
+            PortStatusChange,
+            BandwidthRequest,
+            Doorbell,
+            HostController,
+            DeviceNotification,
+            MfindexWrap,
+        );
         Err(raw)
     }
 }
@@ -122,6 +135,13 @@ impl TransferEvent {
         (u << 32) | l
     }
 
+    /// Return the Transfer TRB that this [`TransferEvent`] originates from.
+    pub fn get_source_transfer_trb(&self) -> Result<TransferTrb, [u32; 4]> {
+        use super::InternalTryFrom;
+        let raw = unsafe { (self.trb_pointer() as *const [u32; 4]).read() };
+        TransferTrb::internal_try_from(raw)
+    }
+
     ro_field!([2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
     ro_bit!([3](2), event_data, "Event Data");
     ro_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
@@ -152,6 +172,13 @@ impl CommandCompletion {
         let u: u64 = self.0[1].into();
 
         (u << 32) | l
+    }
+
+    /// Return the Command TRB that this [`CommandCompletion`] originates from.
+    pub fn get_source_command_trb(&self) -> Result<CommandTrb, [u32; 4]> {
+        use super::InternalTryFrom;
+        let raw = unsafe { (self.command_trb_pointer() as *const [u32; 4]).read() };
+        CommandTrb::internal_try_from(raw)
     }
 
     ro_field!(

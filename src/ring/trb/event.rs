@@ -1,5 +1,6 @@
 //! Event TRBs.
 
+use super::Type;
 use bit_field::BitField;
 use core::convert::{TryFrom, TryInto};
 use num_derive::FromPrimitive;
@@ -30,23 +31,17 @@ impl TryFrom<[u32; 4]> for Allowed {
     type Error = [u32; 4];
 
     fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
-        macro_rules! try_from {
-            ($name:ident) => {
-                if let Ok(t) = $name::try_from(raw) {
-                    return Ok(Self::$name(t));
-                }
-            };
-        }
-
-        try_from!(TransferEvent);
-        try_from!(CommandCompletion);
-        try_from!(PortStatusChange);
-        try_from!(BandwidthRequest);
-        try_from!(Doorbell);
-        try_from!(HostController);
-        try_from!(DeviceNotification);
-        try_from!(MfindexWrap);
-
+        try_from!(
+            raw,
+            TransferEvent,
+            CommandCompletion,
+            PortStatusChange,
+            BandwidthRequest,
+            Doorbell,
+            HostController,
+            DeviceNotification,
+            MfindexWrap,
+        );
         Err(raw)
     }
 }
@@ -99,7 +94,7 @@ reserved!(PortStatusChange(Type::PortStatusChange){
     [1]0..=31;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=31
+    [3]16..=31;
 });
 impl PortStatusChange {
     ro_field!([0](24..=31), port_id, "Port ID", u8);
@@ -110,7 +105,7 @@ event!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
 reserved!(TransferEvent(Type::TransferEvent){
     [3]1..=1;
     [3]3..=9;
-    [3]21..=23
+    [3]21..=23;
 });
 impl TransferEvent {
     /// Returns the value of the TRB Pointer field.
@@ -142,7 +137,7 @@ event!(
 );
 reserved!(CommandCompletion(Type::CommandCompletion){
     [0]0..=3;
-    [3]1..=9
+    [3]1..=9;
 });
 impl CommandCompletion {
     /// Returns the value of the Command TRB Pointer field.
@@ -180,7 +175,7 @@ reserved!(BandwidthRequest(Type::BandwidthRequest){
     [1]0..=31;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=23
+    [3]16..=23;
 });
 impl BandwidthRequest {
     ro_field!([3](24..=31), slot_id, "Slot ID", u8);
@@ -192,7 +187,7 @@ reserved!(Doorbell(Type::Doorbell){
     [0]5..=31;
     [1]0..=31;
     [2]0..=23;
-    [3]1..=9
+    [3]1..=9;
 });
 impl Doorbell {
     ro_field!([0](0..=4), db_reason, "DB Reason", u8);
@@ -215,7 +210,7 @@ reserved!(HostController(Type::HostController){
     [1]0..=31;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=31
+    [3]16..=31;
 });
 impl_debug_for_event_trb!(HostController {});
 
@@ -229,7 +224,7 @@ reserved!(DeviceNotification(Type::DeviceNotification){
     [1]0..=31;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=31
+    [3]16..=31;
 });
 impl DeviceNotification {
     ro_field!([0](4..=7), notification_type, "Notification Type", u8);
@@ -256,7 +251,7 @@ reserved!(MfindexWrap(Type::MfindexWrap){
     [0]0..=3;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=23
+    [3]16..=23;
 });
 impl_debug_for_event_trb!(MfindexWrap {});
 

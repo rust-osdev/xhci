@@ -32,7 +32,7 @@ impl TryFrom<[u32; 4]> for Allowed {
 
     fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
         try_from!(
-            raw => 
+            raw =>
             TransferEvent,
             CommandCompletion,
             PortStatusChange,

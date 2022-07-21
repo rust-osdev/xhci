@@ -28,7 +28,7 @@ macro_rules! reserved{
     };
 }
 macro_rules! try_from {
-    ($raw:ident, $($name:ident $(($t:ident))?),* $(,)?) => {{
+    ($raw:ident => $($name:ident $(($t:ident))?),* $(,)?) => {{
         if let Some(ty) = Type::from_u32($raw[3].get_bits(10..15)) {
             paste::paste! {
                 match ty {

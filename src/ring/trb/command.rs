@@ -51,7 +51,7 @@ impl TryFrom<[u32; 4]> for Allowed {
 
     fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
         try_from!(
-            raw,
+            raw => 
             Link,
             EnableSlot,
             DisableSlot,
@@ -81,7 +81,7 @@ reserved!(Noop(Type::NoopCommand) {
     [1]0..=31;
     [2]0..=31;
     [3]1..=9;
-    [3]16..=31;
+    [3]21..=31;
 });
 impl_debug_for_trb!(Noop {});
 
@@ -268,8 +268,8 @@ add_trb_with_default!(
     Type::ResetEndpoint
 );
 reserved!(ResetEndpoint(Type::ResetEndpoint) {
-    [0]0..=3;
-    [1]0..=3;
+    [0]0..=31;
+    [1]0..=31;
     [2]0..=31;
     [3]1..=8;
     [3]21..=23;
@@ -291,8 +291,8 @@ add_trb_with_default!(
     Type::StopEndpoint
 );
 reserved!(StopEndpoint(Type::StopEndpoint) {
-    [0]0..=3;
-    [1]0..=3;
+    [0]0..=31;
+    [1]0..=31;
     [2]0..=31;
     [3]1..=9;
     [3]21..=22;

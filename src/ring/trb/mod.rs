@@ -6,10 +6,10 @@ use num_derive::FromPrimitive;
 
 macro_rules! reserved{
     ($name:ident($ty:expr) {
-        $([$index:expr] $range:expr);*
+        $([$index:expr] $range:expr);* $(;)?
     })=>{
-        impl TryFrom<[u32;4]> for $name{
-            type Error=[u32;4];
+        impl TryFrom<[u32; 4]> for $name{
+            type Error=[u32; 4];
 
             fn try_from(raw:[u32;4])->Result<Self,Self::Error>{
                 use crate::ring::trb::Type;
@@ -25,7 +25,25 @@ macro_rules! reserved{
                 Ok(Self(raw))
             }
         }
-    }
+    };
+}
+macro_rules! try_from {
+    ($raw:ident => $($name:ident $(($t:ident))?),* $(,)?) => {{
+        if let Some(ty) = Type::from_u32($raw[3].get_bits(10..15)) {
+            paste::paste! {
+                match ty {
+                    $(
+                        Type::[<$name $($t)?>]=> {
+                            if let Ok(t) = $name::try_from($raw) {
+                                return Ok(Self::$name(t));
+                            }
+                        }
+                    )*
+                    _ => {}
+                }
+            }
+        }
+    }};
 }
 macro_rules! add_trb {
     ($name:ident,$full:expr,$ty:expr) => {
@@ -176,6 +194,13 @@ pub mod transfer;
 pub const BYTES: usize = 16;
 
 add_trb_with_default!(Link, "Link TRB", Type::Link);
+reserved!(Link(Type::Link){
+    [0]0..=3;
+    [2]0..=21;
+    [3]2..=3;
+    [3]6..=9;
+    [3]16..=31;
+});
 impl Link {
     /// Sets the value of the Ring Segment Pointer field.
     ///

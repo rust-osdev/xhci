@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- Add the implementation of `TryFrom<[u32; 4]>` to TRB structs in `ring::trb::command` and `ring::trb::transfer`
 
 ## 0.8.4 - 2022-05-29
 ### Fixed

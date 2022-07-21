@@ -1,6 +1,6 @@
 //! Transfer TRBs.
 
-use super::Link;
+use super::{Link, Type};
 use bit_field::BitField;
 use core::convert::TryInto;
 use num_derive::FromPrimitive;
@@ -101,6 +101,24 @@ impl Allowed {
         )
     }
 }
+impl TryFrom<[u32; 4]> for Allowed {
+    type Error = [u32; 4];
+
+    fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
+        try_from!(
+            raw =>
+            Normal,
+            SetupStage,
+            DataStage,
+            StatusStage,
+            Isoch,
+            Link,
+            EventData,
+            Noop(Transfer),
+        );
+        Err(raw)
+    }
+}
 
 macro_rules! interrupt_on_completion {
     ($name:ident) => {
@@ -138,6 +156,10 @@ macro_rules! impl_debug_for_transfer_trb{
 }
 
 transfer_trb_with_default!(Normal, "Normal TRB", Type::Normal);
+reserved!(Normal(Type::Normal) {
+    [3]7..=8;
+    [3]16..=31;
+});
 impl Normal {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -190,6 +212,12 @@ impl_debug_for_transfer_trb! {
 }
 
 transfer_trb!(SetupStage, "Setup Stage TRB", Type::SetupStage);
+reserved!(SetupStage(Type::SetupStage) {
+    [2]17..=21;
+    [3]1..=4;
+    [3]7..=9;
+    [3]18..=31;
+});
 impl SetupStage {
     /// Creates a new Setup Stage TRB.
     ///
@@ -252,6 +280,10 @@ impl_debug_for_transfer_trb!(SetupStage {
 });
 
 transfer_trb_with_default!(DataStage, "Data Stage TRB", Type::DataStage);
+reserved!(DataStage(Type::DataStage) {
+    [3]7..=9;
+    [3]17..=31;
+});
 impl DataStage {
     /// Sets the value of the Data Buffer Pointer field.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -312,6 +344,14 @@ impl_debug_for_transfer_trb!(DataStage {
 });
 
 transfer_trb_with_default!(StatusStage, "Status Stage TRB", Type::StatusStage);
+reserved!(StatusStage(Type::StatusStage) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=21;
+    [3]2..=3;
+    [3]6..=9;
+    [3]17..=31;
+});
 impl StatusStage {
     rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
     rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");
@@ -329,6 +369,7 @@ impl_debug_for_transfer_trb! {
 }
 
 transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
+reserved!(Isoch(Type::Isoch) {});
 impl Isoch {
     /// Sets the value of the Data Buffer Pointer.
     pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
@@ -390,6 +431,12 @@ impl_debug_for_transfer_trb!(Isoch {
 });
 
 transfer_trb_with_default!(EventData, "Event Data TRB", Type::EventData);
+reserved!(EventData(Type::EventData) {
+    [2]0..=21;
+    [3]2..=3;
+    [3]6..=8;
+    [3]16..=31;
+});
 impl EventData {
     /// Sets the value of the Event Data field.
     pub fn set_event_data(&mut self, d: u64) -> &mut Self {
@@ -424,6 +471,14 @@ impl_debug_for_transfer_trb!(EventData {
 });
 
 transfer_trb_with_default!(Noop, "No Op TRB", Type::NoopTransfer);
+reserved!(Noop(Type::NoopTransfer) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=21;
+    [3]2..=3;
+    [3]6..=9;
+    [3]16..=31;
+});
 impl Noop {
     rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u16);
     rw_bit!([3](1), evaluate_next_trb, "Evaluate Next TRB");

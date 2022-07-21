@@ -1,8 +1,9 @@
 //! Command TRBs.
 
-use super::Link;
+use super::{Link, Type};
 use bit_field::BitField;
 use core::convert::TryInto;
+use num_traits::FromPrimitive;
 
 allowed! {
     /// TRBs which are allowed to be pushed to the Command Ring.
@@ -45,17 +46,66 @@ allowed! {
         SetExtendedProperty
     }
 }
+impl TryFrom<[u32; 4]> for Allowed {
+    type Error = [u32; 4];
+
+    fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
+        try_from!(
+            raw =>
+            Link,
+            EnableSlot,
+            DisableSlot,
+            AddressDevice,
+            ConfigureEndpoint,
+            EvaluateContext,
+            ResetEndpoint,
+            StopEndpoint,
+            SetTrDequeuePointer,
+            ResetDevice,
+            ForceEvent,
+            NegotiateBandwidth,
+            SetLatencyToleranceValue,
+            GetPortBandwidth,
+            ForceHeader,
+            Noop(Command),
+            GetExtendedProperty,
+            SetExtendedProperty,
+        );
+        Err(raw)
+    }
+}
 
 add_trb_with_default!(Noop, "No Op Command TRB", Type::NoopCommand);
+reserved!(Noop(Type::NoopCommand) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]21..=31;
+});
 impl_debug_for_trb!(Noop {});
 
 add_trb_with_default!(EnableSlot, "Enable Slot Command TRB", Type::EnableSlot);
+reserved!(EnableSlot(Type::EnableSlot) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]21..=31;
+});
 impl EnableSlot {
     rw_field!([3](16..=20), slot_type, "Slot Type", u8);
 }
 impl_debug_for_trb!(EnableSlot { slot_type });
 
 add_trb_with_default!(DisableSlot, "Disable Slot Command TRB", Type::DisableSlot);
+reserved!(DisableSlot(Type::DisableSlot) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]16..=23;
+});
 impl DisableSlot {
     rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
@@ -66,6 +116,12 @@ add_trb_with_default!(
     "Address Device Command TRB",
     Type::AddressDevice
 );
+reserved!(AddressDevice(Type::AddressDevice) {
+    [0]0..=3;
+    [2]0..=31;
+    [3]1..=8;
+    [3]16..=23;
+});
 impl AddressDevice {
     /// Sets the value of the Input Context Pointer field.
     ///
@@ -114,6 +170,12 @@ add_trb_with_default!(
     "Configure Endpoint Command TRB",
     Type::ConfigureEndpoint
 );
+reserved!(ConfigureEndpoint(Type::ConfigureEndpoint) {
+    [0]0..=3;
+    [2]0..=31;
+    [3]1..=8;
+    [3]16..=23;
+});
 impl ConfigureEndpoint {
     /// Sets the value of the Input Context Pointer field.
     ///
@@ -158,6 +220,12 @@ add_trb_with_default!(
     "Evaluate Context Command TRB",
     Type::EvaluateContext
 );
+reserved!(EvaluateContext(Type::EvaluateContext) {
+    [0]0..=3;
+    [2]0..=31;
+    [3]1..=8;
+    [3]16..=23;
+});
 impl EvaluateContext {
     /// Sets the value of the Input Context Pointer field.
     ///
@@ -199,6 +267,13 @@ add_trb_with_default!(
     "Reset Endpoint Command TRB",
     Type::ResetEndpoint
 );
+reserved!(ResetEndpoint(Type::ResetEndpoint) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=8;
+    [3]21..=23;
+});
 impl ResetEndpoint {
     rw_bit!([3](9), transfer_state_preserve, "Transfer State Preserve");
     rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
@@ -215,6 +290,13 @@ add_trb_with_default!(
     "Stop Endpoint Command TRB",
     Type::StopEndpoint
 );
+reserved!(StopEndpoint(Type::StopEndpoint) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]21..=22;
+});
 impl StopEndpoint {
     rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
     rw_bit!([3](23), suspend, "Suspend");
@@ -231,6 +313,11 @@ add_trb_with_default!(
     "Set TR Dequeue Pointer Command TRB",
     Type::SetTrDequeuePointer
 );
+reserved!(SetTrDequeuePointer(Type::SetTrDequeuePointer) {
+    [2]0..=15;
+    [3]1..=9;
+    [3]21..=23;
+});
 impl SetTrDequeuePointer {
     rw_bit!([0](0), dequeue_cycle_state, "Dequeue Cycle State");
     rw_field!([0](1..=3), stream_context_type, "Stream Context Type", u8);
@@ -278,12 +365,25 @@ impl_debug_for_trb!(SetTrDequeuePointer {
 });
 
 add_trb_with_default!(ResetDevice, "Reset Device Command TRB", Type::ResetDevice);
+reserved!(ResetDevice(Type::ResetDevice) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]16..=23;
+});
 impl ResetDevice {
     rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ResetDevice { slot_id });
 
 add_trb_with_default!(ForceEvent, "Force Event Command TRB", Type::ForceEvent);
+reserved!(ForceEvent(Type::ForceEvent) {
+    [0]0..=3;
+    [2]0..=21;
+    [3]1..=9;
+    [3]24..=31;
+});
 impl ForceEvent {
     /// Sets the value of the Event TRB Pointer field.
     ///
@@ -330,6 +430,13 @@ add_trb_with_default!(
     "Negotiate Bandwidth Command TRB",
     Type::NegotiateBandwidth
 );
+reserved!(NegotiateBandwidth(Type::NegotiateBandwidth) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]16..=23;
+});
 impl NegotiateBandwidth {
     rw_field!([3](24..=31), slot_id, "Slot ID", u8);
 }
@@ -340,6 +447,13 @@ add_trb_with_default!(
     "Set Latency Tolerance Value Command TRB",
     Type::SetLatencyToleranceValue
 );
+reserved!(SetLatencyToleranceValue(Type::SetLatencyToleranceValue) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]0..=31;
+    [3]1..=9;
+    [3]28..=31;
+});
 impl SetLatencyToleranceValue {
     rw_field!(
         [3](16..=27),
@@ -357,6 +471,12 @@ add_trb_with_default!(
     "Get Port Bandwidth Command TRB",
     Type::GetPortBandwidth
 );
+reserved!(GetPortBandwidth(Type::GetPortBandwidth) {
+    [0]0..=3;
+    [2]0..=31;
+    [3]1..=9;
+    [3]20..=23;
+});
 impl GetPortBandwidth {
     /// Sets the value of the Port Bandwidth Context Pointer field.
     ///
@@ -396,6 +516,10 @@ impl_debug_for_trb!(GetPortBandwidth {
 });
 
 add_trb_with_default!(ForceHeader, "Force Header Command TRB", Type::ForceHeader);
+reserved!(ForceHeader(Type::ForceHeader) {
+    [3]1..=9;
+    [3]16..=23;
+});
 impl ForceHeader {
     rw_field!([0](0..=4), packet_type, "Packet Type", u8);
 
@@ -440,6 +564,11 @@ add_trb_with_default!(
     "Get Extended Property Command TRB",
     Type::GetExtendedProperty
 );
+reserved!(GetExtendedProperty(Type::GetExtendedProperty) {
+    [0]0..=3;
+    [2]16..=31;
+    [3]1..=9;
+});
 impl GetExtendedProperty {
     /// Sets the value of the Extended Property Context Pointer field.
     ///
@@ -493,6 +622,12 @@ add_trb_with_default!(
     "Set Extended Property Command TRB",
     Type::SetExtendedProperty
 );
+reserved!(SetExtendedProperty(Type::SetExtendedProperty) {
+    [0]0..=31;
+    [1]0..=31;
+    [2]24..=31;
+    [3]1..=9;
+});
 impl SetExtendedProperty {
     rw_field!(
         [2](0..=15),

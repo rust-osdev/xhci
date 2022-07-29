@@ -351,3 +351,19 @@ pub enum CompletionCode {
     /// Asserted if an error is detected on a USB2 protocol endpoint for a split transaction.
     SplitTransactionError = 36,
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn try_from_macro() {
+        let raw = [13142016, 0, 16777216, 33793];
+        assert_eq!(
+            Allowed::try_from(raw),
+            Ok(Allowed::CommandCompletion(
+                CommandCompletion::try_from(raw).unwrap()
+            )),
+        );
+    }
+}

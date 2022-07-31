@@ -358,7 +358,12 @@ mod test {
 
     #[test]
     fn try_from_macro() {
-        let raw = [13142016, 0, 16777216, 33793];
+        let raw = [
+            0x00c8_8800, // address low
+            0x0000_0000, // address high
+            0x01_000000, // completion code 1, transfer length 0
+            0x0000_8401, // endpoint id 0, slot id 0, type 33, event data 0, cycle bit 1
+        ];
         assert_eq!(
             Allowed::try_from(raw),
             Ok(Allowed::CommandCompletion(

@@ -2,9 +2,13 @@
 
 ## Unreleased - ReleaseDate
 
+## 0.8.6 - 2022-07-31
+### Fixed
+- The wrong bit range in the implementation of `TryFrom<[u32; 4]>` for TRB structs is fixed.
+
 ## 0.8.5 - 2022-07-21
 ### Added
-- Add the implementation of `TryFrom<[u32; 4]>` to TRB structs in `ring::trb::command` and `ring::trb::transfer`
+- Added the implementation of `TryFrom<[u32; 4]>` to TRB structs in `ring::trb::command` and `ring::trb::transfer`
 
 ### Changed
 - Clippy's function size limitation setting is removed.

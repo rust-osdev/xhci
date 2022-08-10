@@ -1,11 +1,15 @@
 //! Host Controller Runtime Registers.
 
 use super::capability::RuntimeRegisterSpaceOffset;
-use accessor::array;
 use accessor::single;
 use accessor::Mapper;
+use accessor::marker::AccessorTypeSpecifier;
+use accessor::marker::ReadOnly;
+use accessor::marker::ReadWrite;
+use accessor::marker::Readable;
 use core::convert::TryFrom;
 use core::convert::TryInto;
+use core::marker::PhantomData;
 
 /// Runtime Registers
 ///
@@ -55,23 +59,75 @@ impl_debug_from_methods! {
     }
 }
 
+/// Interrupter
+#[derive(Debug)]
+pub struct Interrupter<'a, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Interrupter Management Register
+    pub iman: single::Generic<InterrupterManagementRegister, M, A>,
+    /// Interrupter Moderation Register
+    pub imod: single::Generic<InterrupterModerationRegister, M, A>,
+    /// Event Ring Segment Table Size Register
+    pub erstsz: single::Generic<EventRingSegmentTableSizeRegister, M, A>,
+    /// Event Ring Segment Table Base Address Register
+    pub erstba: single::Generic<EventRingSegmentTableBaseAddressRegister, M, A>,
+    /// Event Ring Dequeue Pointer Register
+    pub erdp: single::Generic<EventRingDequeuePointerRegister, M, A>,
+    // Tie the lifetime of this Interrupter to the parent InterrupterRegisterSet.
+    // This prevents multiple mutable handlers from being created.
+    _marker: PhantomData<&'a InterrupterRegisterSet<M>>,
+}
+
+impl<M, A> Interrupter<'_, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Creates an accessor to an interrupter.
+    ///
+    /// # Safety
+    ///
+    /// Any mutable handlers to this Interrupter must be unique.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index > 1023`.
+    unsafe fn new(
+        interrupter_register_set_base: usize,
+        index: usize,
+        mapper: M,
+    ) -> Self {
+        assert!(index < 1024, "index out of range");
+        let base = interrupter_register_set_base + index * 0x20;
+        Self {
+            iman: single::Generic::new(base + 0x0, mapper.clone()),
+            imod: single::Generic::new(base + 0x4, mapper.clone()),
+            erstsz: single::Generic::new(base + 0x8, mapper.clone()),
+            erstba: single::Generic::new(base + 0x10, mapper.clone()),
+            erdp: single::Generic::new(base + 0x18, mapper.clone()),
+            _marker: PhantomData,
+        }
+    }
+}
+
 /// Interrupter Register Set
 #[repr(C)]
-#[derive(Copy, Clone, Debug)]
-pub struct InterrupterRegisterSet {
-    /// Interrupter Management Register
-    pub iman: InterrupterManagementRegister,
-    /// Interrupter Moderation Register
-    pub imod: InterrupterModerationRegister,
-    /// Event Ring Segment Table Size Register
-    pub erstsz: EventRingSegmentTableSizeRegister,
-    _rsvd: u32,
-    /// Event Ring Segment Table Base Address Register
-    pub erstba: EventRingSegmentTableBaseAddressRegister,
-    /// Event Ring Dequeue Pointer Register
-    pub erdp: EventRingDequeuePointerRegister,
+#[derive(Debug)]
+pub struct InterrupterRegisterSet<M>
+where
+    M: Mapper + Clone,
+{
+    base: usize,
+    mapper: M,
 }
-impl InterrupterRegisterSet {
+
+impl<M> InterrupterRegisterSet<M>
+where
+    M: Mapper + Clone,
+{
     /// Creates an accessor to the Interrupter Register Set.
     ///
     /// # Safety
@@ -83,19 +139,37 @@ impl InterrupterRegisterSet {
     ///
     /// This method panics if the base address of the Interrupter Register Sets is not aligned
     /// correctly.
-    pub unsafe fn new<M>(
+    pub unsafe fn new(
         mmio_base: usize,
         rtoff: RuntimeRegisterSpaceOffset,
         mapper: M,
-    ) -> array::ReadWrite<Self, M>
-    where
-        M: Mapper,
+    ) -> Self
     {
-        const NUM_INTERRUPT_REGISTER_SET: usize = 1024;
-
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
+        assert!(base & 0x1f == 0, "base is not aligned");
 
-        array::ReadWrite::new(base, NUM_INTERRUPT_REGISTER_SET, mapper)
+        Self {
+            base,
+            mapper,
+        }
+    }
+
+    /// Returns a handler for an interrupter.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index > 1023`.
+    pub fn interrupter(&self, index: usize) -> Interrupter<'_, M, ReadOnly> {
+        unsafe { Interrupter::new(self.base, index, self.mapper.clone()) }
+    }
+
+    /// Returns a mutable handler for an interrupter.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index > 1023`.
+    pub fn interrupter_mut(&mut self, index: usize) -> Interrupter<'_, M, ReadWrite> {
+        unsafe { Interrupter::new(self.base, index, self.mapper.clone()) }
     }
 }
 
@@ -220,7 +294,3 @@ impl_debug_from_methods! {
         event_ring_dequeue_pointer
     }
 }
-
-/// Alias for [`InterrupterRegisterSet`].
-#[deprecated(note = "use InterrupterRegisterSet instead (note 'er')")]
-pub type InterruptRegisterSet = InterrupterRegisterSet;

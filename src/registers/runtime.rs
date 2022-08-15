@@ -9,8 +9,8 @@ use core::convert::TryInto;
 
 /// Runtime Registers
 ///
-/// Note that this struct does not contain the interrupt register sets. Refer to
-/// [`InterruptRegisterSet`].
+/// Note that this struct does not contain the interrupter register sets. Refer to
+/// [`InterrupterRegisterSet`].
 #[derive(Debug)]
 pub struct Runtime<M>
 where
@@ -55,13 +55,13 @@ impl_debug_from_methods! {
     }
 }
 
-/// Interrupt Register Set
+/// Interrupter Register Set
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
-pub struct InterruptRegisterSet {
-    /// Interrupt Management Register
+pub struct InterrupterRegisterSet {
+    /// Interrupter Management Register
     pub iman: InterrupterManagementRegister,
-    /// Interrupt Moderation Register
+    /// Interrupter Moderation Register
     pub imod: InterrupterModerationRegister,
     /// Event Ring Segment Table Size Register
     pub erstsz: EventRingSegmentTableSizeRegister,
@@ -71,8 +71,8 @@ pub struct InterruptRegisterSet {
     /// Event Ring Dequeue Pointer Register
     pub erdp: EventRingDequeuePointerRegister,
 }
-impl InterruptRegisterSet {
-    /// Creates an accessor to the Interrupt Register Set.
+impl InterrupterRegisterSet {
+    /// Creates an accessor to the Interrupter Register Set.
     ///
     /// # Safety
     ///
@@ -81,7 +81,7 @@ impl InterruptRegisterSet {
     ///
     /// # Panics
     ///
-    /// This method panics if the base address of the Interrupt Register Sets is not aligned
+    /// This method panics if the base address of the Interrupter Register Sets is not aligned
     /// correctly.
     pub unsafe fn new<M>(
         mmio_base: usize,
@@ -220,3 +220,7 @@ impl_debug_from_methods! {
         event_ring_dequeue_pointer
     }
 }
+
+/// Alias for [`InterrupterRegisterSet`].
+#[deprecated(note = "use InterrupterRegisterSet instead (note 'er')")]
+pub type InterruptRegisterSet = InterrupterRegisterSet;

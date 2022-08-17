@@ -2,6 +2,13 @@
 
 ## Unreleased - ReleaseDate
 
+## 0.8.7 - 2022-08-17
+### Changed
+- `registers::runtime::InterruptRegisterSet` is renamed to `registers::runtiem::InterrupterRegisterSet` (note: Interrupt**er**). The former still exists but is an alias of the latter and is deprecated now.
+
+### Deprecated
+- `registers::runtime::InterruptRegisterSet` in favor of `registers::runtime::InterrupterRegisterSet`.
+
 ## 0.8.6 - 2022-07-31
 ### Fixed
 - The wrong bit range in the implementation of `TryFrom<[u32; 4]>` for TRB structs is fixed.

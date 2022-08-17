@@ -4,7 +4,7 @@
 
 ## 0.8.7 - 2022-08-17
 ### Changed
-- `registers::runtime::InterruptRegisterSet` is renamed to `registers::runtiem::InterrupterRegisterSet` (note: Interrupt**er**). The former still exists but is an alias of the latter and is deprecated now.
+- `registers::runtime::InterruptRegisterSet` is renamed to `registers::runtime::InterrupterRegisterSet` (note: Interrupt**er**). The former still exists but is an alias of the latter and is deprecated now.
 
 ### Deprecated
 - `registers::runtime::InterruptRegisterSet` in favor of `registers::runtime::InterrupterRegisterSet`.

@@ -5,7 +5,9 @@ use accessor::Mapper;
 
 pub use capability::Capability;
 pub use operational::{Operational, PortRegisterSet};
+#[allow(deprecated)]
 pub use runtime::InterruptRegisterSet;
+pub use runtime::InterrupterRegisterSet;
 pub use runtime::Runtime;
 
 pub mod capability;
@@ -29,8 +31,9 @@ where
     pub port_register_set: array::ReadWrite<PortRegisterSet, M>,
     /// Runtime Registers
     pub runtime: Runtime<M>,
-    /// Interrupt Register Set Array
-    pub interrupt_register_set: array::ReadWrite<InterruptRegisterSet, M>,
+    /// Interrupter Register Set Array
+    // TODO rename to interrupter_register_set
+    pub interrupt_register_set: array::ReadWrite<InterrupterRegisterSet, M>,
 }
 impl<M> Registers<M>
 where
@@ -81,7 +84,7 @@ where
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
         let runtime = Runtime::new(mmio_base, capability.rtsoff.read_volatile(), mapper.clone());
         let interrupt_register_set =
-            InterruptRegisterSet::new(mmio_base, capability.rtsoff.read_volatile(), mapper);
+            InterrupterRegisterSet::new(mmio_base, capability.rtsoff.read_volatile(), mapper);
 
         Self {
             capability,

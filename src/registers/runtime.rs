@@ -1,12 +1,12 @@
 //! Host Controller Runtime Registers.
 
 use super::capability::RuntimeRegisterSpaceOffset;
-use accessor::single;
-use accessor::Mapper;
 use accessor::marker::AccessorTypeSpecifier;
 use accessor::marker::ReadOnly;
 use accessor::marker::ReadWrite;
 use accessor::marker::Readable;
+use accessor::single;
+use accessor::Mapper;
 use core::convert::TryFrom;
 use core::convert::TryInto;
 use core::marker::PhantomData;
@@ -95,11 +95,7 @@ where
     /// # Panics
     ///
     /// This method panics if `index > 1023`.
-    unsafe fn new(
-        interrupter_register_set_base: usize,
-        index: usize,
-        mapper: M,
-    ) -> Self {
+    unsafe fn new(interrupter_register_set_base: usize, index: usize, mapper: M) -> Self {
         assert!(index < 1024, "index out of range");
         let base = interrupter_register_set_base + index * 0x20;
         Self {
@@ -139,19 +135,11 @@ where
     ///
     /// This method panics if the base address of the Interrupter Register Sets is not aligned
     /// correctly.
-    pub unsafe fn new(
-        mmio_base: usize,
-        rtoff: RuntimeRegisterSpaceOffset,
-        mapper: M,
-    ) -> Self
-    {
+    pub unsafe fn new(mmio_base: usize, rtoff: RuntimeRegisterSpaceOffset, mapper: M) -> Self {
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
         assert!(base & 0x1f == 0, "base is not aligned");
 
-        Self {
-            base,
-            mapper,
-        }
+        Self { base, mapper }
     }
 
     /// Returns a handler for an interrupter.

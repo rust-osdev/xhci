@@ -99,11 +99,11 @@ where
         assert!(index < 1024, "index out of range");
         let base = interrupter_register_set_base + index * 0x20;
         Self {
-            iman: single::Generic::new(base + 0x0, mapper.clone()),
+            iman: single::Generic::new(base, mapper.clone()),
             imod: single::Generic::new(base + 0x4, mapper.clone()),
             erstsz: single::Generic::new(base + 0x8, mapper.clone()),
             erstba: single::Generic::new(base + 0x10, mapper.clone()),
-            erdp: single::Generic::new(base + 0x18, mapper.clone()),
+            erdp: single::Generic::new(base + 0x18, mapper),
             _marker: PhantomData,
         }
     }
@@ -137,7 +137,7 @@ where
     /// correctly.
     pub unsafe fn new(mmio_base: usize, rtoff: RuntimeRegisterSpaceOffset, mapper: M) -> Self {
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
-        assert!(base & 0x1f == 0, "base is not aligned");
+        assert!(base % 0x20 == 0, "base is not aligned");
 
         Self { base, mapper }
     }

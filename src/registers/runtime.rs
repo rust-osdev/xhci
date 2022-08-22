@@ -59,56 +59,6 @@ impl_debug_from_methods! {
     }
 }
 
-/// Interrupter
-#[derive(Debug)]
-pub struct Interrupter<'a, M, A>
-where
-    M: Mapper + Clone,
-    A: AccessorTypeSpecifier + Readable,
-{
-    /// Interrupter Management Register
-    pub iman: single::Generic<InterrupterManagementRegister, M, A>,
-    /// Interrupter Moderation Register
-    pub imod: single::Generic<InterrupterModerationRegister, M, A>,
-    /// Event Ring Segment Table Size Register
-    pub erstsz: single::Generic<EventRingSegmentTableSizeRegister, M, A>,
-    /// Event Ring Segment Table Base Address Register
-    pub erstba: single::Generic<EventRingSegmentTableBaseAddressRegister, M, A>,
-    /// Event Ring Dequeue Pointer Register
-    pub erdp: single::Generic<EventRingDequeuePointerRegister, M, A>,
-    // Tie the lifetime of this Interrupter to the parent InterrupterRegisterSet.
-    // This prevents multiple mutable handlers from being created.
-    _marker: PhantomData<&'a InterrupterRegisterSet<M>>,
-}
-
-impl<M, A> Interrupter<'_, M, A>
-where
-    M: Mapper + Clone,
-    A: AccessorTypeSpecifier + Readable,
-{
-    /// Creates an accessor to an interrupter.
-    ///
-    /// # Safety
-    ///
-    /// Any mutable handlers to this Interrupter must be unique.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `index > 1023`.
-    unsafe fn new(interrupter_register_set_base: usize, index: usize, mapper: M) -> Self {
-        assert!(index < 1024, "index out of range");
-        let base = interrupter_register_set_base + index * 0x20;
-        Self {
-            iman: single::Generic::new(base, mapper.clone()),
-            imod: single::Generic::new(base + 0x4, mapper.clone()),
-            erstsz: single::Generic::new(base + 0x8, mapper.clone()),
-            erstba: single::Generic::new(base + 0x10, mapper.clone()),
-            erdp: single::Generic::new(base + 0x18, mapper),
-            _marker: PhantomData,
-        }
-    }
-}
-
 /// Interrupter Register Set
 #[repr(C)]
 #[derive(Debug)]
@@ -158,6 +108,56 @@ where
     /// This method panics if `index > 1023`.
     pub fn interrupter_mut(&mut self, index: usize) -> Interrupter<'_, M, ReadWrite> {
         unsafe { Interrupter::new(self.base, index, self.mapper.clone()) }
+    }
+}
+
+/// Interrupter
+#[derive(Debug)]
+pub struct Interrupter<'a, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Interrupter Management Register
+    pub iman: single::Generic<InterrupterManagementRegister, M, A>,
+    /// Interrupter Moderation Register
+    pub imod: single::Generic<InterrupterModerationRegister, M, A>,
+    /// Event Ring Segment Table Size Register
+    pub erstsz: single::Generic<EventRingSegmentTableSizeRegister, M, A>,
+    /// Event Ring Segment Table Base Address Register
+    pub erstba: single::Generic<EventRingSegmentTableBaseAddressRegister, M, A>,
+    /// Event Ring Dequeue Pointer Register
+    pub erdp: single::Generic<EventRingDequeuePointerRegister, M, A>,
+    // Tie the lifetime of this Interrupter to the parent InterrupterRegisterSet.
+    // This prevents multiple mutable handlers from being created.
+    _marker: PhantomData<&'a InterrupterRegisterSet<M>>,
+}
+
+impl<M, A> Interrupter<'_, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Creates an accessor to an interrupter.
+    ///
+    /// # Safety
+    ///
+    /// Any mutable handlers to this Interrupter must be unique.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index > 1023`.
+    unsafe fn new(interrupter_register_set_base: usize, index: usize, mapper: M) -> Self {
+        assert!(index < 1024, "index out of range");
+        let base = interrupter_register_set_base + index * 0x20;
+        Self {
+            iman: single::Generic::new(base, mapper.clone()),
+            imod: single::Generic::new(base + 0x4, mapper.clone()),
+            erstsz: single::Generic::new(base + 0x8, mapper.clone()),
+            erstba: single::Generic::new(base + 0x10, mapper.clone()),
+            erdp: single::Generic::new(base + 0x18, mapper),
+            _marker: PhantomData,
+        }
     }
 }
 

@@ -4,7 +4,7 @@
 
 ## 0.9.0 - 2022-08-23
 ### Changed
-- The structure of `registers::runtime::InterrupterRegisterSet` is changed, and you can now modify single fields of the Interrupter Register Set via `Interrupter`. See https://github.com/rust-osdev/xhci/pull/142 and https://github.com/rust-osdev/xhci/pull/142#issuecomment-1222378513 for the background of this change.
+- The structure of `registers::runtime::InterrupterRegisterSet` is changed, and you can now modify single fields of the Interrupter Register Set via `registers::runtime::Interrupter`. See https://github.com/rust-osdev/xhci/pull/142 and https://github.com/rust-osdev/xhci/pull/142#issuecomment-1222378513 for the background of this change.
 
 ### Removed
 - `registers::runtime::InterruptRegisterSet` in favor of `registers::runtime::InterrupterRegisterSet`.

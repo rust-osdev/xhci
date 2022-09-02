@@ -240,7 +240,7 @@ impl_debug_from_methods! {
 
 /// Device Context Base Address Array Pointer Register
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Returns the value of the Device Context Base Address Array Pointer.

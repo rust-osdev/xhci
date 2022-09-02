@@ -379,6 +379,11 @@ impl PortStatusAndControlRegister {
     );
     ro_bit!(30, device_removable, "Device Removable");
     rw1s_bit!(31, warm_port_reset, "Warm Port Reset");
+
+    /// Zero out the `port_enabled_disabled` bit to avoid disabling the port.
+    pub fn unset_port_enabled_disabled(&mut self) {
+        self.0 &= !(1 << 1);
+    }
 }
 impl_debug_from_methods! {
     PortStatusAndControlRegister{

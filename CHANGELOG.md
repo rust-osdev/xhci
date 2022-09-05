@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- `set_0_*` for all RW1C bits, which sets the bit to 0. This prevents the bit from being cleared on write.
 
 ## 0.9.0 - 2022-08-23
 ### Changed

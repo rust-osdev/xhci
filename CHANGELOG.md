@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- `Default` implementations for registers without RsvdP bits, which allows avoiding a redundant read.
 
 ## 0.9.0 - 2022-08-23
 ### Changed

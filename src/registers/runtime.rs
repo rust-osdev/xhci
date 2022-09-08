@@ -178,7 +178,7 @@ impl_debug_from_methods! {
 
 /// Interrupter Moderation Register.
 #[repr(transparent)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct InterrupterModerationRegister(u32);
 impl InterrupterModerationRegister {
     rw_field!(
@@ -245,7 +245,7 @@ impl EventRingSegmentTableBaseAddressRegister {
 
 /// Event Ring Dequeue Pointer Register.
 #[repr(transparent)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
     rw_field!(

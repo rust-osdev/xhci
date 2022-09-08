@@ -7,7 +7,7 @@ use core::{convert::TryFrom, fmt};
 
 /// The element of the Doorbell Array.
 #[repr(transparent)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Register(u32);
 impl Register {
     /// Creates a new accessor to the Doorbell Array.

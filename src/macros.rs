@@ -121,6 +121,15 @@ macro_rules! rw1c_bit {
                 self.0[$offset].set_bit($bit,true);
                 self
             }
+
+            #[doc = "Set the "]
+            #[doc = $name]
+            #[doc = " bit to 0, preventing the bit from being cleared on write."]
+            pub fn [<set_0_ $method>](&mut self) -> &mut Self {
+                use bit_field::BitField;
+                self.0[$offset].set_bit($bit,false);
+                self
+            }
         }
     };
     ($bit:literal,$method:ident,$name:literal) => {
@@ -132,6 +141,15 @@ macro_rules! rw1c_bit {
             pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
+                self
+            }
+
+            #[doc = "Set the "]
+            #[doc = $name]
+            #[doc = " bit to 0, preventing the bit from being cleared on write."]
+            pub fn [<set_0_ $method>](&mut self) -> &mut Self {
+                use bit_field::BitField;
+                self.0.set_bit($bit,false);
                 self
             }
         }

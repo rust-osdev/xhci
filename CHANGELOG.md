@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+
+## 0.9.1 - 2022-09-09
 ### Added
 - `set_0_*` for all RW1C bits, which sets the bit to 0. This prevents the bit from being cleared on write.
 - `Default` implementations for registers without RsvdP bits, which allows avoiding a redundant read.

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- The sponsor button is now shown on the repository page on GitHub.
 
 ## 0.9.1 - 2022-09-09
 ### Added

@@ -527,3 +527,23 @@ pub enum TransferType {
     /// In Data Stage.
     In = 3,
 }
+
+#[cfg(tests)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn data_buffer_pointer_test() {
+        let mut normal = Normal::new();
+        let pointer = 0x12345678_9abcdef0;
+        normal.set_data_buffer_pointer(pointer);
+        let pointer_read = normal.data_buffer_pointer();
+        assert_eq!(pointer, pointer_read);
+
+        let mut isoch = Isoch::new();
+        let pointer = 0xabcd1234_567890ef;
+        isoch.set_data_buffer_pointer(pointer);
+        let pointer_read = isoch.data_buffer_pointer();
+        assert_eq!(pointer, pointer_read);
+    }
+}

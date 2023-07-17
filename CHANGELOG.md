@@ -8,6 +8,7 @@
 - CI now uses `giraffate/clippy-action@` instead of `actions-rs/clippy-check` for Clippy check.
 
 ### Fixed
+- `transfer::Normal`'s data_buffer_pointer calculation is fixed.
 - The path to the workflow status is fixed.
 - Removed an outdated lint `unaligned_references`.
 

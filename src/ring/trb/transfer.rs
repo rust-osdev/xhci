@@ -177,7 +177,7 @@ impl Normal {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
 
-        (l << 32) | u
+        (u << 32) | l
     }
 
     rw_field!([2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);

@@ -6,6 +6,7 @@
 
 ### Fixed
 - The path to the workflow status is fixed.
+- Removed an outdated `unaligned_references` lint.
 
 ## 0.9.1 - 2022-09-09
 ### Added

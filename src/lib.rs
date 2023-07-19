@@ -48,7 +48,6 @@
     non_ascii_idents,
     private_doc_tests,
     single_use_lifetimes,
-    unaligned_references,
     unreachable_pub,
     unused_crate_dependencies,
     unused_extern_crates,

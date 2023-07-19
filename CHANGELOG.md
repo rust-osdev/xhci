@@ -4,8 +4,12 @@
 ### Added
 - The sponsor button is now shown on the repository page on GitHub.
 
+### Changed
+- CI now uses `giraffate/clippy-action@` instead of `actions-rs/clippy-check` for Clippy check.
+
 ### Fixed
 - The path to the workflow status is fixed.
+- Removed an outdated lint `unaligned_references`.
 
 ## 0.9.1 - 2022-09-09
 ### Added

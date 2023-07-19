@@ -25,7 +25,7 @@ jobs:
         shopt -s globstar
         rustfmt **/*.rs --check
 
-    - uses: giraffate/clippy/action@v1
+    - uses: giraffate/clippy-action@v1
       with:
         clippy_flags: -- -D clippy::pedantic -D clippy::all
 

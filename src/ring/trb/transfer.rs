@@ -177,7 +177,7 @@ impl Normal {
         let l: u64 = self.0[0].into();
         let u: u64 = self.0[1].into();
 
-        (l << 32) | u
+        (u << 32) | l
     }
 
     rw_field!([2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
@@ -526,4 +526,27 @@ pub enum TransferType {
     Out = 2,
     /// In Data Stage.
     In = 3,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn normal_data_buffer_pointer() {
+        let mut normal = Normal::new();
+        let pointer = 0x12345678_9abcdef0;
+        normal.set_data_buffer_pointer(pointer);
+        let pointer_read = normal.data_buffer_pointer();
+        assert_eq!(pointer, pointer_read);
+    }
+
+    #[test]
+    fn isoch_data_buffer_pointer() {
+        let mut isoch = Isoch::new();
+        let pointer = 0xabcd1234_567890ef;
+        isoch.set_data_buffer_pointer(pointer);
+        let pointer_read = isoch.data_buffer_pointer();
+        assert_eq!(pointer, pointer_read);
+    }
 }

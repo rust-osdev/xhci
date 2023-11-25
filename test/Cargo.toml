@@ -3,6 +3,7 @@ name = "xhci-test"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+qemu-exit = "3.0.2"
+qemu_print = { version = "0.1.0", features = ["stable"], default-features = false }
+uefi = "0.26.0"

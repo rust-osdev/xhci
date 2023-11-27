@@ -6,6 +6,7 @@ test: build/os.img
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_VARS.fd \
 		-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
 		-serial stdio \
+		-no-reboot \
 		-display none \
 		-drive format=raw,file=build/os.img;	\
 	if [ $$? -eq 33 ];\

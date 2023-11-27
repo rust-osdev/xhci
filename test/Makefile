@@ -1,6 +1,9 @@
+IMG = build/os.img
+EFI = target/x86_64-unknown-uefi/debug/xhci-test.efi
+
 .PHONY:	test clean
 
-test: build/os.img
+test: $(IMG)
 	qemu-system-x86_64	\
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_CODE.fd \
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_VARS.fd \
@@ -8,7 +11,7 @@ test: build/os.img
 		-serial stdio \
 		-no-reboot \
 		-display none \
-		-drive format=raw,file=build/os.img;	\
+		-drive format=raw,file=$(IMG);	\
 	if [ $$? -eq 33 ];\
 	then\
 		echo "Test passed";\
@@ -17,14 +20,14 @@ test: build/os.img
 		exit 1;\
 	fi
 
-build/os.img: target/x86_64-unknown-uefi/debug/xhci-test.efi build
-	dd if=/dev/zero of=build/os.img bs=512 count=93750
-	mformat -i build/os.img -h 200 -t 500 -s 144::
-	mmd -i build/os.img ::/efi
-	mmd -i build/os.img ::/efi/boot
-	mcopy -i build/os.img target/x86_64-unknown-uefi/debug/xhci-test.efi ::/efi/boot/bootx64.efi
+$(IMG): $(EFI) build
+	dd if=/dev/zero of=$@ bs=512 count=93750
+	mformat -i $@ -h 200 -t 500 -s 144::
+	mmd -i $@ ::/efi
+	mmd -i $@ ::/efi/boot
+	mcopy -i $@ $(EFI) ::/efi/boot/bootx64.efi
 
-target/x86_64-unknown-uefi/debug/xhci-test.efi: src/main.rs
+$(EFI):
 	cargo build
 
 build:

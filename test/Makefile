@@ -8,6 +8,7 @@ test: $(IMG)
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_CODE.fd \
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_VARS.fd \
 		-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+		-device qemu-xhci,id=xhci\
 		-serial stdio \
 		-no-reboot \
 		-display none \
@@ -27,7 +28,7 @@ $(IMG): $(EFI) build
 	mmd -i $@ ::/efi/boot
 	mcopy -i $@ $(EFI) ::/efi/boot/bootx64.efi
 
-$(EFI):
+$(EFI): $(wildcard src/*.rs) Cargo.toml
 	cargo build
 
 build:

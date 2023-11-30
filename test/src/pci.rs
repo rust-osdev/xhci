@@ -1,5 +1,4 @@
 use bit_field::BitField;
-use qemu_print::qemu_println;
 use x86_64::instructions::port::PortRead;
 use x86_64::instructions::port::PortWrite;
 

@@ -3,25 +3,51 @@ use x86_64::instructions::port::PortRead;
 use x86_64::instructions::port::PortWrite;
 
 pub fn xhci_exists() -> bool {
-    for device in 0..=31 {
-        for bus in 0..=255 {
-            let config_address_reader = unsafe { ConfigSpaceReader::new(0, device, bus) };
-            let config_space = unsafe { ConfigSpace::new(config_address_reader) };
+    iter_devices()
+        .find(|device| {
+            device.base_class() == 0x0c && device.sub_class() == 0x03 && device.interface() == 0x30
+        })
+        .is_some()
+}
 
-            if config_space.vendor_id() == 0xffff {
-                continue;
-            }
+fn iter_devices() -> impl Iterator<Item = ConfigSpace> {
+    DeviceIter::new()
+}
 
-            if config_space.base_class() == 0x0c
-                && config_space.sub_class() == 0x03
-                && config_space.interface() == 0x30
-            {
-                return true;
-            }
-        }
+struct DeviceIter {
+    device: u8,
+    bus: u8,
+}
+impl DeviceIter {
+    fn new() -> Self {
+        Self { device: 0, bus: 0 }
     }
+}
+impl Iterator for DeviceIter {
+    type Item = ConfigSpace;
 
-    false
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.device == 32 {
+            self.device = 0;
+
+            let Some(result) = self.bus.checked_add(1) else {
+                return None;
+            };
+
+            self.bus = result;
+        }
+
+        let config_address_reader = unsafe { ConfigSpaceReader::new(0, self.device, self.bus) };
+        let config_space = unsafe { ConfigSpace::new(config_address_reader) };
+
+        self.device += 1;
+
+        if config_space.vendor_id() == 0xffff {
+            return self.next();
+        }
+
+        Some(config_space)
+    }
 }
 
 struct ConfigSpace {

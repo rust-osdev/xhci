@@ -113,18 +113,18 @@ macro_rules! rw1c_bit {
     ([$offset:literal]($bit:literal),$method:ident,$name:literal) => {
         bit_getter!([$offset]($bit), $method, $name);
         paste::paste! {
-            #[doc = "Clears the"]
+            #[doc = "Assigns 1 to the"]
             #[doc = $name]
-            #[doc = "bit."]
+            #[doc = "bit. On register write, this results in clearing the bit."]
             pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0[$offset].set_bit($bit,true);
                 self
             }
 
-            #[doc = "Set the "]
+            #[doc = "Assigns 0 to the"]
             #[doc = $name]
-            #[doc = " bit to 0, preventing the bit from being cleared on write."]
+            #[doc = "bit, preventing the bit from being cleared on write."]
             pub fn [<set_0_ $method>](&mut self) -> &mut Self {
                 use bit_field::BitField;
                 self.0[$offset].set_bit($bit,false);
@@ -135,18 +135,18 @@ macro_rules! rw1c_bit {
     ($bit:literal,$method:ident,$name:literal) => {
         bit_getter!($bit, $method, $name);
         paste::paste! {
-            #[doc = "Clears the"]
+            #[doc = "Assigns 1 to the"]
             #[doc = $name]
-            #[doc = "bit."]
+            #[doc = "bit. On register write, this results in clearing the bit."]
             pub fn [<clear_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
                 self
             }
 
-            #[doc = "Set the "]
+            #[doc = "Assigns 0 to the"]
             #[doc = $name]
-            #[doc = " bit to 0, preventing the bit from being cleared on write."]
+            #[doc = "bit, preventing the bit from being cleared on write."]
             pub fn [<set_0_ $method>](&mut self) -> &mut Self {
                 use bit_field::BitField;
                 self.0.set_bit($bit,false);

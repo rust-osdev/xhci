@@ -2,12 +2,10 @@ use bit_field::BitField;
 use x86_64::instructions::port::PortRead;
 use x86_64::instructions::port::PortWrite;
 
-pub fn xhci_exists() -> bool {
-    iter_devices()
-        .find(|device| {
-            device.base_class() == 0x0c && device.sub_class() == 0x03 && device.interface() == 0x30
-        })
-        .is_some()
+pub fn iter_xhc() -> impl Iterator<Item = ConfigSpace> {
+    iter_devices().filter(|device| {
+        device.base_class() == 0x0c && device.sub_class() == 0x03 && device.interface() == 0x30
+    })
 }
 
 fn iter_devices() -> impl Iterator<Item = ConfigSpace> {
@@ -50,7 +48,7 @@ impl Iterator for DeviceIter {
     }
 }
 
-struct ConfigSpace {
+pub struct ConfigSpace {
     address: ConfigSpaceReader,
 }
 impl ConfigSpace {
@@ -59,6 +57,14 @@ impl ConfigSpace {
     /// `address` must be a valid address.
     unsafe fn new(address: ConfigSpaceReader) -> Self {
         Self { address }
+    }
+
+    pub fn base_address_register(&self, index: u8) -> u32 {
+        assert!(index < 6, "index must be less than 6");
+
+        let result = unsafe { self.address.read(4 + index) };
+
+        result
     }
 
     fn vendor_id(&self) -> u16 {

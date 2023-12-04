@@ -1,14 +1,15 @@
 #![no_std]
 #![no_main]
 
+mod pci;
+
 use core::num::NonZeroUsize;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
 use uefi::table::boot::MemoryType;
+use xhci::extended_capabilities;
 
-mod pci;
-
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Mapper;
 impl xhci::accessor::Mapper for Mapper {
     // UEFI sets up the identity mapping, so we don't need to do anything here.
@@ -30,7 +31,21 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     let mmio_base = (((mmio_high as u64) << 32) | (mmio_low as u64 & 0xffff_fff0)) as usize;
 
-    let _registers = unsafe { xhci::Registers::new(mmio_base, Mapper) };
+    let registers = unsafe { xhci::Registers::new(mmio_base, Mapper) };
+
+    let extended_capabilities = unsafe {
+        extended_capabilities::List::new(
+            mmio_base,
+            registers.capability.hccparams1.read_volatile(),
+            Mapper,
+        )
+    };
+
+    if let Some(mut list) = extended_capabilities {
+        for item in list.into_iter() {
+            qemu_println!("{:?}", item);
+        }
+    }
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -5,11 +5,15 @@ use accessor::array;
 use accessor::Mapper;
 use core::{convert::TryFrom, fmt};
 
+/// A type alias to [`Doorbell`] register for backward compability.
+#[deprecated = "Use `Doorbell` instead of `Register`."]
+pub type Register = Doorbell;
+
 /// The element of the Doorbell Array.
 #[repr(transparent)]
 #[derive(Copy, Clone, Default)]
-pub struct Register(u32);
-impl Register {
+pub struct Doorbell(u32);
+impl Doorbell {
     /// Creates a new accessor to the Doorbell Array.
     ///
     /// # Safety
@@ -44,7 +48,7 @@ impl Register {
     rw_field!(0..=7, doorbell_target, "Doorbell Target", u8);
     rw_field!(16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
 }
-impl fmt::Debug for Register {
+impl fmt::Debug for Doorbell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("doorbell::Register")
             .field("doorbell_target", &self.doorbell_target())

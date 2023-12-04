@@ -22,7 +22,7 @@ where
     /// Host Controller Capability Register
     pub capability: Capability<M>,
     /// Doorbell Array
-    pub doorbell: array::ReadWrite<doorbell::Register, M>,
+    pub doorbell: array::ReadWrite<doorbell::Doorbell, M>,
     /// Host Controller Operational Register
     pub operational: Operational<M>,
     /// Port Register Set Array
@@ -75,7 +75,7 @@ where
     /// ```
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
         let capability = Capability::new(mmio_base, &mapper);
-        let doorbell = doorbell::Register::new(mmio_base, &capability, mapper.clone());
+        let doorbell = doorbell::Doorbell::new(mmio_base, &capability, mapper.clone());
         let operational =
             Operational::new(mmio_base, capability.caplength.read_volatile(), &mapper);
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());

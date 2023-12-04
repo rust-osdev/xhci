@@ -5,8 +5,10 @@ edition = "2021"
 
 [dependencies]
 bit_field = "0.10.2"
+conquer-once = { version = "0.4.0", default-features = false }
 qemu-exit = "3.0.2"
 qemu_print = { version = "0.1.0", features = ["stable"], default-features = false }
+spinning_top = "0.3.0"
 uefi = "0.26.0"
 x86_64 = { version = "0.14.11", default-features = false }
 xhci = { version = "0.9.2", path = ".." }

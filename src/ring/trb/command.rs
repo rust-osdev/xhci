@@ -2,7 +2,6 @@
 
 use super::{Link, Type};
 use bit_field::BitField;
-use core::convert::TryInto;
 use num_traits::FromPrimitive;
 
 allowed! {
@@ -123,36 +122,15 @@ reserved!(AddressDevice(Type::AddressDevice) {
     [3]16..=23;
 });
 impl AddressDevice {
-    /// Sets the value of the Input Context Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `p` is not 16-byte aligned.
-    pub fn set_input_context_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Input Context Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Input Context Pointer field.
-    #[must_use]
-    pub fn input_context_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
-    rw_bit!(pub, 
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        input_context_pointer,
+        "Input Context Pointer",
+        32, u64
+    );
+    rw_bit!(
+        pub, 
         [3](9),
         block_set_address_request,
         "Block Set Address Request"
@@ -177,35 +155,13 @@ reserved!(ConfigureEndpoint(Type::ConfigureEndpoint) {
     [3]16..=23;
 });
 impl ConfigureEndpoint {
-    /// Sets the value of the Input Context Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `p` is not 16-byte aligned.
-    pub fn set_input_context_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Input Context Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Input Context Pointer field.
-    #[must_use]
-    pub fn input_context_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        input_context_pointer,
+        "Input Context Pointer",
+        32, u64
+    );
     rw_bit!(pub, [3](9), deconfigure, "Deconfigure");
     rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
@@ -227,34 +183,13 @@ reserved!(EvaluateContext(Type::EvaluateContext) {
     [3]16..=23;
 });
 impl EvaluateContext {
-    /// Sets the value of the Input Context Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `p` is not 16-byte aligned.
-    pub fn set_input_context_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Input Context Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Input Context Pointer field.
-    #[must_use]
-    pub fn input_context_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        input_context_pointer,
+        "Input Context Pointer",
+        32, u64
+    );
     rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(EvaluateContext {
@@ -321,36 +256,13 @@ reserved!(SetTrDequeuePointer(Type::SetTrDequeuePointer) {
 impl SetTrDequeuePointer {
     rw_bit!(pub, [0](0), dequeue_cycle_state, "Dequeue Cycle State");
     rw_field!(pub, [0](1..=3), stream_context_type, "Stream Context Type", u8);
-
-    /// Sets the value of the New TR Dequeue Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `p` is not 16-byte aligned.
-    pub fn set_new_tr_dequeue_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The New TR Dequeue Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0].set_bits(4..32, l.get_bits(4..32).try_into().unwrap());
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the New TR Dequeue Pointer field.
-    #[must_use]
-    pub fn new_tr_dequeue_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        ((u << 32) | l) & 0xffff_fff0
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        new_tr_dequeue_pointer,
+        "New TR Dequeue Pointer",
+        32, u64
+    );
     rw_field!(pub, [2](16..=31), stream_id, "Stream ID", u16);
     rw_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
     rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
@@ -385,32 +297,13 @@ reserved!(ForceEvent(Type::ForceEvent) {
     [3]24..=31;
 });
 impl ForceEvent {
-    /// Sets the value of the Event TRB Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the `p` is not 16-byte aligned.
-    pub fn set_event_trb_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(p % 16, 0, "The Event TRB Pointer must be 16-byte aligned.");
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-
-        self
-    }
-
-    /// Returns the value of the Event TRB Pointer field.
-    #[must_use]
-    pub fn event_trb_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        event_trb_pointer,
+        "Event TRB Pointer",
+        32, u64
+    );
     rw_field!(pub, 
         [2](22..=31),
         vf_interrupter_target,
@@ -478,34 +371,13 @@ reserved!(GetPortBandwidth(Type::GetPortBandwidth) {
     [3]20..=23;
 });
 impl GetPortBandwidth {
-    /// Sets the value of the Port Bandwidth Context Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the `p` is not 16-byte aligned.
-    pub fn set_port_bandwidth_context_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Port Bandwidth Context Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Port Bandwidth Context Pointer field.
-    #[must_use]
-    pub fn port_bandwidth_context_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        port_bandwidth_context_pointer,
+        "Port Bandwidth Context Pointer",
+        32, u64
+    );
     rw_field!(pub, [3](16..=19), dev_speed, "Dev Speed", u8);
     rw_field!(pub, [3](24..=31), hub_slot_id, "Hub Slot ID", u8);
 }
@@ -570,35 +442,13 @@ reserved!(GetExtendedProperty(Type::GetExtendedProperty) {
     [3]1..=9;
 });
 impl GetExtendedProperty {
-    /// Sets the value of the Extended Property Context Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the `p` is not 16-byte aligned.
-    pub fn set_extended_property_context_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Extended Property Context Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Extended Property Context Pointer field.
-    #[must_use]
-    pub fn extended_property_context_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        extended_property_context_pointer,
+        "Extended Property Context Pointer",
+        32, u64
+    );
     rw_field!(pub, 
         [2](0..=15),
         extended_capability_identifier,

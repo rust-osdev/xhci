@@ -108,15 +108,7 @@ reserved!(TransferEvent(Type::TransferEvent){
     [3]21..=23;
 });
 impl TransferEvent {
-    /// Returns the value of the TRB Pointer field.
-    #[must_use]
-    pub fn trb_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    ro_double_field!(pub, [0, 1], trb_pointer, "TRB Pointer", 32, u64);
     ro_field!(pub, [2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
     ro_bit!(pub, [3](2), event_data, "Event Data");
     ro_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
@@ -140,15 +132,13 @@ reserved!(CommandCompletion(Type::CommandCompletion){
     [3]1..=9;
 });
 impl CommandCompletion {
-    /// Returns the value of the Command TRB Pointer field.
-    #[must_use]
-    pub fn command_trb_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    ro_double_field!(
+        pub,
+        [0, 1],
+        command_trb_pointer,
+        "Command TRB Pointer",
+        32, u64
+    );
     ro_field!(pub, 
         [2](0..=23),
         command_completion_parameter,
@@ -228,14 +218,18 @@ reserved!(DeviceNotification(Type::DeviceNotification){
 });
 impl DeviceNotification {
     ro_field!(pub, [0](4..=7), notification_type, "Notification Type", u8);
+    ro_double_field!(
+        pub(self),
+        [0, 1]{8},
+        device_notification_data_raw,
+        "Device Notification Data Raw",
+        32, u64
+    );
 
     /// Returns the value of the Device Notification Data field.
     #[must_use]
     pub fn device_notification_data(&self) -> u64 {
-        let l: u64 = self.0[0].get_bits(8..=31).into();
-        let u: u64 = self.0[1].into();
-
-        ((u << 32) | l) >> 8
+        self.device_notification_data_raw() >> 8
     }
 
     ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);

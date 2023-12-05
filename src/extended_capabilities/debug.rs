@@ -85,11 +85,13 @@ where
 #[derive(Copy, Clone)]
 pub struct Id(u32);
 impl Id {
-    /// Returns the value of the Debug Capability Event Ring Segment Table Max field.
-    #[must_use]
-    pub fn debug_capability_event_ring_segment_table_max(self) -> u8 {
-        self.0.get_bits(16..=20).try_into().unwrap()
-    }
+    ro_field!(
+        pub,
+        16..=20,
+        debug_capability_event_ring_segment_table_max,
+        "Debug Capability Event Ring Segment Table Max",
+        u8
+    );
 }
 impl_debug_from_methods! {
     Id {
@@ -102,10 +104,7 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct Doorbell(u32);
 impl Doorbell {
-    /// Sets the value of the Doorbell Target field.
-    pub fn set_doorbell_target(&mut self, target: u8) {
-        self.0.set_bits(8..=15, target.into());
-    }
+    field_setter!(pub, 8..=15, "Doorbell Target", u8);
 }
 
 /// Debug Capability Event Ring Segment Table Size Register.
@@ -113,16 +112,7 @@ impl Doorbell {
 #[derive(Copy, Clone)]
 pub struct EventRingSegmentTableSize(u32);
 impl EventRingSegmentTableSize {
-    /// Returns the value of the Event Ring Segment Table Size field.
-    #[must_use]
-    pub fn get(self) -> u16 {
-        self.0.get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Event Ring Segment Table Size field.
-    pub fn set(&mut self, sz: u16) {
-        self.0.set_bits(0..=15, sz.into());
-    }
+    rw_field!(pub, 0..=15, "Event Ring Segment Table Size", u16);
 }
 impl_debug_from_methods! {
     EventRingSegmentTableSize {
@@ -135,25 +125,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct EventRingSegmentTableBaseAddress(u64);
 impl EventRingSegmentTableBaseAddress {
-    /// Returns the value of the Event Ring Segment Table Base Address field.
-    #[must_use]
-    pub fn get(self) -> u64 {
-        self.0
-    }
-
-    /// Sets the value of the Event Ring Segment Table Base Address field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the address is not 16-byte aligned.
-    pub fn set(&mut self, a: u64) {
-        assert!(
-            a.trailing_zeros() >= 4,
-            "The base address of the Event Ring Segment Table must be 16-byte aligned."
-        );
-
-        self.0 = a;
-    }
+    rw_field!(
+        pub,
+        []{4, "64-byte aligned"},
+        "Event Ring Segment Table Base Address",
+        u64
+    );
 }
 impl_debug_from_methods! {
     EventRingSegmentTableBaseAddress {
@@ -166,36 +143,20 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct EventRingDequeuePointer(u64);
 impl EventRingDequeuePointer {
-    /// Returns the value of the Dequeue ERST Segment Index field.
-    #[must_use]
-    pub fn dequeue_erst_segment_index(self) -> u8 {
-        self.0.get_bits(0..=2).try_into().unwrap()
-    }
-
-    /// Sets the value of the Dequeue ERST Segment Index field.
-    pub fn set_dequeue_erst_segment_index(&mut self, i: u8) {
-        self.0.set_bits(0..=2, i.into());
-    }
-
-    /// Returns the value of the Dequeue Pointer field.
-    #[must_use]
-    pub fn dequeue_pointer(self) -> u64 {
-        self.0 & !0b1111
-    }
-
-    /// Sets the value of the Dequeue Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the address is not 16-byte aligned.
-    pub fn set_dequeue_pointer(&mut self, a: u64) {
-        assert!(
-            a.trailing_zeros() >= 4,
-            "The Event Ring Dequeue Pointer must be 16-byte aligned."
-        );
-
-        self.0.set_bits(4..=63, a.get_bits(4..=63));
-    }
+    rw_field!(
+        pub,
+        0..=2,
+        dequeue_erst_segment_index,
+        "Dequeue ERST Segment Index",
+        u8
+    );
+    rw_field!(
+        pub,
+        []{4, "16-byte aligned"},
+        dequeue_pointer,
+        "Event Ring Dequeue Pointer",
+        u64
+    );
 }
 impl_debug_from_methods! {
     EventRingDequeuePointer {
@@ -309,22 +270,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct ContextPointer(u64);
 impl ContextPointer {
-    /// Returns the start address of the Debug Capability Context data structure.
-    #[must_use]
-    pub fn get(self) -> u64 {
-        self.0
-    }
-
-    /// Sets the start address of the Debug Capability Context data structure.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the address is not 16-byte aligned.
-    pub fn set(&mut self, a: u64) {
-        assert!(a.trailing_zeros()>=4,"The start address of the Debug Capability Context data structure must be 16-byte aligned.");
-
-        self.0 = a;
-    }
+    rw_field!(
+        pub,
+        []{4, "16-byte aligned"},
+        "Debug Capability Context Base Pointer",
+        u64
+    );
 }
 
 /// Debug Capability Device Descriptor Info Register 1
@@ -332,27 +283,8 @@ impl ContextPointer {
 #[derive(Copy, Clone)]
 pub struct DeviceDescriptorInfo1(u32);
 impl DeviceDescriptorInfo1 {
-    /// Returns the value of the DbC Protocol field.
-    #[must_use]
-    pub fn dbc_protocol(self) -> u8 {
-        self.0.get_bits(0..=7).try_into().unwrap()
-    }
-
-    /// Sets the value of the DbC Protocol field.
-    pub fn set_dbc_protocol(&mut self, protocol: u8) {
-        self.0.set_bits(0..=7, protocol.into());
-    }
-
-    /// Returns the value of the Vendor ID field.
-    #[must_use]
-    pub fn vendor_id(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Vendor ID field.
-    pub fn set_vendor_id(&mut self, id: u16) {
-        self.0.set_bits(16..=31, id.into());
-    }
+    rw_field!(pub, 0..=7, dbc_protocol, "DbC Protocol", u8);
+    rw_field!(pub, 16..=31, vendor_id, "Vendor ID", u16);
 }
 impl_debug_from_methods! {
     DeviceDescriptorInfo1 {
@@ -366,27 +298,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct DeviceDescriptorInfo2(u32);
 impl DeviceDescriptorInfo2 {
-    /// Returns the value of the Product ID field.
-    #[must_use]
-    pub fn product_id(self) -> u16 {
-        self.0.get_bits(0..=15).try_into().unwrap()
-    }
-
-    /// Sets the value of the Product ID field.
-    pub fn set_product_id(&mut self, id: u16) {
-        self.0.set_bits(0..=15, id.into());
-    }
-
-    /// Returns the value of the Device Revision field.
-    #[must_use]
-    pub fn device_revision(self) -> u16 {
-        self.0.get_bits(16..=31).try_into().unwrap()
-    }
-
-    /// Sets the value of the Device Revision field.
-    pub fn set_device_revision(&mut self, revision: u16) {
-        self.0.set_bits(16..=31, revision.into());
-    }
+    rw_field!(pub, 0..=15, product_id, "Product ID", u16);
+    rw_field!(pub, 16..=31, device_revision, "Device Revision", u16);
 }
 impl_debug_from_methods! {
     DeviceDescriptorInfo2 {

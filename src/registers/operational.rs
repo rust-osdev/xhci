@@ -216,21 +216,13 @@ impl CommandRingControlRegister {
     w1s_bit!(pub, 1, command_stop, "Command Stop");
     w1s_bit!(pub, 2, command_abort, "Command Abort");
     ro_bit!(pub, 3, command_ring_running, "Command Ring Running");
-
-    /// Sets the value of the Command Ring Pointer field. It must be 64 byte aligned.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the given pointer is not 64 byte aligned.
-    pub fn set_command_ring_pointer(&mut self, p: u64) {
-        assert!(
-            p.trailing_zeros() >= 6,
-            "The Command Ring Pointer must be 64-byte aligned."
-        );
-
-        let p = p >> 6;
-        self.0.set_bits(6..=63, p);
-    }
+    rw_field!(
+        pub,
+        []{6, "64-byte aligned"},
+        command_ring_pointer,
+        "Command Ring Pointer",
+        u64
+    );
 }
 impl_debug_from_methods! {
     CommandRingControlRegister{
@@ -243,24 +235,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug, Default)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
 impl DeviceContextBaseAddressArrayPointerRegister {
-    /// Returns the value of the Device Context Base Address Array Pointer.
-    #[must_use]
-    pub fn get(self) -> u64 {
-        self.0
-    }
-
-    /// Sets the value of the Device Context Base Address Array Pointer. It must be 64 byte aligned.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the given pointer is not 64 byte aligned.
-    pub fn set(&mut self, p: u64) {
-        assert!(
-            p.trailing_zeros() >= 6,
-            "The Device Context Base Address Array Pointer must be 64-byte aligned."
-        );
-        self.0 = p;
-    }
+    rw_field!(
+        pub,
+        []{6, "64-byte aligned"},
+        "Device Context Base Address Array Pointer",
+        u64
+    );
 }
 
 /// Configure Register

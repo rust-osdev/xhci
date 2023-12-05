@@ -206,16 +206,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
-    /// Returns the number of segments the Event Ring Segment Table supports.
-    #[must_use]
-    pub fn get(self) -> u16 {
-        self.0.try_into().unwrap()
-    }
-
-    /// Sets the number of segments the Event Ring Segment Table supports.
-    pub fn set(&mut self, s: u16) {
-        self.0 = s.into();
-    }
+    rw_field!(
+        pub,
+        0..=15,
+        "Event Ring Segment Table Size (the number of segments)",
+        u16
+    );
 }
 
 /// Event Ring Segment Table Base Address Register.
@@ -223,24 +219,12 @@ impl EventRingSegmentTableSizeRegister {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
-    /// Returns the base address of the Event Ring Segment Table.
-    #[must_use]
-    pub fn get(self) -> u64 {
-        self.0
-    }
-
-    /// Sets the base address of the Event Ring Segment Table. It must be 64 byte aligned.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the address is not 64 byte aligned.
-    pub fn set(&mut self, a: u64) {
-        assert!(
-            a.trailing_zeros() >= 6,
-            "The Event Ring Segment Table Base Address must be 64-byte aligned."
-        );
-        self.0 = a;
-    }
+    rw_field!(
+        pub,
+        []{6, "64-byte aligned"},
+        "Event Ring Segment Table Base Address",
+        u64
+    );
 }
 
 /// Event Ring Dequeue Pointer Register.
@@ -256,24 +240,13 @@ impl EventRingDequeuePointerRegister {
     );
     rw1c_bit!(pub, 3, event_handler_busy, "Event Handler Busy");
 
-    /// Returns the address of the current Event Ring Dequeue Pointer.
-    #[must_use]
-    pub fn event_ring_dequeue_pointer(self) -> u64 {
-        self.0 & !0b1111
-    }
-
-    /// Sets the address of the current Event Ring Dequeue Pointer. It must be 16 byte aligned.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the address is not 16 byte aligned.
-    pub fn set_event_ring_dequeue_pointer(&mut self, p: u64) {
-        assert!(
-            p.trailing_zeros() >= 4,
-            "The Event Ring Dequeue Pointer must be 16-byte aligned."
-        );
-        self.0 = p;
-    }
+    rw_field!(
+        pub,
+        []{4, "16-byte aligned"},
+        event_ring_dequeue_pointer,
+        "current Event Ring Dequeue Pointer",
+        u64
+    );
 }
 impl_debug_from_methods! {
     EventRingDequeuePointerRegister{

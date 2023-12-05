@@ -1,7 +1,6 @@
 //! TRB (Transfer Request Block).
 
 use bit_field::BitField;
-use core::convert::TryInto;
 use num_derive::FromPrimitive;
 
 macro_rules! reserved{
@@ -202,35 +201,13 @@ reserved!(Link(Type::Link){
     [3]16..=31;
 });
 impl Link {
-    /// Sets the value of the Ring Segment Pointer field.
-    ///
-    /// # Panics
-    ///
-    /// This method panics if `p` is not 16-byte aligned.
-    pub fn set_ring_segment_pointer(&mut self, p: u64) -> &mut Self {
-        assert_eq!(
-            p % 16,
-            0,
-            "The Ring Segment Pointer must be 16-byte aligned."
-        );
-
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Ring Segment Pointer field.
-    #[must_use]
-    pub fn ring_segment_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1]{4, "16-byte aligned"},
+        ring_segment_pointer,
+        "Ring Segment Pointer",
+        32, u64
+    );
     rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u32);
     rw_bit!(pub, [3](1), toggle_cycle, "Toggle Cycle");
     rw_bit!(pub, [3](4), chain_bit, "Chain bit");

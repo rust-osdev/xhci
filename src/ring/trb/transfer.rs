@@ -161,25 +161,13 @@ reserved!(Normal(Type::Normal) {
     [3]16..=31;
 });
 impl Normal {
-    /// Sets the value of the Data Buffer Pointer field.
-    pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Data Buffer Pointer field.
-    #[must_use]
-    pub fn data_buffer_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1],
+        data_buffer_pointer,
+        "Data Buffer Pointer",
+        32, u64
+    );
     rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
     rw_field!(pub, [2](17..=21), td_size, "TD Size", u8);
     rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
@@ -285,25 +273,13 @@ reserved!(DataStage(Type::DataStage) {
     [3]17..=31;
 });
 impl DataStage {
-    /// Sets the value of the Data Buffer Pointer field.
-    pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Data Buffer Pointer field.
-    #[must_use]
-    pub fn data_buffer_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1],
+        data_buffer_pointer,
+        "Data Buffer Pointer",
+        32, u64
+    );
     rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
     rw_field!(pub, [2](17..=21), td_size, "TD Size", u8);
     rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
@@ -371,25 +347,13 @@ impl_debug_for_transfer_trb! {
 transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
 reserved!(Isoch(Type::Isoch) {});
 impl Isoch {
-    /// Sets the value of the Data Buffer Pointer.
-    pub fn set_data_buffer_pointer(&mut self, p: u64) -> &mut Self {
-        let l = p.get_bits(0..32);
-        let u = p.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Data Buffer Pointer.
-    #[must_use]
-    pub fn data_buffer_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1],
+        data_buffer_pointer,
+        "Data Buffer Pointer",
+        32, u64
+    );
     rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
     rw_field!(pub, [2](17..=21), td_size_or_tbc, "TD Size/TBC", u8);
     rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
@@ -438,25 +402,13 @@ reserved!(EventData(Type::EventData) {
     [3]16..=31;
 });
 impl EventData {
-    /// Sets the value of the Event Data field.
-    pub fn set_event_data(&mut self, d: u64) -> &mut Self {
-        let l = d.get_bits(0..32);
-        let u = d.get_bits(32..64);
-
-        self.0[0] = l.try_into().unwrap();
-        self.0[1] = u.try_into().unwrap();
-        self
-    }
-
-    /// Returns the value of the Event Data field.
-    #[must_use]
-    pub fn event_data(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
-
+    rw_double_field!(
+        pub,
+        [0, 1],
+        event_data,
+        "Event Data",
+        32, u64
+    );
     rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
     rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
     rw_bit!(pub, [3](4), chain_bit, "Chain bit");

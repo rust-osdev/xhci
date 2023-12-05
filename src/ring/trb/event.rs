@@ -97,7 +97,7 @@ reserved!(PortStatusChange(Type::PortStatusChange){
     [3]16..=31;
 });
 impl PortStatusChange {
-    ro_field!([0](24..=31), port_id, "Port ID", u8);
+    ro_field!(pub, [0](24..=31), port_id, "Port ID", u8);
 }
 impl_debug_for_event_trb!(PortStatusChange { port_id });
 
@@ -117,10 +117,10 @@ impl TransferEvent {
         (u << 32) | l
     }
 
-    ro_field!([2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
-    ro_bit!([3](2), event_data, "Event Data");
-    ro_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, [2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
+    ro_bit!(pub, [3](2), event_data, "Event Data");
+    ro_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
+    ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(TransferEvent {
     trb_pointer,
@@ -149,14 +149,14 @@ impl CommandCompletion {
         (u << 32) | l
     }
 
-    ro_field!(
+    ro_field!(pub, 
         [2](0..=23),
         command_completion_parameter,
         "Command Completion Parameter",
         u32
     );
-    ro_field!([3](16..=23), vf_id, "VF ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, [3](16..=23), vf_id, "VF ID", u8);
+    ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(CommandCompletion {
     command_trb_pointer,
@@ -178,7 +178,7 @@ reserved!(BandwidthRequest(Type::BandwidthRequest){
     [3]16..=23;
 });
 impl BandwidthRequest {
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(BandwidthRequest { slot_id });
 
@@ -190,9 +190,9 @@ reserved!(Doorbell(Type::Doorbell){
     [3]1..=9;
 });
 impl Doorbell {
-    ro_field!([0](0..=4), db_reason, "DB Reason", u8);
-    ro_field!([3](16..=23), vf_id, "VF ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, [0](0..=4), db_reason, "DB Reason", u8);
+    ro_field!(pub, [3](16..=23), vf_id, "VF ID", u8);
+    ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(Doorbell {
     db_reason,
@@ -227,7 +227,7 @@ reserved!(DeviceNotification(Type::DeviceNotification){
     [3]16..=31;
 });
 impl DeviceNotification {
-    ro_field!([0](4..=7), notification_type, "Notification Type", u8);
+    ro_field!(pub, [0](4..=7), notification_type, "Notification Type", u8);
 
     /// Returns the value of the Device Notification Data field.
     #[must_use]
@@ -238,7 +238,7 @@ impl DeviceNotification {
         ((u << 32) | l) >> 8
     }
 
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(DeviceNotification {
     notification_type,

@@ -113,8 +113,8 @@ impl MessageAddress for u64 {}
 #[derive(Copy, Clone)]
 pub struct MessageControl(u16);
 impl MessageControl {
-    ro_bit!(8, per_vector_masking_capable, "Per-vector masking capable");
-    ro_bit!(7, bit64_address_capable, "64 bit address capable");
+    ro_bit!(pub, 8, per_vector_masking_capable, "Per-vector masking capable");
+    ro_bit!(pub, 7, bit64_address_capable, "64 bit address capable");
 
     /// Returns the value of the Multiple Message Enable field.
     #[must_use]
@@ -133,7 +133,7 @@ impl MessageControl {
         self.0.get_bits(1..=3).try_into().unwrap()
     }
 
-    rw_bit!(0, msi_enable, "MSI Enable");
+    rw_bit!(pub, 0, msi_enable, "MSI Enable");
 }
 impl_debug_from_methods! {
     MessageControl {

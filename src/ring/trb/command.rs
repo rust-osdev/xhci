@@ -94,7 +94,7 @@ reserved!(EnableSlot(Type::EnableSlot) {
     [3]21..=31;
 });
 impl EnableSlot {
-    rw_field!([3](16..=20), slot_type, "Slot Type", u8);
+    rw_field!(pub, [3](16..=20), slot_type, "Slot Type", u8);
 }
 impl_debug_for_trb!(EnableSlot { slot_type });
 
@@ -107,7 +107,7 @@ reserved!(DisableSlot(Type::DisableSlot) {
     [3]16..=23;
 });
 impl DisableSlot {
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(DisableSlot { slot_id });
 
@@ -152,12 +152,12 @@ impl AddressDevice {
         (u << 32) | l
     }
 
-    rw_bit!(
+    rw_bit!(pub, 
         [3](9),
         block_set_address_request,
         "Block Set Address Request"
     );
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(AddressDevice {
     input_context_pointer,
@@ -206,8 +206,8 @@ impl ConfigureEndpoint {
         (u << 32) | l
     }
 
-    rw_bit!([3](9), deconfigure, "Deconfigure");
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_bit!(pub, [3](9), deconfigure, "Deconfigure");
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ConfigureEndpoint {
     input_context_pointer,
@@ -255,7 +255,7 @@ impl EvaluateContext {
 
         (u << 32) | l
     }
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(EvaluateContext {
     input_context_pointer,
@@ -275,9 +275,9 @@ reserved!(ResetEndpoint(Type::ResetEndpoint) {
     [3]21..=23;
 });
 impl ResetEndpoint {
-    rw_bit!([3](9), transfer_state_preserve, "Transfer State Preserve");
-    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_bit!(pub, [3](9), transfer_state_preserve, "Transfer State Preserve");
+    rw_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ResetEndpoint {
     transfer_state_preserve,
@@ -298,9 +298,9 @@ reserved!(StopEndpoint(Type::StopEndpoint) {
     [3]21..=22;
 });
 impl StopEndpoint {
-    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
-    rw_bit!([3](23), suspend, "Suspend");
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_bit!(pub, [3](23), suspend, "Suspend");
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(StopEndpoint {
     endpoint_id,
@@ -319,8 +319,8 @@ reserved!(SetTrDequeuePointer(Type::SetTrDequeuePointer) {
     [3]21..=23;
 });
 impl SetTrDequeuePointer {
-    rw_bit!([0](0), dequeue_cycle_state, "Dequeue Cycle State");
-    rw_field!([0](1..=3), stream_context_type, "Stream Context Type", u8);
+    rw_bit!(pub, [0](0), dequeue_cycle_state, "Dequeue Cycle State");
+    rw_field!(pub, [0](1..=3), stream_context_type, "Stream Context Type", u8);
 
     /// Sets the value of the New TR Dequeue Pointer field.
     ///
@@ -351,9 +351,9 @@ impl SetTrDequeuePointer {
         ((u << 32) | l) & 0xffff_fff0
     }
 
-    rw_field!([2](16..=31), stream_id, "Stream ID", u16);
-    rw_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [2](16..=31), stream_id, "Stream ID", u16);
+    rw_field!(pub, [3](16..=20), endpoint_id, "Endpoint ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(SetTrDequeuePointer {
     dequeue_cycle_state,
@@ -373,7 +373,7 @@ reserved!(ResetDevice(Type::ResetDevice) {
     [3]16..=23;
 });
 impl ResetDevice {
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(ResetDevice { slot_id });
 
@@ -411,13 +411,13 @@ impl ForceEvent {
         (u << 32) | l
     }
 
-    rw_field!(
+    rw_field!(pub, 
         [2](22..=31),
         vf_interrupter_target,
         "VF Interrupter Target",
         u16
     );
-    rw_field!([3](16..=23), vf_id, "VF ID", u8);
+    rw_field!(pub, [3](16..=23), vf_id, "VF ID", u8);
 }
 impl_debug_for_trb!(ForceEvent {
     event_trb_pointer,
@@ -438,7 +438,7 @@ reserved!(NegotiateBandwidth(Type::NegotiateBandwidth) {
     [3]16..=23;
 });
 impl NegotiateBandwidth {
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(NegotiateBandwidth { slot_id });
 
@@ -455,7 +455,7 @@ reserved!(SetLatencyToleranceValue(Type::SetLatencyToleranceValue) {
     [3]28..=31;
 });
 impl SetLatencyToleranceValue {
-    rw_field!(
+    rw_field!(pub, 
         [3](16..=27),
         best_effort_latency_tolerance_value,
         "Best Effort Latency Tolerance Value",
@@ -506,8 +506,8 @@ impl GetPortBandwidth {
 
         (u << 32) | l
     }
-    rw_field!([3](16..=19), dev_speed, "Dev Speed", u8);
-    rw_field!([3](24..=31), hub_slot_id, "Hub Slot ID", u8);
+    rw_field!(pub, [3](16..=19), dev_speed, "Dev Speed", u8);
+    rw_field!(pub, [3](24..=31), hub_slot_id, "Hub Slot ID", u8);
 }
 impl_debug_for_trb!(GetPortBandwidth {
     port_bandwidth_context_pointer,
@@ -521,7 +521,7 @@ reserved!(ForceHeader(Type::ForceHeader) {
     [3]16..=23;
 });
 impl ForceHeader {
-    rw_field!([0](0..=4), packet_type, "Packet Type", u8);
+    rw_field!(pub, [0](0..=4), packet_type, "Packet Type", u8);
 
     /// Sets the value of the Header Info field.
     ///
@@ -546,7 +546,7 @@ impl ForceHeader {
         [self.0[0] & 0xffff_ffe0, self.0[1], self.0[2]]
     }
 
-    rw_field!(
+    rw_field!(pub, 
         [3](24..=31),
         root_hub_port_number,
         "Root Hub Port Number",
@@ -599,15 +599,15 @@ impl GetExtendedProperty {
         (u << 32) | l
     }
 
-    rw_field!(
+    rw_field!(pub, 
         [2](0..=15),
         extended_capability_identifier,
         "Extended Capability Identifier",
         u16
     );
-    rw_field!([3](16..=18), command_sub_type, "Command Sub Type", u8);
-    rw_field!([3](19..=23), endpoint_id, "Endpoint ID", u8);
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](16..=18), command_sub_type, "Command Sub Type", u8);
+    rw_field!(pub, [3](19..=23), endpoint_id, "Endpoint ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(GetExtendedProperty {
     extended_property_context_pointer,
@@ -629,21 +629,21 @@ reserved!(SetExtendedProperty(Type::SetExtendedProperty) {
     [3]1..=9;
 });
 impl SetExtendedProperty {
-    rw_field!(
+    rw_field!(pub, 
         [2](0..=15),
         extended_capability_identifier,
         "Extended Cpaability Identifier",
         u16
     );
-    rw_field!(
+    rw_field!(pub, 
         [2](16..=23),
         capability_parameter,
         "Capability Parameter",
         u8
     );
-    rw_field!([3](16..=18), command_sub_type, "Command Sub Type", u8);
-    rw_field!([3](19..=23), endpoint_id, "Endpoint ID", u8);
-    rw_field!([3](24..=31), slot_id, "Slot ID", u8);
+    rw_field!(pub, [3](16..=18), command_sub_type, "Command Sub Type", u8);
+    rw_field!(pub, [3](19..=23), endpoint_id, "Endpoint ID", u8);
+    rw_field!(pub, [3](24..=31), slot_id, "Slot ID", u8);
 }
 impl_debug_for_trb!(SetExtendedProperty {
     extended_capability_identifier,

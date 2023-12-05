@@ -58,7 +58,7 @@ macro_rules! add_trb {
                 self.0
             }
 
-            rw_bit!([3](0), cycle_bit, "Cycle bit");
+            rw_bit!(pub, [3](0), cycle_bit, "Cycle bit");
 
             fn set_trb_type(&mut self) -> &mut Self {
                 use crate::ring::trb::Type;
@@ -231,10 +231,10 @@ impl Link {
         (u << 32) | l
     }
 
-    rw_field!([2](22..=31), interrupter_target, "Interrupter Target", u32);
-    rw_bit!([3](1), toggle_cycle, "Toggle Cycle");
-    rw_bit!([3](4), chain_bit, "Chain bit");
-    rw_bit!([3](5), interrupt_on_completion, "Interrupt On Completion");
+    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u32);
+    rw_bit!(pub, [3](1), toggle_cycle, "Toggle Cycle");
+    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
+    rw_bit!(pub, [3](5), interrupt_on_completion, "Interrupt On Completion");
 }
 impl_debug_for_trb!(Link {
     ring_segment_pointer,

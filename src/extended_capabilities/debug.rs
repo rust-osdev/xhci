@@ -209,11 +209,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Control(u32);
 impl Control {
-    ro_bit!(0, dbc_run, "DbC Run");
-    rw_bit!(1, link_status_event_enable, "Link Status Event Enable");
-    rw1s_bit!(2, halt_out_tr, "Halt OUT TR");
-    rw1s_bit!(3, halt_in_tr, "Halt IN TR");
-    rw1c_bit!(4, dbc_run_change, "DbC Run Change");
+    ro_bit!(pub, 0, dbc_run, "DbC Run");
+    rw_bit!(pub, 1, link_status_event_enable, "Link Status Event Enable");
+    rw1s_bit!(pub, 2, halt_out_tr, "Halt OUT TR");
+    rw1s_bit!(pub, 3, halt_in_tr, "Halt IN TR");
+    rw1c_bit!(pub, 4, dbc_run_change, "DbC Run Change");
 
     /// Returns the value of the Debug Max Burst Size field.
     #[must_use]
@@ -227,7 +227,7 @@ impl Control {
         self.0.get_bits(24..=30).try_into().unwrap()
     }
 
-    rw_bit!(31, debug_capability_enable, "Debug Capability Enable");
+    rw_bit!(pub, 31, debug_capability_enable, "Debug Capability Enable");
 }
 impl_debug_from_methods! {
     Control {
@@ -247,8 +247,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Status(u32);
 impl Status {
-    ro_bit!(0, event_ring_not_empty, "Event Ring Not Empty");
-    ro_bit!(1, dbc_system_bus_reset, "DbC System Bus Reset");
+    ro_bit!(pub, 0, event_ring_not_empty, "Event Ring Not Empty");
+    ro_bit!(pub, 1, dbc_system_bus_reset, "DbC System Bus Reset");
 
     /// Returns the value of the Debug Port Number field.
     #[must_use]
@@ -269,9 +269,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortStatusAndControl(u32);
 impl PortStatusAndControl {
-    ro_bit!(0, current_connect_status, "Current Connect Status");
-    rw_bit!(1, port_enabled_disabled, "Port Enabled/Disabled");
-    ro_bit!(4, port_reset, "Port Reset");
+    ro_bit!(pub, 0, current_connect_status, "Current Connect Status");
+    rw_bit!(pub, 1, port_enabled_disabled, "Port Enabled/Disabled");
+    ro_bit!(pub, 4, port_reset, "Port Reset");
 
     /// Returns the value of the Port Link State field.
     #[must_use]
@@ -285,10 +285,10 @@ impl PortStatusAndControl {
         self.0.get_bits(10..=13).try_into().unwrap()
     }
 
-    rw1c_bit!(17, connect_status_change, "Connect Status Change");
-    rw1c_bit!(21, port_reset_change, "Port Reset Change");
-    rw1c_bit!(22, port_link_status_change, "Port Link Status Change");
-    rw1c_bit!(23, port_config_error_change, "Port Config Error Change");
+    rw1c_bit!(pub, 17, connect_status_change, "Connect Status Change");
+    rw1c_bit!(pub, 21, port_reset_change, "Port Reset Change");
+    rw1c_bit!(pub, 22, port_link_status_change, "Port Link Status Change");
+    rw1c_bit!(pub, 23, port_config_error_change, "Port Config Error Change");
 }
 impl_debug_from_methods! {
     PortStatusAndControl {

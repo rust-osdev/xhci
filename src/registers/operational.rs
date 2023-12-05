@@ -77,27 +77,27 @@ where
 #[derive(Copy, Clone)]
 pub struct UsbCommandRegister(u32);
 impl UsbCommandRegister {
-    rw_bit!(0, run_stop, "Run/Stop");
-    rw_bit!(1, host_controller_reset, "Host Controller Reset");
-    rw_bit!(2, interrupter_enable, "Interrupter Enable");
-    rw_bit!(3, host_system_error_enable, "Host System Error Enable");
-    rw_bit!(
+    rw_bit!(pub, 0, run_stop, "Run/Stop");
+    rw_bit!(pub, 1, host_controller_reset, "Host Controller Reset");
+    rw_bit!(pub, 2, interrupter_enable, "Interrupter Enable");
+    rw_bit!(pub, 3, host_system_error_enable, "Host System Error Enable");
+    rw_bit!(pub, 
         7,
         light_host_controller_reset,
         "Light Host Controller Reset"
     );
-    rw_bit!(8, controller_save_state, "Controller Save State");
-    rw_bit!(9, controller_restore_state, "Controller Restore State");
-    rw_bit!(10, enable_wrap_event, "Enable Wrap Event");
-    rw_bit!(11, enable_u3_mfindex_stop, "Enable U3 MFINDEX Stop");
-    rw_bit!(13, cem_enable, "CEM Enable");
-    ro_bit!(14, extended_tbc_enable, "Extended TBC Enable");
-    ro_bit!(
+    rw_bit!(pub, 8, controller_save_state, "Controller Save State");
+    rw_bit!(pub, 9, controller_restore_state, "Controller Restore State");
+    rw_bit!(pub, 10, enable_wrap_event, "Enable Wrap Event");
+    rw_bit!(pub, 11, enable_u3_mfindex_stop, "Enable U3 MFINDEX Stop");
+    rw_bit!(pub, 13, cem_enable, "CEM Enable");
+    ro_bit!(pub, 14, extended_tbc_enable, "Extended TBC Enable");
+    ro_bit!(pub, 
         15,
         extended_tbc_trb_status_enable,
         "Extended TBC TRB Status Enable"
     );
-    rw_bit!(16, vtio_enable, "VTIO Enable");
+    rw_bit!(pub, 16, vtio_enable, "VTIO Enable");
 }
 impl_debug_from_methods! {
     UsbCommandRegister{
@@ -122,15 +122,15 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct UsbStatusRegister(u32);
 impl UsbStatusRegister {
-    ro_bit!(0, hc_halted, "HC Halted");
-    rw1c_bit!(2, host_system_error, "Host System Error");
-    rw1c_bit!(3, event_interrupt, "Event Interrupt");
-    rw1c_bit!(4, port_change_detect, "Port Change Detect");
-    ro_bit!(8, save_state_status, "Save State Status");
-    ro_bit!(9, restore_state_status, "Restore State Status");
-    rw1c_bit!(10, save_restore_error, "Save/Restore Error");
-    ro_bit!(11, controller_not_ready, "Controller Not Ready");
-    ro_bit!(12, host_controller_error, "Host Controller Error");
+    ro_bit!(pub, 0, hc_halted, "HC Halted");
+    rw1c_bit!(pub, 2, host_system_error, "Host System Error");
+    rw1c_bit!(pub, 3, event_interrupt, "Event Interrupt");
+    rw1c_bit!(pub, 4, port_change_detect, "Port Change Detect");
+    ro_bit!(pub, 8, save_state_status, "Save State Status");
+    ro_bit!(pub, 9, restore_state_status, "Restore State Status");
+    rw1c_bit!(pub, 10, save_restore_error, "Save/Restore Error");
+    ro_bit!(pub, 11, controller_not_ready, "Controller Not Ready");
+    ro_bit!(pub, 12, host_controller_error, "Host Controller Error");
 }
 impl_debug_from_methods! {
     UsbStatusRegister{
@@ -212,10 +212,10 @@ impl DeviceNotificationControl {
 #[derive(Copy, Clone)]
 pub struct CommandRingControlRegister(u64);
 impl CommandRingControlRegister {
-    wo_bit!(0, ring_cycle_state, "Ring Cycle State");
-    w1s_bit!(1, command_stop, "Command Stop");
-    w1s_bit!(2, command_abort, "Command Abort");
-    ro_bit!(3, command_ring_running, "Command Ring Running");
+    wo_bit!(pub, 0, ring_cycle_state, "Ring Cycle State");
+    w1s_bit!(pub, 1, command_stop, "Command Stop");
+    w1s_bit!(pub, 2, command_abort, "Command Abort");
+    ro_bit!(pub, 3, command_ring_running, "Command Ring Running");
 
     /// Sets the value of the Command Ring Pointer field. It must be 64 byte aligned.
     ///
@@ -268,14 +268,14 @@ impl DeviceContextBaseAddressArrayPointerRegister {
 #[derive(Copy, Clone)]
 pub struct ConfigureRegister(u32);
 impl ConfigureRegister {
-    rw_field!(
+    rw_field!(pub, 
         0..=7,
         max_device_slots_enabled,
         "Max Device Slots Enabled",
         u8
     );
-    rw_bit!(8, u3_entry_enable, "U3 Entry Enable");
-    rw_bit!(
+    rw_bit!(pub, 8, u3_entry_enable, "U3 Entry Enable");
+    rw_bit!(pub, 
         9,
         configuration_information_enable,
         "Configuration Information Enable"
@@ -340,45 +340,45 @@ impl PortRegisterSet {
 #[derive(Copy, Clone)]
 pub struct PortStatusAndControlRegister(u32);
 impl PortStatusAndControlRegister {
-    ro_bit!(0, current_connect_status, "Current Connect Status");
-    rw1c_bit!(1, port_enabled_disabled, "Port Enabled/Disabled");
-    ro_bit!(3, over_current_active, "Over-current Active");
-    rw1s_bit!(4, port_reset, "Port Reset");
-    rw_field!(5..=8, port_link_state, "Port Link State", u8);
-    rw_bit!(9, port_power, "Port Power");
-    ro_field!(10..=13, port_speed, "Port Speed", u8);
-    rw_field!(
+    ro_bit!(pub, 0, current_connect_status, "Current Connect Status");
+    rw1c_bit!(pub, 1, port_enabled_disabled, "Port Enabled/Disabled");
+    ro_bit!(pub, 3, over_current_active, "Over-current Active");
+    rw1s_bit!(pub, 4, port_reset, "Port Reset");
+    rw_field!(pub, 5..=8, port_link_state, "Port Link State", u8);
+    rw_bit!(pub, 9, port_power, "Port Power");
+    ro_field!(pub, 10..=13, port_speed, "Port Speed", u8);
+    rw_field!(pub, 
         14..=15,
         port_indicator_control,
         "Port Indicator Control",
         PortIndicator
     );
-    rw_bit!(
+    rw_bit!(pub, 
         16,
         port_link_state_write_strobe,
         "Port Link State Write Strobe"
     );
-    rw1c_bit!(17, connect_status_change, "Connect Status Change");
-    rw1c_bit!(
+    rw1c_bit!(pub, 17, connect_status_change, "Connect Status Change");
+    rw1c_bit!(pub, 
         18,
         port_enabled_disabled_change,
         "Port Enabled/Disabled Change"
     );
-    rw1c_bit!(19, warm_port_reset_change, "Warm Port Reset Change");
-    rw1c_bit!(20, over_current_change, "Over-Current Change");
-    rw1c_bit!(21, port_reset_change, "Port Reset Change");
-    rw1c_bit!(22, port_link_state_change, "Port Link State Change");
-    rw1c_bit!(23, port_config_error_change, "Port Config Error Change");
-    ro_bit!(24, cold_attach_status, "Cold Attach Status");
-    rw_bit!(25, wake_on_connect_enable, "Wake on Connect Enable");
-    rw_bit!(26, wake_on_disconnect_enable, "Wake on Disconnect Enable");
-    rw_bit!(
+    rw1c_bit!(pub, 19, warm_port_reset_change, "Warm Port Reset Change");
+    rw1c_bit!(pub, 20, over_current_change, "Over-Current Change");
+    rw1c_bit!(pub, 21, port_reset_change, "Port Reset Change");
+    rw1c_bit!(pub, 22, port_link_state_change, "Port Link State Change");
+    rw1c_bit!(pub, 23, port_config_error_change, "Port Config Error Change");
+    ro_bit!(pub, 24, cold_attach_status, "Cold Attach Status");
+    rw_bit!(pub, 25, wake_on_connect_enable, "Wake on Connect Enable");
+    rw_bit!(pub, 26, wake_on_disconnect_enable, "Wake on Disconnect Enable");
+    rw_bit!(pub, 
         27,
         wake_on_over_current_enable,
         "Wake on Over-Current Enable"
     );
-    ro_bit!(30, device_removable, "Device Removable");
-    rw1s_bit!(31, warm_port_reset, "Warm Port Reset");
+    ro_bit!(pub, 30, device_removable, "Device Removable");
+    rw1s_bit!(pub, 31, warm_port_reset, "Warm Port Reset");
 }
 impl_debug_from_methods! {
     PortStatusAndControlRegister{
@@ -413,9 +413,9 @@ impl_debug_from_methods! {
 pub struct PortPowerManagementStatusAndControlRegister(u32);
 /// **These methods are only valid for USB3.**
 impl PortPowerManagementStatusAndControlRegister {
-    rw_field!(0..=7, u1_timeout, "U1 Timeout", u8);
-    rw_field!(8..=15, u2_timeout, "U2 Timeout", u8);
-    rw_bit!(16, force_link_pm_accept, "Force Link PM Accept");
+    rw_field!(pub, 0..=7, u1_timeout, "U1 Timeout", u8);
+    rw_field!(pub, 8..=15, u2_timeout, "U2 Timeout", u8);
+    rw_bit!(pub, 16, force_link_pm_accept, "Force Link PM Accept");
 }
 /// **These methods are only valid for USB2.**
 impl PortPowerManagementStatusAndControlRegister {
@@ -428,15 +428,15 @@ impl PortPowerManagementStatusAndControlRegister {
         FromPrimitive::from_u32(s)
     }
 
-    rw_bit!(3, remote_wake_enable, "Remote Wake Enable");
-    rw_field!(
+    rw_bit!(pub, 3, remote_wake_enable, "Remote Wake Enable");
+    rw_field!(pub, 
         4..=7,
         best_effort_service_latency,
         "Best Effort Service Latency",
         u8
     );
-    rw_field!(8..=15, l1_device_slot, "L1 Device Slot", u8);
-    rw_bit!(16, hardware_lpm_enable, "Hardware LPM Enable");
+    rw_field!(pub, 8..=15, l1_device_slot, "L1 Device Slot", u8);
+    rw_bit!(pub, 16, hardware_lpm_enable, "Hardware LPM Enable");
 
     /// Returns the value of the Port Test Control field.
     ///
@@ -474,9 +474,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortLinkInfoRegister(u32);
 impl PortLinkInfoRegister {
-    rw_field!(0..=15, link_error_count, "Link Error Count", u16);
-    ro_field!(16..=19, rx_lane_count, "Rx Lane Count", u8);
-    ro_field!(20..=23, tx_lane_count, "Tx Lane Count", u8);
+    rw_field!(pub, 0..=15, link_error_count, "Link Error Count", u16);
+    ro_field!(pub, 16..=19, rx_lane_count, "Rx Lane Count", u8);
+    ro_field!(pub, 20..=23, tx_lane_count, "Tx Lane Count", u8);
 }
 impl_debug_from_methods! {
     PortLinkInfoRegister{
@@ -493,14 +493,14 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortHardwareLpmControlRegister(u32);
 impl PortHardwareLpmControlRegister {
-    rw_field!(
+    rw_field!(pub, 
         0..=1,
         host_initiated_resume_duration_mode,
         "Host Initiated Resume Duration Mode",
         u8
     );
-    rw_field!(2..=9, l1_timeout, "L1 Timeout", u8);
-    rw_field!(
+    rw_field!(pub, 2..=9, l1_timeout, "L1 Timeout", u8);
+    rw_field!(pub, 
         10..=13,
         best_effort_service_latency_deep,
         "Best Effort Service Latency Depp",

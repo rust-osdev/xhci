@@ -68,9 +68,7 @@ macro_rules! impl_idt {
     () => {
         rw_bit!(pub, self, self.0.0[3]; 6, immediate_data, "Immediate Data");
     };
-}
-macro_rules! implprv_idt {
-    () => {
+    (prv) => {
         rw1s_bit!(pub(self), self, self.0.0[3]; 6, immediate_data, "Immediate Data");
     };
 }
@@ -158,7 +156,7 @@ impl SetupStage {
     impl_interrupter_target!();
 
     impl_ioc!();
-    implprv_idt!();
+    impl_idt!(prv);
 
     /// Sets the value of the Transfer Type field.
     pub fn set_transfer_type(&mut self, t: TransferType) -> &mut Self {

@@ -182,7 +182,7 @@ reserved!(Doorbell(Type::Doorbell){
 });
 impl Doorbell {
     ro_field!(pub, self, self.0[0]; 0..=4, db_reason, "DB Reason", u8);
-    ro_field!(pub, self, self.0[3]; 24..=31, vf_id, "VF ID", u8);
+    ro_field!(pub, self, self.0[3]; 16..=23, vf_id, "VF ID", u8);
     ro_field!(pub, self, self.0[3]; 24..=31, slot_id, "Slot ID", u8);
 }
 impl_debug_for_event_trb!(Doorbell {
@@ -211,11 +211,10 @@ event!(
     Type::DeviceNotification
 );
 reserved!(DeviceNotification(Type::DeviceNotification){
-    [0]0..=31;
-    [1]0..=31;
+    [0]0..=3;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=31;
+    [3]16..=23;
 });
 impl DeviceNotification {
     ro_field!(pub, self, self.0[0]; 4..=7, notification_type, "Notification Type", u8);
@@ -243,10 +242,11 @@ impl_debug_for_event_trb!(DeviceNotification {
 
 event!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
 reserved!(MfindexWrap(Type::MfindexWrap){
-    [0]0..=3;
+    [0]0..=31;
+    [1]0..=31;
     [2]0..=23;
     [3]1..=9;
-    [3]16..=23;
+    [3]16..=31;
 });
 impl_debug_for_event_trb!(MfindexWrap {});
 

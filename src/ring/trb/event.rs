@@ -14,10 +14,10 @@ macro_rules! impl_cc {
         /// This method may return an [`Err`] variant with the Completion Code that is either reserved or
         /// not implemented in this crate.
         pub fn completion_code(&self) -> Result<CompletionCode, u8> {
-            let c: u8 = self.0.0[2].get_bits(24..=31).try_into().unwrap();
+            let c: u8 = self.0 .0[2].get_bits(24..=31).try_into().unwrap();
             CompletionCode::from_u8(c).ok_or(c)
         }
-    }
+    };
 }
 
 allowed_trb!("Transfer TRB", {
@@ -74,7 +74,7 @@ impl CommandCompletion {
 
     ro_field!(
         pub, self,
-        self.0.0[2]; 0..=23, 
+        self.0.0[2]; 0..=23,
         command_completion_parameter,
         "Command Completion Parameter",
         u32
@@ -154,9 +154,7 @@ rsvdz_checking_try_from!(Doorbell {
 impl HostController {
     impl_cc!(ro);
 }
-impl_debug_from_methods!(HostController {
-    completion_code,
-});
+impl_debug_from_methods!(HostController { completion_code });
 rsvdz_checking_try_from!(HostController {
     [0];0..=31,
     [1];0..=31,
@@ -206,9 +204,7 @@ rsvdz_checking_try_from!(DeviceNotification {
 impl MfindexWrap {
     impl_cc!(ro);
 }
-impl_debug_from_methods!(MfindexWrap {
-    completion_code,
-});
+impl_debug_from_methods!(MfindexWrap { completion_code });
 rsvdz_checking_try_from!(MfindexWrap {
     [0];0..=31,
     [1];0..=31,
@@ -216,7 +212,6 @@ rsvdz_checking_try_from!(MfindexWrap {
     [3];1..=9,
     [3];16..=31,
 });
-
 
 /// The TRB Completion Codes.
 ///

@@ -8,7 +8,7 @@ use num_traits::FromPrimitive;
 macro_rules! impl_input_context_pointer {
     () => {
         param_align_16!(input_context_pointer, "Input Context Pointer");
-    }
+    };
 }
 
 macro_rules! impl_subtype {
@@ -93,9 +93,7 @@ impl_debug_from_methods!(NoOp {});
 impl EnableSlot {
     rw_field!(pub, self, self.0.0[3]; 16..=20, slot_type, "Slot Type", u8);
 }
-impl_debug_from_methods!(EnableSlot {
-    slot_type,
-});
+impl_debug_from_methods!(EnableSlot { slot_type });
 rsvdz_checking_try_from!(EnableSlot {
     [0];0..=31,
     [1];0..=31,
@@ -107,9 +105,7 @@ rsvdz_checking_try_from!(EnableSlot {
 impl DisableSlot {
     impl_slot_id!();
 }
-impl_debug_from_methods!(DisableSlot {
-    slot_id,
-});
+impl_debug_from_methods!(DisableSlot { slot_id });
 rsvdz_checking_try_from!(DisableSlot {
     [0];0..=31,
     [1];0..=31,
@@ -233,9 +229,7 @@ rsvdz_checking_try_from!(SetTrDequeuePointer {
 impl ResetDevice {
     impl_slot_id!();
 }
-impl_debug_from_methods!(ResetDevice {
-    slot_id,
-});
+impl_debug_from_methods!(ResetDevice { slot_id });
 rsvdz_checking_try_from!(ResetDevice {
     [0];0..=31,
     [1];0..=31,
@@ -272,9 +266,7 @@ rsvdz_checking_try_from!(ForceEvent {
 impl NegotiateBandwidth {
     impl_slot_id!();
 }
-impl_debug_from_methods!(NegotiateBandwidth {
-    slot_id,
-});
+impl_debug_from_methods!(NegotiateBandwidth { slot_id });
 rsvdz_checking_try_from!(NegotiateBandwidth {
     [0];0..=31,
     [1];0..=31,
@@ -338,16 +330,16 @@ impl ForceHeader {
             "The lowest 5 bits of the Header Info Low must be 0."
         );
 
-        self.0.0[0].set_bits(5.., info[0].get_bits(5..));
-        self.0.0[1] = info[1];
-        self.0.0[2] = info[2];
+        self.0 .0[0].set_bits(5.., info[0].get_bits(5..));
+        self.0 .0[1] = info[1];
+        self.0 .0[2] = info[2];
         self
     }
 
     /// Returns the value of the Header Info field.
     #[must_use]
     pub fn header_info(&self) -> [u32; 3] {
-        [self.0.0[0] >> 5 << 5, self.0.0[1], self.0.0[2]]
+        [self.0 .0[0] >> 5 << 5, self.0 .0[1], self.0 .0[2]]
     }
 
     rw_field!(

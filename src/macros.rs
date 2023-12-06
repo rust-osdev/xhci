@@ -229,7 +229,7 @@ macro_rules! double_field_getter {
         $vis fn $method(&$self_) -> $ty {
             let lo = $arr[$off_lo] as $ty;
             let hi = $arr[$off_hi] as $ty;
-            
+
             (hi << $bits) | lo
         }
     };
@@ -244,7 +244,7 @@ macro_rules! double_zero_trailing_getter {
         $vis fn $method(&$self_) -> $ty {
             let lo = ($arr[$off_lo] as $ty) >> $start << $start;
             let hi = $arr[$off_hi] as $ty;
-            
+
             (hi << $bits) | lo
         }
     };

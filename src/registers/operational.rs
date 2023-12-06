@@ -332,7 +332,7 @@ impl PortStatusAndControlRegister {
     rw_bit!(pub, self, self.0; 9, port_power, "Port Power");
     ro_field!(pub, self, self.0; 10..=13, port_speed, "Port Speed", u8);
     rw_field!(
-        pub, self, 
+        pub, self,
         self.0; 14..=15,
         port_indicator_control,
         "Port Indicator Control",
@@ -483,7 +483,7 @@ impl_debug_from_methods! {
 pub struct PortHardwareLpmControlRegister(u32);
 impl PortHardwareLpmControlRegister {
     rw_field!(
-        pub, self, 
+        pub, self,
         self.0; 0..=1,
         host_initiated_resume_duration_mode,
         "Host Initiated Resume Duration Mode",

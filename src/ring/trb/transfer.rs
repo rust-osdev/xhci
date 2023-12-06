@@ -106,7 +106,7 @@ allowed_trb!("Transfer TRB", {
 
 impl Normal {
     impl_data_buffer_pointer!();
-    
+
     impl_trb_transfer_length!();
     impl_td_size!();
     impl_interrupter_target!();
@@ -162,7 +162,7 @@ impl SetupStage {
 
     /// Sets the value of the Transfer Type field.
     pub fn set_transfer_type(&mut self, t: TransferType) -> &mut Self {
-        self.0.0[3].set_bits(16..=17, t as _);
+        self.0 .0[3].set_bits(16..=17, t as _);
         self
     }
 
@@ -173,7 +173,7 @@ impl SetupStage {
     /// This method panics if the Transfer Type field contains 1 which is reserved.
     #[must_use]
     pub fn transfer_type(&self) -> TransferType {
-        FromPrimitive::from_u32(self.0.0[3].get_bits(16..=17))
+        FromPrimitive::from_u32(self.0 .0[3].get_bits(16..=17))
             .expect("Transfer Type 1 is reserved.")
     }
 }
@@ -301,7 +301,7 @@ impl Link {
     impl_ring_segment_pointer!();
 
     impl_interrupter_target!();
-    
+
     impl_tc!();
     impl_ch!();
     impl_ioc!();

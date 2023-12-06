@@ -16,7 +16,7 @@ macro_rules! param_align_16 {
 macro_rules! impl_ring_segment_pointer {
     () => {
         param_align_16!(ring_segment_pointer, "Ring Segment Pointer");
-    }
+    };
 }
 
 macro_rules! impl_tc {
@@ -79,7 +79,7 @@ macro_rules! allowed_trb {
                 ),+
             }
         );
-        
+
         // defining common block
         paste::paste!(
             #[doc = "A raw " $name " Block."]
@@ -104,12 +104,11 @@ macro_rules! allowed_trb {
                 rw_bit!(pub, self, self.0[3]; 0, cycle_bit, "Cycle");
             }
         );
-        
+
         // defining individual TRB types
         // all TRB types require `Self::new()`. Derive by simple default or manually implement it.
         $(
             paste::paste! {
-                #[doc = "A "]
                 $(#[$docs])*
                 #[doc = "."]
                 #[repr(transparent)]
@@ -168,6 +167,6 @@ macro_rules! rsvdz_checking_try_from {
     }
 }
 
-pub mod transfer;
-pub mod event;
 pub mod command;
+pub mod event;
+pub mod transfer;

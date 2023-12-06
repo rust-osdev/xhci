@@ -2,7 +2,7 @@
 
 use accessor::single;
 use accessor::Mapper;
-use bit_field::BitField;
+// use bit_field::BitField;
 
 /// Host Controller Capability Registers
 #[derive(Debug)]
@@ -105,9 +105,9 @@ impl InterfaceVersionNumber {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters1(u32);
 impl StructuralParameters1 {
-    ro_field!(pub, 0..=7, number_of_device_slots, "Number of Device Slots", u8);
-    ro_field!(pub, 8..=18, number_of_interrupts, "Number of Interrupts", u16);
-    ro_field!(pub, 24..=31, number_of_ports, "Number of Ports", u8);
+    ro_field!(pub, self, self.0; 0..=7, number_of_device_slots, "Number of Device Slots", u8);
+    ro_field!(pub, self, self.0; 8..=18, number_of_interrupts, "Number of Interrupts", u16);
+    ro_field!(pub, self, self.0; 24..=31, number_of_ports, "Number of Ports", u8);
 }
 impl_debug_from_methods! {
     StructuralParameters1{
@@ -122,12 +122,18 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters2(u32);
 impl StructuralParameters2 {
-    ro_field!(pub, 
-        0..=3,
+    ro_field!(
+        pub, self,
+        self.0; 0..=3,
         isochronous_scheduling_threshold,
         "Isochronous Scheduling Threshold",
         u8
     );
+    ro_field!(pub(self), self, self.0; 4..=7, erst_max, "ERST Max", u32);
+
+    ro_field!(pub(self), self, self.0; 21..=25, max_scratchpad_buffers_hi, "Max Scratchpad Buffers HI", u32);
+    ro_bit!(pub, self, self.0; 26, scratchpad_restore, "Scratchpad Restore");
+    ro_field!(pub(self), self, self.0; 27..=31, max_scratchpad_buffers_lo, "Max Scratchpad Buffers LO", u32);
 
     /// Returns the maximum number of the elements the Event Ring Segment Table can contain.
     ///
@@ -146,20 +152,6 @@ impl StructuralParameters2 {
 
         h << 5 | l
     }
-
-    ro_bit!(pub, 26, scratchpad_restore, "Scratchpad Restore");
-
-    fn erst_max(self) -> u32 {
-        self.0.get_bits(4..=7)
-    }
-
-    fn max_scratchpad_buffers_hi(self) -> u32 {
-        self.0.get_bits(21..=25)
-    }
-
-    fn max_scratchpad_buffers_lo(self) -> u32 {
-        self.0.get_bits(27..=31)
-    }
 }
 impl_debug_from_methods! {
     StructuralParameters2{
@@ -175,9 +167,16 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct StructuralParameters3(u32);
 impl StructuralParameters3 {
-    ro_field!(pub, 0..=7, u1_device_exit_latency, "U1 Device Exit Latency", u8);
-    ro_field!(pub, 
-        16..=31,
+    ro_field!(
+        pub, self,
+        self.0; 0..=7,
+        u1_device_exit_latency,
+        "U1 Device Exit Latency",
+        u8
+    );
+    ro_field!(
+        pub, self,
+        self.0; 16..=31,
         u2_device_exit_latency,
         "U2 Device Exit Latency",
         u16
@@ -196,38 +195,43 @@ impl_debug_from_methods! {
 #[allow(clippy::module_name_repetitions)]
 pub struct CapabilityParameters1(u32);
 impl CapabilityParameters1 {
-    ro_bit!(pub, 0, addressing_capability, "64-bit Addressing Capability");
-    ro_bit!(pub, 1, bw_negotiation_capability, "BW Negotiation Capability");
-    ro_bit!(pub, 2, context_size, "Context Size");
-    ro_bit!(pub, 3, port_power_control, "Port Power Control");
-    ro_bit!(pub, 4, port_indicators, "Port Indicators");
-    ro_bit!(pub, 5, light_hc_reset_capability, "Light HC Reset Capability");
-    ro_bit!(pub, 
-        6,
+    ro_bit!(pub, self, self.0; 0, addressing_capability, "64-bit Addressing Capability");
+    ro_bit!(pub, self, self.0; 1, bw_negotiation_capability, "BW Negotiation Capability");
+    ro_bit!(pub, self, self.0; 2, context_size, "Context Size");
+    ro_bit!(pub, self, self.0; 3, port_power_control, "Port Power Control");
+    ro_bit!(pub, self, self.0; 4, port_indicators, "Port Indicators");
+    ro_bit!(pub, self, self.0; 5, light_hc_reset_capability, "Light HC Reset Capability");
+    ro_bit!(
+        pub, self,
+        self.0; 6,
         latency_tolerance_messaging_capability,
         "Latency Tolerance Messaging Capability"
     );
-    ro_bit!(pub, 7, no_secondary_sid_support, "No Secondary SID Support");
-    ro_bit!(pub, 8, parse_all_event_data, "Parse All Event Data");
-    ro_bit!(pub, 
-        9,
+    ro_bit!(pub, self, self.0; 7, no_secondary_sid_support, "No Secondary SID Support");
+    ro_bit!(pub, self, self.0; 8, parse_all_event_data, "Parse All Event Data");
+    ro_bit!(
+        pub, self,
+        self.0; 9,
         stopped_short_packet_capability,
         "Stopped - Short Packet Capability"
     );
-    ro_bit!(pub, 10, stopped_edtla_capability, "Stopped EDTLA Capability");
-    ro_bit!(pub, 
-        11,
+    ro_bit!(pub, self, self.0; 10, stopped_edtla_capability, "Stopped EDTLA Capability");
+    ro_bit!(
+        pub, self,
+        self.0; 11,
         contiguous_frame_id_capability,
         "Contiguous Frame ID Capability"
     );
-    ro_field!(pub, 
-        12..=15,
+    ro_field!(
+        pub, self,
+        self.0; 12..=15,
         maximum_primary_stream_array_size,
         "Maximum Primary Stream Array Size",
         u8
     );
-    ro_field!(pub, 
-        16..=31,
+    ro_field!(
+        pub, self,
+        self.0; 16..=31,
         xhci_extended_capabilities_pointer,
         "xHCI Extended Capabilities Pointer",
         u16
@@ -282,45 +286,53 @@ impl RuntimeRegisterSpaceOffset {
 #[derive(Copy, Clone)]
 pub struct CapabilityParameters2(u32);
 impl CapabilityParameters2 {
-    ro_bit!(pub, 0, u3_entry_capability, "U3 Entry Capability");
-    ro_bit!(pub, 
-        1,
+    ro_bit!(pub, self, self.0; 0, u3_entry_capability, "U3 Entry Capability");
+    ro_bit!(
+        pub, self,
+        self.0; 1,
         configure_endpoint_command_max_exit_latency_too_large_capability,
         "Configure Endpoint Command Max Exit Latency Too Large Capability"
     );
-    ro_bit!(pub, 
-        2,
+    ro_bit!(
+        pub, self,
+        self.0; 2,
         force_save_context_capability,
         "Force Save Context Capability"
     );
-    ro_bit!(pub, 
-        3,
+    ro_bit!(
+        pub, self,
+        self.0; 3,
         compliance_transition_capability,
         "Compliance Transition Capability"
     );
-    ro_bit!(pub, 
-        4,
+    ro_bit!(
+        pub, self,
+        self.0; 4,
         large_esit_payload_capability,
         "Large ESIT Payload Capability"
     );
-    ro_bit!(pub, 
-        5,
+    ro_bit!(
+        pub, self,
+        self.0; 5,
         configuration_information_capability,
         "Configuration Information Capability"
     );
-    ro_bit!(pub, 6, extended_tbc_capability, "Extended TBC Capability");
-    ro_bit!(pub, 
-        7,
+    ro_bit!(pub, self, self.0; 6, extended_tbc_capability, "Extended TBC Capability");
+    ro_bit!(
+        pub, self,
+        self.0; 7,
         extended_tbc_trb_status_capability,
         "Extended TBC TRB Status Capability"
     );
-    ro_bit!(pub, 
-        8,
+    ro_bit!(
+        pub, self,
+        self.0; 8,
         get_set_extended_property_capability,
         "Get/Set Extended Property Capability"
     );
-    ro_bit!(pub, 
-        9,
+    ro_bit!(
+        pub, self,
+        self.0; 9,
         virtualization_based_trusted_io_capability,
         "Virtualization Based Trusted I/O Capability"
     );

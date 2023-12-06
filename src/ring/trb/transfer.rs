@@ -2,7 +2,7 @@
 
 use super::{Link, Type};
 use bit_field::BitField;
-use core::convert::TryInto;
+// use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -123,7 +123,7 @@ impl TryFrom<[u32; 4]> for Allowed {
 macro_rules! interrupt_on_completion {
     ($name:ident) => {
         impl $name {
-            rw_bit!(pub, [3](5), interrupt_on_completion, "Interrupt On Completion");
+            rw_bit!(pub, self, self.0[3]; 5, interrupt_on_completion, "Interrupt On Completion");
         }
     };
 }
@@ -162,25 +162,26 @@ reserved!(Normal(Type::Normal) {
 });
 impl Normal {
     rw_double_field!(
-        pub,
-        [0, 1],
+        pub, self,
+        self.0; [0, 1],
         data_buffer_pointer,
         "Data Buffer Pointer",
         32, u64
     );
-    rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
-    rw_field!(pub, [2](17..=21), td_size, "TD Size", u8);
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, 
-        [3](2),
+    rw_field!(pub, self, self.0[2]; 0..=16, trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!(pub, self, self.0[2]; 17..=21, td_size, "TD Size", u8);
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        pub, self,
+        self.0[3]; 2,
         interrupt_on_short_packet,
         "Interrupt-on Short Packet"
     );
-    rw_bit!(pub, [3](3), no_snoop, "No Snoop");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
-    rw_bit!(pub, [3](6), immediate_data, "Immediate Data");
-    rw_bit!(pub, [3](9), block_event_interrupt, "Block Event Interrupt");
+    rw_bit!(pub, self, self.0[3]; 3, no_snoop, "No Snoop");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
+    rw_bit!(pub, self, self.0[3]; 6, immediate_data, "Immediate Data");
+    rw_bit!(pub, self, self.0[3]; 9, block_event_interrupt, "Block Event Interrupt");
 }
 impl_debug_for_transfer_trb! {
     Normal {
@@ -219,12 +220,12 @@ impl SetupStage {
             .set_trb_transfer_length()
     }
 
-    rw_field!(pub, [0](0..=7), request_type, "bmRequestType", u8);
-    rw_field!(pub, [0](8..=15), request, "bRequest", u8);
-    rw_field!(pub, [0](16..=31), value, "wValue", u16);
-    rw_field!(pub, [1](0..=15), index, "wIndex", u16);
-    rw_field!(pub, [1](16..=31), length, "wLength", u16);
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
+    rw_field!(pub, self, self.0[0]; 0..=7, request_type, "bmRequestType", u8);
+    rw_field!(pub, self, self.0[0]; 8..=15, request, "bRequest", u8);
+    rw_field!(pub, self, self.0[0]; 16..=31, value, "wValue", u16);
+    rw_field!(pub, self, self.0[1]; 0..=15, index, "wIndex", u16);
+    rw_field!(pub, self, self.0[1]; 16..=31, length, "wLength", u16);
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
 
     /// Sets the value of the Transfer Type field.
     pub fn set_transfer_type(&mut self, t: TransferType) -> &mut Self {
@@ -274,24 +275,25 @@ reserved!(DataStage(Type::DataStage) {
 });
 impl DataStage {
     rw_double_field!(
-        pub,
-        [0, 1],
+        pub, self,
+        self.0; [0, 1],
         data_buffer_pointer,
         "Data Buffer Pointer",
         32, u64
     );
-    rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
-    rw_field!(pub, [2](17..=21), td_size, "TD Size", u8);
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, 
-        [3](2),
+    rw_field!(pub, self, self.0[2]; 0..=16, trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!(pub, self, self.0[2]; 17..=21, td_size, "TD Size", u8);
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        pub, self,
+        self.0[3]; 2,
         interrupt_on_short_packet,
         "Interrupt-on Short Packet"
     );
-    rw_bit!(pub, [3](3), no_snoop, "No Snoop");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
-    rw_bit!(pub, [3](6), immediate_data, "Immediate Data");
+    rw_bit!(pub, self, self.0[3]; 3, no_snoop, "No Snoop");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
+    rw_bit!(pub, self, self.0[3]; 6, immediate_data, "Immediate Data");
 
     /// Sets the value of the Direction field.
     pub fn set_direction(&mut self, d: Direction) -> &mut Self {
@@ -329,10 +331,10 @@ reserved!(StatusStage(Type::StatusStage) {
     [3]17..=31;
 });
 impl StatusStage {
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
-    rw_bit!(pub, [3](16), direction, "Direction");
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
+    rw_bit!(pub, self, self.0[3]; 16, direction, "Direction");
 }
 impl_debug_for_transfer_trb! {
     StatusStage {
@@ -348,34 +350,36 @@ transfer_trb_with_default!(Isoch, "Isoch TRB", Type::Isoch);
 reserved!(Isoch(Type::Isoch) {});
 impl Isoch {
     rw_double_field!(
-        pub,
-        [0, 1],
+        pub, self,
+        self.0; [0, 1],
         data_buffer_pointer,
         "Data Buffer Pointer",
         32, u64
     );
-    rw_field!(pub, [2](0..=16), trb_transfer_length, "TRB Transfer Length", u32);
-    rw_field!(pub, [2](17..=21), td_size_or_tbc, "TD Size/TBC", u8);
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, 
-        [3](2),
+    rw_field!(pub, self, self.0[2]; 0..=16, trb_transfer_length, "TRB Transfer Length", u32);
+    rw_field!(pub, self, self.0[2]; 17..=21, td_size_or_tbc, "TD Size/TBC", u8);
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(
+        pub, self,
+        self.0[3]; 2, 
         interrupt_on_short_packet,
         "Interrupt on Short Packet"
     );
-    rw_bit!(pub, [3](3), no_snoop, "No Snoop");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
-    rw_bit!(pub, [3](6), immediate_data, "Immediate Data");
-    rw_field!(pub, [3](7..=8), transfer_burst_count, "Transfer Burst Count", u8);
-    rw_bit!(pub, [3](9), block_event_interrupt, "Block Event Interrupt");
-    rw_field!(pub, 
-        [3](16..=19),
+    rw_bit!(pub, self, self.0[3]; 3, no_snoop, "No Snoop");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
+    rw_bit!(pub, self, self.0[3]; 6, immediate_data, "Immediate Data");
+    rw_field!(pub, self, self.0[3]; 7..=8, transfer_burst_count, "Transfer Burst Count", u8);
+    rw_bit!(pub, self, self.0[3]; 9, block_event_interrupt, "Block Event Interrupt");
+    rw_field!(
+        pub, self,
+        self.0[3]; 16..=19,
         transfer_last_burst_packet_count,
         "Transfer Last Burst Packet Count",
         u8
     );
-    rw_field!(pub, [3](20..=30), frame_id, "Frame ID", u16);
-    rw_bit!(pub, [3](31), start_isoch_asap, "Start Isoch ASAP");
+    rw_field!(pub, self, self.0[3]; 20..=30, frame_id, "Frame ID", u16);
+    rw_bit!(pub, self, self.0[3]; 31, start_isoch_asap, "Start Isoch ASAP");
 }
 impl_debug_for_transfer_trb!(Isoch {
     data_buffer_pointer,
@@ -403,16 +407,16 @@ reserved!(EventData(Type::EventData) {
 });
 impl EventData {
     rw_double_field!(
-        pub,
-        [0, 1],
+        pub, self,
+        self.0; [0, 1],
         event_data,
         "Event Data",
         32, u64
     );
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
-    rw_bit!(pub, [3](9), block_event_interrupt, "Block Event Interrupt");
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
+    rw_bit!(pub, self, self.0[3]; 9, block_event_interrupt, "Block Event Interrupt");
 }
 impl_debug_for_transfer_trb!(EventData {
     event_data,
@@ -432,9 +436,9 @@ reserved!(Noop(Type::NoopTransfer) {
     [3]16..=31;
 });
 impl Noop {
-    rw_field!(pub, [2](22..=31), interrupter_target, "Interrupter Target", u16);
-    rw_bit!(pub, [3](1), evaluate_next_trb, "Evaluate Next TRB");
-    rw_bit!(pub, [3](4), chain_bit, "Chain bit");
+    rw_field!(pub, self, self.0[2]; 22..=31, interrupter_target, "Interrupter Target", u16);
+    rw_bit!(pub, self, self.0[3]; 1, evaluate_next_trb, "Evaluate Next TRB");
+    rw_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain bit");
 }
 impl_debug_for_transfer_trb!(Noop {
     interrupter_target,

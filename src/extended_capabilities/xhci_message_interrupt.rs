@@ -3,7 +3,7 @@
 use super::ExtendedCapability;
 use accessor::single;
 use accessor::Mapper;
-use bit_field::BitField;
+// use bit_field::BitField;
 use core::convert::TryFrom;
 use core::convert::TryInto;
 
@@ -113,23 +113,23 @@ impl MessageAddress for u64 {}
 #[derive(Copy, Clone)]
 pub struct MessageControl(u16);
 impl MessageControl {
-    rw_bit!(pub, 0, msi_enable, "MSI Enable");
+    rw_bit!(pub, self, self.0; 0, msi_enable, "MSI Enable");
     ro_field!(
-        pub,
-        1..=3,
+        pub, self,
+        self.0; 1..=3,
         multiple_message_capable,
         "Multiple Message Capable",
         u8
     );
     rw_field!(
-        pub,
-        4..=6,
+        pub, self,
+        self.0; 4..=6,
         multiple_message_enable,
         "Multiple Message Enable",
         u8
     );
-    ro_bit!(pub, 7, bit64_address_capable, "64 bit address capable");
-    ro_bit!(pub, 8, per_vector_masking_capable, "Per-vector masking capable");
+    ro_bit!(pub, self, self.0; 7, bit64_address_capable, "64 bit address capable");
+    ro_bit!(pub, self, self.0; 8, per_vector_masking_capable, "Per-vector masking capable");
 }
 impl_debug_from_methods! {
     MessageControl {

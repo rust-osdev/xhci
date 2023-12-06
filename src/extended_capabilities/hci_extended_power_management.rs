@@ -32,13 +32,13 @@ where
 #[derive(Copy, Clone)]
 pub struct PowerManagementCapabilities(u16);
 impl PowerManagementCapabilities {
-    ro_field!(pub, 11..=15, pme_support, "PME_Support", u8);
-    ro_bit!(pub, 10, d2_support, "D2_Support");
-    ro_bit!(pub, 9, d1_support, "D1_Support");
-    ro_field!(pub, 6..=8, aux_current, "Aux_Current", u8);
-    ro_bit!(pub, 5, dsi, "DSI");
-    ro_bit!(pub, 3, pme_clock, "PME Clock");
-    ro_field!(pub, 0..=2, version, "Version", u8);
+    ro_field!(pub, self, self.0; 11..=15, pme_support, "PME_Support", u8);
+    ro_bit!(pub, self, self.0; 10, d2_support, "D2_Support");
+    ro_bit!(pub, self, self.0; 9, d1_support, "D1_Support");
+    ro_field!(pub, self, self.0; 6..=8, aux_current, "Aux_Current", u8);
+    ro_bit!(pub, self, self.0; 5, dsi, "DSI");
+    ro_bit!(pub, self, self.0; 3, pme_clock, "PME Clock");
+    ro_field!(pub, self, self.0; 0..=2, version, "Version", u8);
 }
 impl_debug_from_methods! {
     PowerManagementCapabilities {
@@ -57,11 +57,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PowerManagementControlStatusRegister(u16);
 impl PowerManagementControlStatusRegister {
-    rw1c_bit!(pub, 15, pme_status, "PME_Status");
-    ro_field!(pub, 13..=14, data_scale, "Data_Scale", u8);
-    rw_field!(pub, 9..=12, data_select, "Data_Select", u8);
-    rw_bit!(pub, 8, pme_en, "PME_En");
-    rw_field!(pub, 0..=1, power_state, "PowerState", u8);
+    rw1c_bit!(pub, self, self.0; 15, pme_status, "PME_Status");
+    ro_field!(pub, self, self.0; 13..=14, data_scale, "Data_Scale", u8);
+    rw_field!(pub, self, self.0; 9..=12, data_select, "Data_Select", u8);
+    rw_bit!(pub, self, self.0; 8, pme_en, "PME_En");
+    rw_field!(pub, self, self.0; 0..=1, power_state, "PowerState", u8);
 }
 impl_debug_from_methods! {
     PowerManagementControlStatusRegister {
@@ -78,8 +78,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PmesrBse(u8);
 impl PmesrBse {
-    ro_bit!(pub, 7, bpcc_en, "BPCC_En");
-    ro_bit!(pub, 6, b2_b3, "B2_B3");
+    ro_bit!(pub, self, self.0; 7, bpcc_en, "BPCC_En");
+    ro_bit!(pub, self, self.0; 6, b2_b3, "B2_B3");
 }
 impl_debug_from_methods! {
     PmesrBse {

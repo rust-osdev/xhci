@@ -45,8 +45,8 @@ impl Doorbell {
         )
     }
 
-    rw_field!(pub, 0..=7, doorbell_target, "Doorbell Target", u8);
-    rw_field!(pub, 16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
+    rw_field!(pub, self, self.0; 0..=7, doorbell_target, "Doorbell Target", u8);
+    rw_field!(pub, self, self.0; 16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
 }
 impl fmt::Debug for Doorbell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

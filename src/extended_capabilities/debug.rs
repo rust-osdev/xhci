@@ -86,8 +86,8 @@ where
 pub struct Id(u32);
 impl Id {
     ro_field!(
-        pub,
-        16..=20,
+        pub, self,
+        self.0; 16..=20,
         debug_capability_event_ring_segment_table_max,
         "Debug Capability Event Ring Segment Table Max",
         u8
@@ -104,7 +104,12 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct Doorbell(u32);
 impl Doorbell {
-    field_setter!(pub, 8..=15, "Doorbell Target", u8);
+    rw_field!(
+        pub, self,
+        self.0; 8..=15,
+        "Doorbell Target",
+        u8
+    );
 }
 
 /// Debug Capability Event Ring Segment Table Size Register.
@@ -112,7 +117,7 @@ impl Doorbell {
 #[derive(Copy, Clone)]
 pub struct EventRingSegmentTableSize(u32);
 impl EventRingSegmentTableSize {
-    rw_field!(pub, 0..=15, "Event Ring Segment Table Size", u16);
+    rw_field!(pub, self, self.0; 0..=15, "Event Ring Segment Table Size", u16);
 }
 impl_debug_from_methods! {
     EventRingSegmentTableSize {
@@ -125,9 +130,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct EventRingSegmentTableBaseAddress(u64);
 impl EventRingSegmentTableBaseAddress {
-    rw_field!(
-        pub,
-        []{4, "64-byte aligned"},
+    rw_zero_trailing!(
+        pub, self,
+        self.0; 4~; "64-byte aligned",
         "Event Ring Segment Table Base Address",
         u64
     );
@@ -144,15 +149,15 @@ impl_debug_from_methods! {
 pub struct EventRingDequeuePointer(u64);
 impl EventRingDequeuePointer {
     rw_field!(
-        pub,
-        0..=2,
+        pub, self,
+        self.0; 0..=2,
         dequeue_erst_segment_index,
         "Dequeue ERST Segment Index",
         u8
     );
-    rw_field!(
-        pub,
-        []{4, "16-byte aligned"},
+    rw_zero_trailing!(
+        pub, self,
+        self.0; 4~; "16-byte aligned",
         dequeue_pointer,
         "Event Ring Dequeue Pointer",
         u64
@@ -170,11 +175,11 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Control(u32);
 impl Control {
-    ro_bit!(pub, 0, dbc_run, "DbC Run");
-    rw_bit!(pub, 1, link_status_event_enable, "Link Status Event Enable");
-    rw1s_bit!(pub, 2, halt_out_tr, "Halt OUT TR");
-    rw1s_bit!(pub, 3, halt_in_tr, "Halt IN TR");
-    rw1c_bit!(pub, 4, dbc_run_change, "DbC Run Change");
+    ro_bit!(pub, self, self.0; 0, dbc_run, "DbC Run");
+    rw_bit!(pub, self, self.0; 1, link_status_event_enable, "Link Status Event Enable");
+    rw1s_bit!(pub, self, self.0; 2, halt_out_tr, "Halt OUT TR");
+    rw1s_bit!(pub, self, self.0; 3, halt_in_tr, "Halt IN TR");
+    rw1c_bit!(pub, self, self.0; 4, dbc_run_change, "DbC Run Change");
 
     /// Returns the value of the Debug Max Burst Size field.
     #[must_use]
@@ -188,7 +193,7 @@ impl Control {
         self.0.get_bits(24..=30).try_into().unwrap()
     }
 
-    rw_bit!(pub, 31, debug_capability_enable, "Debug Capability Enable");
+    rw_bit!(pub, self, self.0; 31, debug_capability_enable, "Debug Capability Enable");
 }
 impl_debug_from_methods! {
     Control {
@@ -208,8 +213,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct Status(u32);
 impl Status {
-    ro_bit!(pub, 0, event_ring_not_empty, "Event Ring Not Empty");
-    ro_bit!(pub, 1, dbc_system_bus_reset, "DbC System Bus Reset");
+    ro_bit!(pub, self, self.0; 0, event_ring_not_empty, "Event Ring Not Empty");
+    ro_bit!(pub, self, self.0; 1, dbc_system_bus_reset, "DbC System Bus Reset");
 
     /// Returns the value of the Debug Port Number field.
     #[must_use]
@@ -230,9 +235,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct PortStatusAndControl(u32);
 impl PortStatusAndControl {
-    ro_bit!(pub, 0, current_connect_status, "Current Connect Status");
-    rw_bit!(pub, 1, port_enabled_disabled, "Port Enabled/Disabled");
-    ro_bit!(pub, 4, port_reset, "Port Reset");
+    ro_bit!(pub, self, self.0; 0, current_connect_status, "Current Connect Status");
+    rw_bit!(pub, self, self.0; 1, port_enabled_disabled, "Port Enabled/Disabled");
+    ro_bit!(pub, self, self.0; 4, port_reset, "Port Reset");
 
     /// Returns the value of the Port Link State field.
     #[must_use]
@@ -246,10 +251,10 @@ impl PortStatusAndControl {
         self.0.get_bits(10..=13).try_into().unwrap()
     }
 
-    rw1c_bit!(pub, 17, connect_status_change, "Connect Status Change");
-    rw1c_bit!(pub, 21, port_reset_change, "Port Reset Change");
-    rw1c_bit!(pub, 22, port_link_status_change, "Port Link Status Change");
-    rw1c_bit!(pub, 23, port_config_error_change, "Port Config Error Change");
+    rw1c_bit!(pub, self, self.0; 17, connect_status_change, "Connect Status Change");
+    rw1c_bit!(pub, self, self.0; 21, port_reset_change, "Port Reset Change");
+    rw1c_bit!(pub, self, self.0; 22, port_link_status_change, "Port Link Status Change");
+    rw1c_bit!(pub, self, self.0; 23, port_config_error_change, "Port Config Error Change");
 }
 impl_debug_from_methods! {
     PortStatusAndControl {
@@ -270,9 +275,9 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Debug)]
 pub struct ContextPointer(u64);
 impl ContextPointer {
-    rw_field!(
-        pub,
-        []{4, "16-byte aligned"},
+    rw_zero_trailing!(
+        pub, self,
+        self.0; 4~; "16-byte aligned",
         "Debug Capability Context Base Pointer",
         u64
     );
@@ -283,8 +288,8 @@ impl ContextPointer {
 #[derive(Copy, Clone)]
 pub struct DeviceDescriptorInfo1(u32);
 impl DeviceDescriptorInfo1 {
-    rw_field!(pub, 0..=7, dbc_protocol, "DbC Protocol", u8);
-    rw_field!(pub, 16..=31, vendor_id, "Vendor ID", u16);
+    rw_field!(pub, self, self.0; 0..=7, dbc_protocol, "DbC Protocol", u8);
+    rw_field!(pub, self, self.0; 16..=31, vendor_id, "Vendor ID", u16);
 }
 impl_debug_from_methods! {
     DeviceDescriptorInfo1 {
@@ -298,8 +303,8 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone)]
 pub struct DeviceDescriptorInfo2(u32);
 impl DeviceDescriptorInfo2 {
-    rw_field!(pub, 0..=15, product_id, "Product ID", u16);
-    rw_field!(pub, 16..=31, device_revision, "Device Revision", u16);
+    rw_field!(pub, self, self.0; 0..=15, product_id, "Product ID", u16);
+    rw_field!(pub, self, self.0; 16..=31, device_revision, "Device Revision", u16);
 }
 impl_debug_from_methods! {
     DeviceDescriptorInfo2 {

@@ -8,7 +8,7 @@ use accessor::marker::Readable;
 use accessor::single;
 use accessor::Mapper;
 use core::convert::TryFrom;
-use core::convert::TryInto;
+// use core::convert::TryInto;
 use core::marker::PhantomData;
 
 /// Runtime Registers
@@ -51,7 +51,7 @@ where
 #[derive(Copy, Clone)]
 pub struct MicroframeIndexRegister(u32);
 impl MicroframeIndexRegister {
-    ro_field!(pub, 0..=13, microframe_index, "Microframe Index", u16);
+    ro_field!(pub, self, self.0; 0..=13, microframe_index, "Microframe Index", u16);
 }
 impl_debug_from_methods! {
     MicroframeIndexRegister {
@@ -166,8 +166,8 @@ where
 #[derive(Copy, Clone)]
 pub struct InterrupterManagementRegister(u32);
 impl InterrupterManagementRegister {
-    rw1c_bit!(pub, 0, interrupt_pending, "Interrupt Pending");
-    rw_bit!(pub, 1, interrupt_enable, "Interrupt Enable");
+    rw1c_bit!(pub, self, self.0; 0, interrupt_pending, "Interrupt Pending");
+    rw_bit!(pub, self, self.0; 1, interrupt_enable, "Interrupt Enable");
 }
 impl_debug_from_methods! {
     InterrupterManagementRegister {
@@ -181,14 +181,16 @@ impl_debug_from_methods! {
 #[derive(Copy, Clone, Default)]
 pub struct InterrupterModerationRegister(u32);
 impl InterrupterModerationRegister {
-    rw_field!(pub, 
-        0..=15,
+    rw_field!(
+        pub, self,
+        self.0; 0..=15,
         interrupt_moderation_interval,
         "Interrupt Moderation Interval",
         u16
     );
-    rw_field!(pub, 
-        16..=31,
+    rw_field!(
+        pub, self,
+        self.0; 16..=31,
         interrupt_moderation_counter,
         "Interrupt Moderation Counter",
         u16
@@ -207,8 +209,8 @@ impl_debug_from_methods! {
 pub struct EventRingSegmentTableSizeRegister(u32);
 impl EventRingSegmentTableSizeRegister {
     rw_field!(
-        pub,
-        0..=15,
+        pub, self,
+        self.0; 0..=15,
         "Event Ring Segment Table Size (the number of segments)",
         u16
     );
@@ -219,9 +221,9 @@ impl EventRingSegmentTableSizeRegister {
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
 impl EventRingSegmentTableBaseAddressRegister {
-    rw_field!(
-        pub,
-        []{6, "64-byte aligned"},
+    rw_zero_trailing!(
+        pub, self,
+        self.0; 6~; "64-byte aligned",
         "Event Ring Segment Table Base Address",
         u64
     );
@@ -232,17 +234,17 @@ impl EventRingSegmentTableBaseAddressRegister {
 #[derive(Copy, Clone, Default)]
 pub struct EventRingDequeuePointerRegister(u64);
 impl EventRingDequeuePointerRegister {
-    rw_field!(pub, 
-        0..=2,
+    rw_field!(
+        pub, self,
+        self.0; 0..=2,
         dequeue_erst_segment_index,
         "Dequeue ERST Segment Index",
         u8
     );
-    rw1c_bit!(pub, 3, event_handler_busy, "Event Handler Busy");
-
-    rw_field!(
-        pub,
-        []{4, "16-byte aligned"},
+    rw1c_bit!(pub, self, self.0; 3, event_handler_busy, "Event Handler Busy");
+    rw_zero_trailing!(
+        pub, self,
+        self.0; 4~; "16-byte aligned",
         event_ring_dequeue_pointer,
         "current Event Ring Dequeue Pointer",
         u64

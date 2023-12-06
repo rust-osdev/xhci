@@ -13,295 +13,158 @@ macro_rules! impl_debug_from_methods {
 }
 
 macro_rules! bit_getter {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
         #[doc = "Returns the"]
         #[doc = $name]
         #[doc = "bit."]
         #[must_use]
-        $vis fn $method(&self) -> bool {
+        $vis fn $method(&$self_) -> bool {
             use bit_field::BitField;
-            self.0[$offset].get_bit($bit)
-        }
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        #[doc = "Returns the"]
-        #[doc = $name]
-        #[doc = "bit."]
-        #[must_use]
-        $vis fn $method(&self) -> bool {
-            use bit_field::BitField;
-            self.0.get_bit($bit)
+            $from.get_bit($bit)
         }
     };
 }
 
-macro_rules! bit_modifier {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
+macro_rules! bit_raiser {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
         paste::paste! {
             #[doc = "Sets the"]
             #[doc = $name]
             #[doc = "bit."]
-            $vis fn [<set_ $method>](&mut self)->&mut Self{
+            $vis fn [<set_ $method>](&mut $self_)->&mut Self{
                 use bit_field::BitField;
-                self.0[$offset].set_bit($bit,true);
-                self
-            }
-
-            #[doc = "Clears the"]
-            #[doc = $name]
-            #[doc = "bit."]
-            $vis fn [<clear_ $method>](&mut self)->&mut Self{
-                use bit_field::BitField;
-                self.0[$offset].set_bit($bit,false);
-                self
+                $from.set_bit($bit,true);
+                $self_
             }
         }
     };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        paste::paste! {
-            #[doc = "Sets the"]
-            #[doc = $name]
-            #[doc = "bit."]
-            $vis fn [<set_ $method>](&mut self)->&mut Self{
-                use bit_field::BitField;
-                self.0.set_bit($bit,true);
-                self
-            }
+}
 
+macro_rules! bit_clearer {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        paste::paste! {
             #[doc = "Clears the"]
             #[doc = $name]
             #[doc = "bit."]
-            $vis fn [<clear_ $method>](&mut self)->&mut Self{
+            $vis fn [<clear_ $method>](&mut $self_)->&mut Self{
                 use bit_field::BitField;
-                self.0.set_bit($bit,false);
-                self
+                $from.set_bit($bit,false);
+                $self_
             }
         }
     };
 }
 
 macro_rules! bit_modifier_w1c {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
         paste::paste! {
             #[doc = "Assigns 1 to the"]
             #[doc = $name]
             #[doc = "bit. On register write, this results in clearing the bit."]
-            $vis fn [<clear_ $method>](&mut self)->&mut Self{
+            $vis fn [<clear_ $method>](&mut $self_)->&mut Self{
                 use bit_field::BitField;
-                self.0[$offset].set_bit($bit,true);
-                self
+                $from.set_bit($bit,true);
+                $self_
             }
 
             #[doc = "Assigns 0 to the"]
             #[doc = $name]
             #[doc = "bit, preventing the bit from being cleared on write."]
-            $vis fn [<set_0_ $method>](&mut self) -> &mut Self {
+            $vis fn [<set_0_ $method>](&mut $self_) -> &mut Self {
                 use bit_field::BitField;
-                self.0[$offset].set_bit($bit,false);
-                self
-            }
-        }
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        paste::paste! {
-            #[doc = "Assigns 1 to the"]
-            #[doc = $name]
-            #[doc = "bit. On register write, this results in clearing the bit."]
-            $vis fn [<clear_ $method>](&mut self)->&mut Self{
-                use bit_field::BitField;
-                self.0.set_bit($bit,true);
-                self
-            }
-
-            #[doc = "Assigns 0 to the"]
-            #[doc = $name]
-            #[doc = "bit, preventing the bit from being cleared on write."]
-            $vis fn [<set_0_ $method>](&mut self) -> &mut Self {
-                use bit_field::BitField;
-                self.0.set_bit($bit,false);
-                self
+                $from.set_bit($bit,false);
+                $self_
             }
         }
     };
 }
 
 macro_rules! ro_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        bit_getter!($vis, [$offset]($bit), $method, $name);
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        bit_getter!($vis, $bit, $method, $name);
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_getter!($vis, $self_, $from;$bit, $method, $name);
     };
 }
 
 macro_rules! wo_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        bit_modifier!($vis, [$offset]($bit), $method, $name);
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        bit_modifier!($vis, $bit, $method, $name);
-    };
-}
-
-macro_rules! rw_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        bit_getter!($vis, [$offset]($bit), $method, $name);
-        bit_modifier!($vis, [$offset]($bit), $method, $name);
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        bit_getter!($vis, $bit, $method, $name);
-        bit_modifier!($vis, $bit, $method, $name);
-    };
-}
-
-macro_rules! rw1c_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        bit_getter!($vis, [$offset]($bit), $method, $name);
-        bit_modifier_w1c!($vis, [$offset]($bit), $method, $name);
-    };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        bit_getter!($vis, $bit, $method, $name);
-        bit_modifier_w1c!($vis, $bit, $method, $name);
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_raiser!($vis, $self_, $from;$bit, $method, $name);
+        bit_clearer!($vis, $self_, $from;$bit, $method, $name);
     };
 }
 
 macro_rules! w1s_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        paste::paste! {
-            #[doc = "Sets the"]
-            #[doc = $name]
-            #[doc = "bit."]
-            $vis fn [<set_ $method>](&mut self)->&mut Self{
-                use bit_field::BitField;
-                self.0[$offset].set_bit($bit,true);
-                self
-            }
-        }
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_raiser!($vis, $self_, $from;$bit, $method, $name);
     };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        paste::paste! {
-            #[doc = "Sets the"]
-            #[doc = $name]
-            #[doc = "bit."]
-            $vis fn [<set_ $method>](&mut self)->&mut Self{
-                use bit_field::BitField;
-                self.0.set_bit($bit,true);
-                self
-            }
-        }
+}
+
+macro_rules! rw_bit {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_getter!($vis, $self_, $from;$bit, $method, $name);
+        bit_raiser!($vis, $self_, $from;$bit, $method, $name);
+        bit_clearer!($vis, $self_, $from;$bit, $method, $name);
     };
 }
 
 macro_rules! rw1s_bit {
-    ($vis:vis,[$offset:literal]($bit:literal),$method:ident,$name:literal) => {
-        bit_getter!($vis, [$offset]($bit), $method, $name);
-        w1s_bit!($vis, [$offset]($bit), $method, $name);
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_getter!($vis, $self_, $from;$bit, $method, $name);
+        bit_raiser!($vis, $self_, $from;$bit, $method, $name);
     };
-    ($vis:vis,$bit:literal,$method:ident,$name:literal) => {
-        bit_getter!($vis, $bit, $method, $name);
-        w1s_bit!($vis, $bit, $method, $name);
+}
+
+macro_rules! rw1c_bit {
+    ($vis:vis,$self_:ident,$from:expr;$bit:literal,$method:ident,$name:literal) => {
+        bit_getter!($vis, $self_, $from;$bit, $method, $name);
+        bit_modifier_w1c!($vis, $self_, $from;$bit, $method, $name);
     };
 }
 
 macro_rules! field_getter {
-    ($vis:vis,[$offset:literal]($range:expr),$method:ident,$name:literal,$ty:ty) => {
+    ($vis:vis,$self_:ident,$from:expr;$range:expr,$method:ident,$name:literal,$ty:ty) => {
         #[doc = "Returns the value of the"]
         #[doc = $name]
         #[doc = "field."]
         #[must_use]
-        $vis fn $method(&self) -> $ty {
+        $vis fn $method(&$self_) -> $ty {
             use bit_field::BitField;
             use core::convert::TryInto;
-            self.0[$offset].get_bits($range).try_into().unwrap()
+            $from.get_bits($range).try_into().unwrap()
         }
     };
-    ($vis:vis,$range:expr,$method:ident,$name:literal,$ty:ty) => {
+}
+
+macro_rules! zero_trailing_getter {
+    ($vis:vis,$self_:ident,$from:expr;$start:literal~,$method:ident,$name:literal,$ty:ty) => {
         #[doc = "Returns the value of the"]
         #[doc = $name]
         #[doc = "field."]
         #[must_use]
-        $vis fn $method(&self) -> $ty {
-            use bit_field::BitField;
+        $vis fn $method(&$self_) -> $ty {
             use core::convert::TryInto;
-            self.0.get_bits($range).try_into().unwrap()
+            ($from >> $start << $start).try_into().unwrap()
         }
     };
-    ($vis:vis,$range:expr,$name:literal,$ty:ty) => {
-        #[doc = "Returns the value of the"]
-        #[doc = $name]
-        #[doc = "field."]
-        #[must_use]
-        $vis fn get(&self) -> $ty {
-            use bit_field::BitField;
-            use core::convert::TryInto;
-            self.0.get_bits($range).try_into().unwrap()
-        }
-    };
-    ($vis:vis,[]{$start:literal},$method:ident,$name:literal,$ty:ty) => {
-        #[doc = "Returns the value of the"]
-        #[doc = $name]
-        #[doc = "field."]
-        #[must_use]
-        $vis fn $method(&self) -> $ty {
-            // use bit_field::BitField;
-            use core::convert::TryInto;
-            (self.0 >> $start << $start).try_into().unwrap()
-        }
-    };
-    ($vis:vis,[]{$start:literal},$name:literal,$ty:ty) => {
-        #[doc = "Returns the value of the"]
-        #[doc = $name]
-        #[doc = "field."]
-        #[must_use]
-        $vis fn get(&self) -> $ty {
-            // use bit_field::BitField;
-            use core::convert::TryInto;
-            (self.0 >> $start << $start).try_into().unwrap()
-        }
-    }
 }
 
 macro_rules! field_setter {
-    ($vis:vis,[$offset:literal]($range:expr),$method:ident,$name:literal,$ty:ty) => {
+    ($vis:vis,$self_:ident,$from:expr;$range:expr,$method:ident,$name:literal,$ty:ty) => {
         paste::paste! {
             #[doc = "Sets the value of the"]
             #[doc = $name]
             #[doc = "field."]
-            $vis fn [<set_ $method>](&mut self,value:$ty) -> &mut Self {
+            $vis fn $method(&mut $self_,value:$ty) -> &mut Self {
                 use bit_field::BitField;
                 use core::convert::TryInto;
-                self.0[$offset].set_bits($range,value.try_into().unwrap());
-                self
+                $from.set_bits($range,value.try_into().unwrap());
+                $self_
             }
         }
     };
-    ($vis:vis,$range:expr,$method:ident,$name:literal,$ty:ty) => {
-        paste::paste! {
-            #[doc = "Sets the value of the"]
-            #[doc = $name]
-            #[doc = "field."]
-            $vis fn [<set_ $method>](&mut self,value:$ty) -> &mut Self {
-                use bit_field::BitField;
-                use core::convert::TryInto;
-                self.0.set_bits($range,value.try_into().unwrap());
-                self
-            }
-        }
-    };
-    ($vis:vis,$range:expr,$name:literal,$ty:ty) => {
-        paste::paste! {
-            #[doc = "Sets the value of the"]
-            #[doc = $name]
-            #[doc = "field."]
-            $vis fn set(&mut self,value:$ty) -> &mut Self {
-                use bit_field::BitField;
-                use core::convert::TryInto;
-                self.0.set_bits($range,value.try_into().unwrap());
-                self
-            }
-        }
-    };
-    ($vis:vis,[]{$start:literal,$expect:literal},$method:ident,$name:literal,$ty:ty) => {
+}
+
+macro_rules! zero_trailing_setter {
+    ($vis:vis,$self_:ident,$from:expr;$start:literal~;$expect:literal,$method:ident,$name:literal,$ty:ty) => {
         paste::paste! {
             #[doc = "Sets the value of the"]
             #[doc = $name]
@@ -310,99 +173,77 @@ macro_rules! field_setter {
             #[doc = "This method panics if the given value is not"]
             #[doc = $expect]
             #[doc = "."]
-            $vis fn [<set_ $method>](&mut self,value:$ty) -> &mut Self {
+            $vis fn set(&mut $self_,value:$ty) -> &mut Self {
                 use bit_field::BitField;
 
                 assert!(value.trailing_zeros() >= $start, "The {} must be {}.", $name, $expect);
 
-                self.0.set_bits($start.., value.get_bits($start..));
-                self
-            }
-        }
-    };
-    ($vis:vis,[]{$start:literal,$expect:literal},$name:literal,$ty:ty) => {
-        paste::paste! {
-            #[doc = "Sets the value of the"]
-            #[doc = $name]
-            #[doc = "field."]
-            #[doc = "\n\n# Panics \n\n"]
-            #[doc = "This method panics if the given value is not"]
-            #[doc = $expect]
-            #[doc = "."]
-            $vis fn set(&mut self,value:$ty) -> &mut Self {
-                use bit_field::BitField;
-
-                assert!(value.trailing_zeros() >= $start, "The {} must be {}.", $name, $expect);
-
-                self.0.set_bits($start.., value.get_bits($start..));
-                self
+                $from.set_bits($start.., value.get_bits($start..));
+                $self_
             }
         }
     };
 }
 
 macro_rules! ro_field {
-    ($vis:vis,[$offset:literal]($range:expr),$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, [$offset]($range), $method, $name, $ty);
+    ($vis:vis,$self_:ident,$from:expr;$range:expr,$method:ident,$name:literal,$ty:ty) => {
+        field_getter!($vis, $self_, $from;$range, $method, $name, $ty);
     };
-    ($vis:vis,$range:expr,$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, $range, $method, $name, $ty);
-    };
-    ($vis:vis,$range:expr,$name:literal,$ty:ty) => {
-        field_getter!($vis, $range, $name, $ty);
-    };
-    ($vis:vis,[]{$start:literal},$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, []{$start}, $method, $name, $ty);
-    };
-    ($vis:vis,[]{$start:literal},$name:literal,$ty:ty) => {
-        field_getter!($vis, []{$start}, $name, $ty);
+    ($vis:vis,$self_:ident,$from:expr,$range:expr,$name:literal,$ty:ty) => {
+        field_getter!($vis, $self_, $from;$range, get, $name, $ty);
     };
 }
 
 macro_rules! rw_field {
-    ($vis:vis,[$offset:literal]($range:expr),$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, [$offset]($range), $method, $name, $ty);
-        field_setter!($vis, [$offset]($range), $method, $name, $ty);
+    ($vis:vis,$self_:ident,$from:expr;$range:expr,$method:ident,$name:literal,$ty:ty) => {
+        paste::paste!{
+            field_getter!($vis, $self_, $from;$range, $method, $name, $ty);
+            field_setter!($vis, $self_, $from;$range, [<set_ $method>], $name, $ty);
+        }
     };
-    ($vis:vis,$range:expr,$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, $range, $method, $name, $ty);
-        field_setter!($vis, $range, $method, $name, $ty);
+    ($vis:vis,$self_:ident,$from:expr;$range:expr,$name:literal,$ty:ty) => {
+        field_getter!($vis, $self_, $from;$range, get, $name, $ty);
+        field_setter!($vis, $self_, $from;$range, set, $name, $ty);
     };
-    ($vis:vis,$range:expr,$name:literal,$ty:ty) => {
-        field_getter!($vis, $range, $name, $ty);
-        field_setter!($vis, $range, $name, $ty);
+}
+
+macro_rules! rw_zero_trailing {
+    ($vis:vis,$self_:ident,$from:expr;$start:literal~;$expect:literal,$method:ident,$name:literal,$ty:ty) => {
+        paste::paste!{
+            zero_trailing_getter!($vis, $self_, $from;$start~, $method, $name, $ty);
+            zero_trailing_setter!($vis, $self_, $from;$start~;$expect, [<set_ $method>], $name, $ty);
+        }
     };
-    ($vis:vis,[]{$start:literal,$expect:literal},$method:ident,$name:literal,$ty:ty) => {
-        field_getter!($vis, []{$start}, $method, $name, $ty);
-        field_setter!($vis, []{$start, $expect}, $method, $name, $ty);
-    };
-    ($vis:vis,[]{$start:literal,$expect:literal},$name:literal,$ty:ty) => {
-        field_getter!($vis, []{$start}, $name, $ty);
-        field_setter!($vis, []{$start, $expect}, $name, $ty);
+    ($vis:vis,$self_:ident,$from:expr;$start:literal~;$expect:literal,$name:literal,$ty:ty) => {
+        zero_trailing_getter!($vis, $self_, $from;$start~, get, $name, $ty);
+        zero_trailing_setter!($vis, $self_, $from;$start~;$expect, set, $name, $ty);
     };
 }
 
 macro_rules! double_field_getter {
-    ($vis:vis,[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
         #[doc = "Returns the value of the"]
         #[doc = $name]
         #[doc = "field."]
         #[must_use]
-        $vis fn $method(&self) -> $ty {
-            let lo = self.0[$off_lo] as $ty;
-            let hi = self.0[$off_hi] as $ty;
+        $vis fn $method(&$self_) -> $ty {
+            let lo = $arr[$off_lo] as $ty;
+            let hi = $arr[$off_hi] as $ty;
             
             (hi << $bits) | lo
         }
     };
-    ($vis:vis,[$off_lo:literal,$off_hi:literal]{$start:literal},$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+}
+
+macro_rules! double_zero_trailing_getter {
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal];$start:literal~,$method:ident,$name:literal,$bits:literal,$ty:ty) => {
         #[doc = "Returns the value of the"]
         #[doc = $name]
         #[doc = "field."]
         #[must_use]
-        $vis fn $method(&self) -> $ty {
-            let lo = (self.0[$off_lo] as $ty) >> $start << $start;
-            let hi = self.0[$off_hi] as $ty;
+        $vis fn $method(&$self_) -> $ty {
+            let lo = ($arr[$off_lo] as $ty) >> $start << $start;
+            let hi = $arr[$off_hi] as $ty;
             
             (hi << $bits) | lo
         }
@@ -410,69 +251,79 @@ macro_rules! double_field_getter {
 }
 
 macro_rules! double_field_setter {
-    ($vis:vis,[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        paste::paste! {
-            #[doc = "Sets the value of the"]
-            #[doc = $name]
-            #[doc = "field."]
-            $vis fn [<set_ $method>](&mut self, value: $ty) -> &mut Self {
-                use bit_field::BitField;
-                use core::convert::TryInto;
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+        #[doc = "Sets the value of the"]
+        #[doc = $name]
+        #[doc = "field."]
+        $vis fn $method(&mut $self_, value: $ty) -> &mut Self {
+            use bit_field::BitField;
+            use core::convert::TryInto;
 
-                let lo = value.get_bits(..$bits);
-                let hi = value.get_bits($bits..);
+            let lo = value.get_bits(..$bits);
+            let hi = value.get_bits($bits..);
 
-                self.0[$off_lo] = lo.try_into().unwrap();
-                self.0[$off_hi] = hi.try_into().unwrap();
-                self
-            }
+            $arr[$off_lo] = lo.try_into().unwrap();
+            $arr[$off_hi] = hi.try_into().unwrap();
+            $self_
         }
     };
-    ($vis:vis,[$off_lo:literal,$off_hi:literal]{$start:literal,$expect:literal},$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        paste::paste! {
-            #[doc = "Sets the value of the"]
-            #[doc = $name]
-            #[doc = "field."]
-            #[doc = "\n\n# Panics \n\n"]
-            #[doc = "This method panics if the given value is not"]
-            #[doc = $expect]
-            #[doc = "."]
-            $vis fn [<set_ $method>](&mut self, value: $ty) -> &mut Self {
-                use bit_field::BitField;
-                use core::convert::TryInto;
+}
 
-                let lo = value.get_bits(..$bits);
-                let hi = value.get_bits($bits..);
+macro_rules! double_zero_trailing_setter {
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal];$start:literal~;$expect:literal,$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+        #[doc = "Sets the value of the"]
+        #[doc = $name]
+        #[doc = "field."]
+        #[doc = "\n\n# Panics \n\n"]
+        #[doc = "This method panics if the given value is not"]
+        #[doc = $expect]
+        #[doc = "."]
+        $vis fn $method(&mut $self_, value: $ty) -> &mut Self {
+            use bit_field::BitField;
+            use core::convert::TryInto;
 
-                assert!(lo.trailing_zeros() >= $start, "The {} must be {}.", $name, $expect);
+            let lo = value.get_bits(..$bits);
+            let hi = value.get_bits($bits..);
 
-                self.0[$off_lo].set_bits(
-                    $start..,
-                    lo.get_bits($start..).try_into().unwrap()
-                );
-                self.0[$off_hi] = hi.try_into().unwrap();
-                self
-            }
+            assert!(lo.trailing_zeros() >= $start, "The {} must be {}.", $name, $expect);
+
+            $arr[$off_lo].set_bits(
+                $start..,
+                lo.get_bits($start..).try_into().unwrap()
+            );
+            $arr[$off_hi] = hi.try_into().unwrap();
+            $self_
         }
     };
 }
 
 macro_rules! ro_double_field {
-    ($vis:vis,[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        double_field_getter!($vis, [$off_lo, $off_hi], $method, $name, $bits, $ty);
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+        double_field_getter!($vis, $self_, $arr; [$off_lo, $off_hi], $method, $name, $bits, $ty);
     };
-    ($vis:vis,[$off_lo:literal,$off_hi:literal]{$start:literal},$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        double_field_getter!($vis, [$off_lo, $off_hi]{$start}, $method, $name, $bits, $ty);
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$name:literal,$bits:literal,$ty:ty) => {
+        double_field_getter!($vis, $self_, $arr; [$off_lo, $off_hi], get, $name, $bits, $ty);
     };
 }
 
 macro_rules! rw_double_field {
-    ($vis:vis,[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        double_field_getter!($vis, [$off_lo, $off_hi], $method, $name, $bits, $ty);
-        double_field_setter!($vis, [$off_lo, $off_hi], $method, $name, $bits, $ty);
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+        paste::paste! {
+            double_field_getter!($vis, $self_, $arr; [$off_lo, $off_hi], $method, $name, $bits, $ty);
+            double_field_setter!($vis, $self_, $arr; [$off_lo, $off_hi], [<set_ $method>], $name, $bits, $ty);
+        }
     };
-    ($vis:vis,[$off_lo:literal,$off_hi:literal]{$start:literal,$expect:literal},$method:ident,$name:literal,$bits:literal,$ty:ty) => {
-        double_field_getter!($vis, [$off_lo, $off_hi]{$start}, $method, $name, $bits, $ty);
-        double_field_setter!($vis, [$off_lo, $off_hi]{$start, $expect}, $method, $name, $bits, $ty);
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal],$name:literal,$bits:literal,$ty:ty) => {
+        double_field_getter!($vis, $self_, $arr; [$off_lo, $off_hi], get, $name, $bits, $ty);
+        double_field_setter!($vis, $self_, $arr; [$off_lo, $off_hi], set, $name, $bits, $ty);
+    };
+}
+
+macro_rules! rw_double_zero_trailing {
+    ($vis:vis,$self_:ident,$arr:expr;[$off_lo:literal,$off_hi:literal];$start:literal~;$expect:literal,$method:ident,$name:literal,$bits:literal,$ty:ty) => {
+        paste::paste! {
+            double_zero_trailing_getter!($vis, $self_, $arr; [$off_lo, $off_hi]; $start~, $method, $name, $bits, $ty);
+            double_zero_trailing_setter!($vis, $self_, $arr; [$off_lo, $off_hi]; $start~; $expect, [<set_ $method>], $name, $bits, $ty);
+        }
     };
 }

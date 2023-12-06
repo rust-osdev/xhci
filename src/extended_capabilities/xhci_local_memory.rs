@@ -61,8 +61,8 @@ where
 pub struct Header([u32; 2]);
 impl Header {
     rw_bit!(
-        pub,
-        [0](16),
+        pub, self,
+        self.0[0]; 16,
         local_memory_enable,
         "Local Memory Enable"
     );

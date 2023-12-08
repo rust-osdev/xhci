@@ -3,7 +3,7 @@
 use super::capability::Capability;
 use accessor::array;
 use accessor::Mapper;
-use core::{convert::TryFrom, fmt};
+use core::convert::TryFrom;
 
 /// A type alias to [`Doorbell`] register for backward compability.
 #[deprecated = "Use `Doorbell` instead of `Register`."]
@@ -48,11 +48,7 @@ impl Doorbell {
     rw_field!(0..=7, doorbell_target, "Doorbell Target", u8);
     rw_field!(16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
 }
-impl fmt::Debug for Doorbell {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("doorbell::Register")
-            .field("doorbell_target", &self.doorbell_target())
-            .field("doorbell_stream_id", &self.doorbell_stream_id())
-            .finish()
-    }
-}
+impl_debug_from_methods!(Doorbell {
+    doorbell_target,
+    doorbell_stream_id,
+});

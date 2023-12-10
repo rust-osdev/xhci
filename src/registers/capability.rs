@@ -11,25 +11,25 @@ where
     M: Mapper + Clone,
 {
     /// Capability Registers Length
-    pub caplength: single::ReadWrite<CapabilityRegistersLength, M>,
+    pub caplength: single::ReadOnly<CapabilityRegistersLength, M>,
     /// Host Controller Interface Version Number
-    pub hciversion: single::ReadWrite<InterfaceVersionNumber, M>,
+    pub hciversion: single::ReadOnly<InterfaceVersionNumber, M>,
     /// Structural Parameters 1
-    pub hcsparams1: single::ReadWrite<StructuralParameters1, M>,
+    pub hcsparams1: single::ReadOnly<StructuralParameters1, M>,
     /// Structural Parameters 2
-    pub hcsparams2: single::ReadWrite<StructuralParameters2, M>,
+    pub hcsparams2: single::ReadOnly<StructuralParameters2, M>,
     /// Structural Parameters 3
-    pub hcsparams3: single::ReadWrite<StructuralParameters3, M>,
+    pub hcsparams3: single::ReadOnly<StructuralParameters3, M>,
     /// Capability Parameters 1
-    pub hccparams1: single::ReadWrite<CapabilityParameters1, M>,
+    pub hccparams1: single::ReadOnly<CapabilityParameters1, M>,
     /// Doorbell Offset
-    pub dboff: single::ReadWrite<DoorbellOffset, M>,
+    pub dboff: single::ReadOnly<DoorbellOffset, M>,
     /// Runtime Register Space Offset
-    pub rtsoff: single::ReadWrite<RuntimeRegisterSpaceOffset, M>,
+    pub rtsoff: single::ReadOnly<RuntimeRegisterSpaceOffset, M>,
     /// Capability Parameters 2
-    pub hccparams2: single::ReadWrite<CapabilityParameters2, M>,
+    pub hccparams2: single::ReadOnly<CapabilityParameters2, M>,
     /// Virtualization Based Trusted IO Register Space Offset
-    pub vtiosoff: single::ReadWrite<VirtualizationBasedTrustedIoRegisterSpaceOffset, M>,
+    pub vtiosoff: single::ReadOnly<VirtualizationBasedTrustedIoRegisterSpaceOffset, M>,
 }
 impl<M> Capability<M>
 where
@@ -51,7 +51,7 @@ where
     {
         macro_rules! m {
             ($offset:expr) => {
-                single::ReadWrite::new(mmio_base + $offset, mapper.clone())
+                single::ReadOnly::new(mmio_base + $offset, mapper.clone())
             };
         }
 

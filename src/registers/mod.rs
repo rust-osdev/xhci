@@ -4,6 +4,7 @@ use accessor::array;
 use accessor::Mapper;
 
 pub use capability::Capability;
+pub use doorbell::Doorbell;
 pub use operational::{Operational, PortRegisterSet};
 pub use runtime::InterrupterRegisterSet;
 pub use runtime::Runtime;
@@ -22,7 +23,7 @@ where
     /// Host Controller Capability Register
     pub capability: Capability<M>,
     /// Doorbell Array
-    pub doorbell: array::ReadWrite<doorbell::Doorbell, M>,
+    pub doorbell: array::ReadWrite<Doorbell, M>,
     /// Host Controller Operational Register
     pub operational: Operational<M>,
     /// Port Register Set Array

@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased - ReleaseDate
+### Added
+- `registers::Doorbell` as an alias of `registers::doorbell::Doorbell`. ([#170])
+
 ### Changed
 - `registers::Capability` now has read-only accessors instead of read-write ones. ([#167])
 - `registers::doorbell::Register` is renamed to `registers::doorbell::Doorbell`. The former still exists, but is deprecated now. ([#167])
@@ -201,4 +204,5 @@
 ### Added
 - Initial version.
 
+[#170]: https://github.com/rust-osdev/xhci/pull/170
 [#167]: https://github.com/rust-osdev/xhci/pull/167

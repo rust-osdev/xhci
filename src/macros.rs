@@ -173,7 +173,7 @@ macro_rules! zero_trailing_setter {
             #[doc = "This method panics if the given value is not"]
             #[doc = $expect]
             #[doc = "."]
-            $vis fn set(&mut $self_,value:$ty) -> &mut Self {
+            $vis fn $method(&mut $self_,value:$ty) -> &mut Self {
                 use bit_field::BitField;
 
                 assert!(value.trailing_zeros() >= $start, "The {} must be {}.", $name, $expect);

@@ -61,7 +61,6 @@ impl EventRingSegmentTableEntry {
         }
     }
 }
-
 impl EventRingSegmentTableEntry {
     rw_double_zero_trailing!(
         pub, self,
@@ -84,7 +83,6 @@ impl EventRingSegmentTableEntry {
         self.ring_segment_base_address() + (self.ring_segment_size() as u64)
     }
 }
-
 impl Index<usize> for EventRingSegmentTableEntry {
     type Output = event::TRB;
 
@@ -94,7 +92,6 @@ impl Index<usize> for EventRingSegmentTableEntry {
         &slice[index]
     }
 }
-
 impl IndexMut<usize> for EventRingSegmentTableEntry {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         let slice = self.as_mut_slice();

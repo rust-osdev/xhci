@@ -101,6 +101,9 @@ allowed_trb!("Transfer TRB", {
     /// No Op Transfer TRB
     NoOp = 8,
 });
+impl TRB {
+    ro_bit!(pub, self, self.0[3]; 4, chain_bit, "Chain");
+}
 
 impl Normal {
     impl_data_buffer_pointer!();

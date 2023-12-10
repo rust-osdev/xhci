@@ -4,6 +4,7 @@
 mod mapper;
 mod pci;
 mod registers;
+mod xhc;
 
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
@@ -14,6 +15,8 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let (_, _memory_map) = st.exit_boot_services(MemoryType::LOADER_DATA);
 
     registers::init();
+
+    xhc::init();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

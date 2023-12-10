@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 bit_field = "0.10.2"
 conquer-once = { version = "0.4.0", default-features = false }
+linked_list_allocator = "0.10.5"
 qemu-exit = "3.0.2"
 qemu_print = { version = "0.1.0", features = ["stable"], default-features = false }
 spinning_top = "0.3.0"

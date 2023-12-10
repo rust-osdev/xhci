@@ -1,5 +1,5 @@
 IMG = build/os.img
-EFI = target/x86_64-unknown-uefi/debug/xhci-test.efi
+EFI = ../target/x86_64-unknown-uefi/debug/xhci-test.efi
 
 .PHONY:	test clean
 

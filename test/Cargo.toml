@@ -11,4 +11,4 @@ qemu_print = { version = "0.1.0", features = ["stable"], default-features = fals
 spinning_top = "0.3.0"
 uefi = "0.26.0"
 x86_64 = { version = "0.14.11", default-features = false }
-xhci = { version = "0.9.2", path = ".." }
+xhci = { version = "0.9.2", path = "../lib" }

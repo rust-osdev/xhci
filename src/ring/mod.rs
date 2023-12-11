@@ -21,13 +21,12 @@ impl EventRingSegmentTableEntry {
     ///
     /// This method will panic if `len >= 4096`.
     pub unsafe fn new(base: *const event::TRB, len: usize) -> Self {
-        let size_in_bytes = len * trb::BYTES;
-        assert!(size_in_bytes <= u16::MAX as usize);
+        assert!(len <= u16::MAX as usize);
 
         let mut entry = Self([0; 4]);
         entry
             .set_ring_segment_base_address(base as usize as u64)
-            .set_ring_segment_size((len * trb::BYTES) as u16);
+            .set_ring_segment_size(len as u16);
         entry
     }
 
@@ -74,13 +73,13 @@ impl EventRingSegmentTableEntry {
         pub, self,
         self.0[2]; 0..=15,
         ring_segment_size,
-        "Ring Segment Size (in bytes)",
+        "Ring Segment Size (entry count)",
         u16
     );
 
     /// Returns the value of the ring segment end address.
     pub fn ring_segment_bound_address(&self) -> u64 {
-        self.ring_segment_base_address() + (self.ring_segment_size() as u64)
+        self.ring_segment_base_address() + (trb::BYTES * self.ring_segment_size() as usize) as u64
     }
 }
 impl Index<usize> for EventRingSegmentTableEntry {

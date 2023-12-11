@@ -21,9 +21,10 @@ pub fn init(memory_map: boot::MemoryMap) {
 }
 
 fn find_largest_conventional_memory_chunk(memory_map: boot::MemoryMap) -> boot::MemoryDescriptor {
-    // Only EfiConventionalMemory is used because dealing with additional memory
-    // types involves unnecessary complexity, given the presence of stack space
-    // in EfiBootServicesData (confirmed by manual testing) and UEFI binaries in
+    // Only EfiConventionalMemory which is usable both before and after exiting
+    // the boot service is used because dealing with additional memory types
+    // involves unnecessary complexity, given the presence of stack space in
+    // EfiBootServicesData (confirmed by manual testing) and UEFI binaries in
     // EfiLoaderData (as specified in UEFI version 2.10, Table 7.6.)
     *memory_map
         .entries()

@@ -45,8 +45,8 @@ impl Doorbell {
         )
     }
 
-    rw_field!(0..=7, doorbell_target, "Doorbell Target", u8);
-    rw_field!(16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
+    rw_field!(pub, self, self.0; 0..=7, doorbell_target, "Doorbell Target", u8);
+    rw_field!(pub, self, self.0; 16..=31, doorbell_stream_id, "Doorbell Stream ID", u16);
 }
 impl_debug_from_methods!(Doorbell {
     doorbell_target,

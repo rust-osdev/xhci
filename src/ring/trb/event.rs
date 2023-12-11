@@ -1,259 +1,217 @@
 //! Event TRBs.
 
-use super::Type;
 use bit_field::BitField;
-use core::convert::{TryFrom, TryInto};
+// use core::convert::TryInto;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
-allowed! {
-    /// TRBs which are allowed to be pushed to the Event Ring.
-    enum {
-        /// Transfer Event TRB.
-        TransferEvent,
-        /// Command Completion Event TRB.
-        CommandCompletion,
-        /// Port Status Change Event TRB.
-        PortStatusChange,
-        /// Bandwidth Request Event TRB.
-        BandwidthRequest,
-        /// Doorbell Event TRB.
-        Doorbell,
-        /// Host Controller Event TRB.
-        HostController,
-        /// Device Notification Event TRB.
-        DeviceNotification,
-        /// MFINDEX Wrap Event TRB.
-        MfindexWrap
-    }
-}
-impl TryFrom<[u32; 4]> for Allowed {
-    type Error = [u32; 4];
-
-    fn try_from(raw: [u32; 4]) -> Result<Self, Self::Error> {
-        try_from!(
-            raw =>
-            TransferEvent,
-            CommandCompletion,
-            PortStatusChange,
-            BandwidthRequest,
-            Doorbell,
-            HostController,
-            DeviceNotification,
-            MfindexWrap,
-        );
-        Err(raw)
-    }
-}
-
-macro_rules! completion_code {
-    ($name:ident) => {
-        impl $name {
-            /// Returns the Completion Code.
-            ///
-            /// # Errors
-            ///
-            /// This method may return an [`Err`] value with the Completion Code that is either reserved or
-            /// not implemented by this crate.
-            pub fn completion_code(&self) -> Result<CompletionCode, u8> {
-                let c: u8 = self.0[2].get_bits(24..=31).try_into().unwrap();
-                CompletionCode::from_u8(c).ok_or(c)
-            }
+macro_rules! impl_cc {
+    (ro) => {
+        /// Returns the Completion Code.
+        ///
+        /// # Errors
+        ///
+        /// This method may return an [`Err`] variant with the Completion Code that is either reserved or
+        /// not implemented in this crate.
+        pub fn completion_code(&self) -> Result<CompletionCode, u8> {
+            let c: u8 = self.0 .0[2].get_bits(24..=31).try_into().unwrap();
+            CompletionCode::from_u8(c).ok_or(c)
         }
     };
 }
-macro_rules! event {
-    ($name:ident,$full:expr,$ty:expr) => {
-        add_trb_with_default!($name, $full, $ty);
-        completion_code!($name);
-    };
-}
-macro_rules! impl_debug_for_event_trb{
-    ($name:ident{})=>{
-        impl_debug_for_trb!($name{
-            completion_code
-        });
-    };
-    ($name:ident {
-        $($method:ident),*
-    })=>{
-        impl_debug_for_trb!($name{
-            completion_code,
-            $($method),*
-        });
-    }
-}
 
-event!(
-    PortStatusChange,
-    "Port Status Change Event TRB",
-    Type::PortStatusChange
-);
-reserved!(PortStatusChange(Type::PortStatusChange){
-    [0]0..=23;
-    [1]0..=31;
-    [2]0..=23;
-    [3]1..=9;
-    [3]16..=31;
+allowed_trb!("Transfer TRB", {
+    /// Transfer Event TRB
+    TransferEvent = 32,
+    /// Command Completion Event TRB
+    CommandCompletion = 33,
+    /// Port Status Change Event TRB
+    PortStatusChange = 34,
+    /// Bandwidth Request Event TRB
+    BandwidthRequest = 35,
+    /// Doorbell Event TRB
+    Doorbell = 36,
+    /// Host Controller Event TRB
+    HostController = 37,
+    /// Device Notification Event TRB
+    DeviceNotification = 38,
+    /// MFINDEX Wrap Event TRB
+    MfindexWrap = 39,
 });
-impl PortStatusChange {
-    ro_field!([0](24..=31), port_id, "Port ID", u8);
-}
-impl_debug_for_event_trb!(PortStatusChange { port_id });
 
-event!(TransferEvent, "Transfer Event TRB", Type::TransferEvent);
-reserved!(TransferEvent(Type::TransferEvent){
-    [3]1..=1;
-    [3]3..=9;
-    [3]21..=23;
-});
 impl TransferEvent {
-    /// Returns the value of the TRB Pointer field.
-    #[must_use]
-    pub fn trb_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
+    ro_double_field!(pub, self, self.0.0; [0, 1], trb_pointer, "TRB Pointer (or event data)", 32, u64);
 
-        (u << 32) | l
-    }
+    ro_field!(pub, self, self.0.0[2]; 0..=23, trb_transfer_length, "TRB Transfer Length", u32);
+    impl_cc!(ro);
 
-    ro_field!([2](0..=23), trb_transfer_length, "TRB Transfer Length", u32);
-    ro_bit!([3](2), event_data, "Event Data");
-    ro_field!([3](16..=20), endpoint_id, "Endpoint ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_bit!(pub, self, self.0.0[3]; 2, event_data, "Event Data Flag");
+    impl_ep_id!(ro);
+    impl_slot_id!(ro);
 }
-impl_debug_for_event_trb!(TransferEvent {
+impl_debug_from_methods!(TransferEvent {
     trb_pointer,
     trb_transfer_length,
+    completion_code,
     event_data,
     endpoint_id,
-    slot_id
+    slot_id,
+});
+rsvdz_checking_try_from!(TransferEvent {
+    [3];1..=1,
+    [3];3..=9,
+    [3];21..=23,
 });
 
-event!(
-    CommandCompletion,
-    "Command Completion Event TRB",
-    Type::CommandCompletion
-);
-reserved!(CommandCompletion(Type::CommandCompletion){
-    [0]0..=3;
-    [3]1..=9;
-});
 impl CommandCompletion {
-    /// Returns the value of the Command TRB Pointer field.
-    #[must_use]
-    pub fn command_trb_pointer(&self) -> u64 {
-        let l: u64 = self.0[0].into();
-        let u: u64 = self.0[1].into();
-
-        (u << 32) | l
-    }
+    ro_double_field!(
+        pub, self,
+        self.0.0; [0, 1],
+        command_trb_pointer,
+        "Command TRB Pointer",
+        32, u64
+    );
 
     ro_field!(
-        [2](0..=23),
+        pub, self,
+        self.0.0[2]; 0..=23,
         command_completion_parameter,
         "Command Completion Parameter",
         u32
     );
-    ro_field!([3](16..=23), vf_id, "VF ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    impl_cc!(ro);
+
+    impl_vf_id!(ro);
+    impl_slot_id!(ro);
 }
-impl_debug_for_event_trb!(CommandCompletion {
+impl_debug_from_methods!(CommandCompletion {
     command_trb_pointer,
     command_completion_parameter,
+    completion_code,
     vf_id,
-    slot_id
+    slot_id,
+});
+rsvdz_checking_try_from!(CommandCompletion {
+    [0];0..=3,
+    [3];1..=9,
 });
 
-event!(
-    BandwidthRequest,
-    "Bandwidth Request Event TRB",
-    Type::BandwidthRequest
-);
-reserved!(BandwidthRequest(Type::BandwidthRequest){
-    [0]0..=31;
-    [1]0..=31;
-    [2]0..=23;
-    [3]1..=9;
-    [3]16..=23;
+impl PortStatusChange {
+    ro_field!(pub, self, self.0.0[0]; 24..=31, port_id, "Port ID", u8);
+
+    impl_cc!(ro);
+}
+impl_debug_from_methods!(PortStatusChange {
+    port_id,
+    completion_code,
 });
+rsvdz_checking_try_from!(PortStatusChange {
+    [0];0..=23,
+    [1];0..=31,
+    [2];0..=23,
+    [3];1..=9,
+    [3];16..=31,
+});
+
 impl BandwidthRequest {
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
-}
-impl_debug_for_event_trb!(BandwidthRequest { slot_id });
+    impl_cc!(ro);
 
-event!(Doorbell, "Doorbell Event TRB", Type::Doorbell);
-reserved!(Doorbell(Type::Doorbell){
-    [0]5..=31;
-    [1]0..=31;
-    [2]0..=23;
-    [3]1..=9;
+    impl_slot_id!(ro);
+}
+impl_debug_from_methods!(BandwidthRequest {
+    completion_code,
+    slot_id,
 });
+rsvdz_checking_try_from!(BandwidthRequest {
+    [0];0..=31,
+    [1];0..=31,
+    [2];0..=23,
+    [3];1..=9,
+    [3];16..=23,
+});
+
 impl Doorbell {
-    ro_field!([0](0..=4), db_reason, "DB Reason", u8);
-    ro_field!([3](16..=23), vf_id, "VF ID", u8);
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    ro_field!(pub, self, self.0.0[0]; 0..=4, db_reason, "DB Reason", u8);
+
+    impl_cc!(ro);
+
+    impl_vf_id!(ro);
+    impl_slot_id!(ro);
 }
-impl_debug_for_event_trb!(Doorbell {
+impl_debug_from_methods!(Doorbell {
     db_reason,
+    completion_code,
     vf_id,
-    slot_id
+    slot_id,
+});
+rsvdz_checking_try_from!(Doorbell {
+    [0];5..=31,
+    [1];0..=31,
+    [2];0..=23,
+    [3];1..=9,
 });
 
-event!(
-    HostController,
-    "Host Controller Event TRB",
-    Type::HostController
-);
-reserved!(HostController(Type::HostController){
-    [0]0..=31;
-    [1]0..=31;
-    [2]0..=23;
-    [3]1..=9;
-    [3]16..=31;
+impl HostController {
+    impl_cc!(ro);
+}
+impl_debug_from_methods!(HostController { completion_code });
+rsvdz_checking_try_from!(HostController {
+    [0];0..=31,
+    [1];0..=31,
+    [2];0..=23,
+    [3];1..=9,
+    [3];16..=31,
 });
-impl_debug_for_event_trb!(HostController {});
 
-event!(
-    DeviceNotification,
-    "Device Notification Event TRB",
-    Type::DeviceNotification
-);
-reserved!(DeviceNotification(Type::DeviceNotification){
-    [0]0..=31;
-    [1]0..=31;
-    [2]0..=23;
-    [3]1..=9;
-    [3]16..=31;
-});
 impl DeviceNotification {
-    ro_field!([0](4..=7), notification_type, "Notification Type", u8);
-
+    ro_field!(
+        pub, self,
+        self.0.0[0]; 4..=7,
+        notification_type,
+        "Notification Type",
+        u8
+    );
+    ro_double_field!(
+        pub(self), self,
+        self.0.0; [0, 1],
+        device_notification_data_raw,
+        "Device Notification Data Raw",
+        32, u64
+    );
     /// Returns the value of the Device Notification Data field.
     #[must_use]
     pub fn device_notification_data(&self) -> u64 {
-        let l: u64 = self.0[0].get_bits(8..=31).into();
-        let u: u64 = self.0[1].into();
-
-        ((u << 32) | l) >> 8
+        self.device_notification_data_raw() >> 8
     }
 
-    ro_field!([3](24..=31), slot_id, "Slot ID", u8);
+    impl_cc!(ro);
+
+    impl_slot_id!(ro);
 }
-impl_debug_for_event_trb!(DeviceNotification {
+impl_debug_from_methods!(DeviceNotification {
     notification_type,
     device_notification_data,
-    slot_id
+    completion_code,
+    slot_id,
+});
+rsvdz_checking_try_from!(DeviceNotification {
+    [0];0..=3,
+    [2];0..=23,
+    [3];1..=9,
+    [3];16..=31,
 });
 
-event!(MfindexWrap, "MFINDEX Wrap Event TRB", Type::MfindexWrap);
-reserved!(MfindexWrap(Type::MfindexWrap){
-    [0]0..=3;
-    [2]0..=23;
-    [3]1..=9;
-    [3]16..=23;
+impl MfindexWrap {
+    impl_cc!(ro);
+}
+impl_debug_from_methods!(MfindexWrap { completion_code });
+rsvdz_checking_try_from!(MfindexWrap {
+    [0];0..=31,
+    [1];0..=31,
+    [2];0..=23,
+    [3];1..=9,
+    [3];16..=31,
 });
-impl_debug_for_event_trb!(MfindexWrap {});
 
 /// The TRB Completion Codes.
 ///
@@ -350,25 +308,4 @@ pub enum CompletionCode {
     SecondaryBandwidthError = 35,
     /// Asserted if an error is detected on a USB2 protocol endpoint for a split transaction.
     SplitTransactionError = 36,
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn try_from_macro() {
-        let raw = [
-            0x00c8_8800, // address low
-            0x0000_0000, // address high
-            0x01_000000, // completion code 1, transfer length 0
-            0x0000_8401, // endpoint id 0, slot id 0, type 33, event data 0, cycle bit 1
-        ];
-        assert_eq!(
-            Allowed::try_from(raw),
-            Ok(Allowed::CommandCompletion(
-                CommandCompletion::try_from(raw).unwrap()
-            )),
-        );
-    }
 }

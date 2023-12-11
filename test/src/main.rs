@@ -4,6 +4,7 @@
 extern crate alloc;
 
 mod allocator;
+mod event_ring;
 mod mapper;
 mod pci;
 mod registers;
@@ -21,6 +22,8 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     registers::init();
 
     xhc::init();
+
+    event_ring::init();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

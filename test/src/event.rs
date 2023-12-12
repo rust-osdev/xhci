@@ -7,8 +7,7 @@ use xhci::ring::trb;
 
 static EVENT_HANDLER: OnceCell<Spinlock<EventHandler>> = OnceCell::uninit();
 
-// Just an arbitrary number.
-const NUM_OF_TRBS_IN_RING: usize = 10;
+const NUM_OF_TRBS_IN_RING: usize = 16;
 
 pub fn init() {
     let handler = EventHandler::new();

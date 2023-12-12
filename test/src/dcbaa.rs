@@ -21,10 +21,10 @@ pub fn init() {
     qemu_println!("Device Context Base Address Array is initialized");
 }
 
-struct DeviceContextBaseAddressArray(Vec<u64>);
+struct DeviceContextBaseAddressArray(Vec<RawDCBAA>);
 impl DeviceContextBaseAddressArray {
     fn new() -> Self {
-        Self(vec![0; number_of_slots()])
+        Self(vec![RawDCBAA::new(); number_of_slots()])
     }
 
     fn init(&mut self) {
@@ -37,6 +37,15 @@ impl DeviceContextBaseAddressArray {
                 .dcbaap
                 .update_volatile(|dcbaap| dcbaap.set(self.0.as_ptr() as u64));
         });
+    }
+}
+
+#[repr(C, align(64))]
+#[derive(Clone, Copy)]
+struct RawDCBAA(u64);
+impl RawDCBAA {
+    fn new() -> Self {
+        Self(0)
     }
 }
 

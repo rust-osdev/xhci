@@ -10,6 +10,7 @@ mod event;
 mod mapper;
 mod pci;
 mod registers;
+mod scratchpat;
 mod xhc;
 
 use qemu_exit::QEMUExit;
@@ -28,6 +29,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     event::init();
     command_ring::init();
     dcbaa::init();
+    scratchpat::init();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -22,17 +22,17 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let (_, memory_map) = st.exit_boot_services(MemoryType::LOADER_DATA);
     allocator::init(memory_map);
 
-    registers::init();
+    let mut regs = registers::get_accessor();
 
-    xhc::init();
+    xhc::init(&mut regs);
 
-    event::init();
-    command_ring::init();
-    dcbaa::init();
-    scratchpat::init();
+    event::init(&mut regs);
+    command_ring::init(&mut regs);
+    dcbaa::init(&mut regs);
+    scratchpat::init(&regs);
 
-    xhc::run();
-    xhc::ensure_no_error_occurs();
+    xhc::run(&mut regs);
+    xhc::ensure_no_error_occurs(&regs);
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

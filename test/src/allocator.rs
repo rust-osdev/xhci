@@ -1,5 +1,3 @@
-use alloc::collections::LinkedList;
-use core::alloc::{GlobalAlloc, Layout};
 use linked_list_allocator::LockedHeap;
 use uefi::table::boot;
 

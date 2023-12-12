@@ -1,102 +1,93 @@
-use crate::registers;
+use crate::registers::Registers;
 use qemu_print::qemu_println;
 
-pub fn init() {
+pub fn init(regs: &mut Registers) {
     qemu_println!("Initializing xHC...");
 
-    stop_and_reset();
-    set_num_of_enabled_slots();
+    stop_and_reset(regs);
+    set_num_of_enabled_slots(regs);
 
     qemu_println!("xHC is initialized.");
 }
 
-pub fn run() {
-    registers::handle(|r| {
-        let o = &mut r.operational;
+pub fn run(regs: &mut Registers) {
+    let o = &mut regs.operational;
 
-        o.usbcmd.update_volatile(|u| {
-            u.set_run_stop();
-        });
-
-        while o.usbsts.read_volatile().hc_halted() {}
+    o.usbcmd.update_volatile(|u| {
+        u.set_run_stop();
     });
+
+    while o.usbsts.read_volatile().hc_halted() {}
 }
 
-pub fn ensure_no_error_occurs() {
-    registers::handle(|r| {
-        let s = r.operational.usbsts.read_volatile();
+pub fn ensure_no_error_occurs(regs: &Registers) {
+    let s = regs.operational.usbsts.read_volatile();
 
-        assert!(!s.hc_halted(), "HC is halted.");
-        assert!(
-            !s.host_system_error(),
-            "An error occured on the host system."
-        );
-        assert!(!s.host_controller_error(), "An error occured on the xHC.");
-    });
-}
-
-fn stop_and_reset() {
-    stop();
-    wait_until_halt();
-    reset();
-}
-
-fn stop() {
-    registers::handle(|r| {
-        r.operational.usbcmd.update_volatile(|u| {
-            u.clear_run_stop();
-        });
-    });
-}
-
-fn wait_until_halt() {
-    registers::handle(|r| while !r.operational.usbsts.read_volatile().hc_halted() {});
-}
-
-fn reset() {
-    start_resetting();
-    wait_until_reset_completed();
-    wait_until_ready();
-}
-
-fn start_resetting() {
-    registers::handle(|r| {
-        r.operational.usbcmd.update_volatile(|u| {
-            u.set_host_controller_reset();
-        });
-    });
-}
-
-fn wait_until_reset_completed() {
-    registers::handle(
-        |r| {
-            while r.operational.usbcmd.read_volatile().host_controller_reset() {}
-        },
+    assert!(!s.hc_halted(), "HC is halted.");
+    assert!(
+        !s.host_system_error(),
+        "An error occured on the host system."
     );
+    assert!(!s.host_controller_error(), "An error occured on the xHC.");
 }
 
-fn wait_until_ready() {
-    registers::handle(
-        |r| {
-            while r.operational.usbsts.read_volatile().controller_not_ready() {}
-        },
-    );
+fn stop_and_reset(regs: &mut Registers) {
+    stop(regs);
+    wait_until_halt(regs);
+    reset(regs);
 }
 
-fn set_num_of_enabled_slots() {
-    let n = num_of_device_slots();
-    registers::handle(|r| {
-        r.operational.config.update_volatile(|c| {
-            c.set_max_device_slots_enabled(n);
-        });
+fn stop(regs: &mut Registers) {
+    regs.operational.usbcmd.update_volatile(|u| {
+        u.clear_run_stop();
     });
 }
 
-fn num_of_device_slots() -> u8 {
-    registers::handle(|r| {
-        r.capability
-            .hcsparams1
-            .read_volatile()
-            .number_of_device_slots()
-    })
+fn wait_until_halt(regs: &Registers) {
+    while !regs.operational.usbsts.read_volatile().hc_halted() {}
+}
+
+fn reset(regs: &mut Registers) {
+    start_resetting(regs);
+    wait_until_reset_completed(regs);
+    wait_until_ready(regs);
+}
+
+fn start_resetting(regs: &mut Registers) {
+    regs.operational.usbcmd.update_volatile(|u| {
+        u.set_host_controller_reset();
+    });
+}
+
+fn wait_until_reset_completed(regs: &Registers) {
+    while regs
+        .operational
+        .usbcmd
+        .read_volatile()
+        .host_controller_reset()
+    {}
+}
+
+fn wait_until_ready(regs: &Registers) {
+    while regs
+        .operational
+        .usbsts
+        .read_volatile()
+        .controller_not_ready()
+    {}
+}
+
+fn set_num_of_enabled_slots(regs: &mut Registers) {
+    let n = num_of_device_slots(regs);
+
+    regs.operational.config.update_volatile(|c| {
+        c.set_max_device_slots_enabled(n);
+    });
+}
+
+fn num_of_device_slots(regs: &Registers) -> u8 {
+    regs.capability
+        .hcsparams1
+        .read_volatile()
+        .number_of_device_slots()
 }

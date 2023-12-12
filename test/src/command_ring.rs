@@ -1,4 +1,4 @@
-use crate::registers;
+use crate::registers::Registers;
 use alloc::boxed::Box;
 use conquer_once::spin::OnceCell;
 use qemu_print::qemu_println;
@@ -8,7 +8,7 @@ static COMMAND_RING_CONTROLLER: OnceCell<Spinlock<CommandRingController>> = Once
 
 const NUM_OF_TRBS_IN_RING: usize = 10;
 
-pub fn init() {
+pub fn init(regs: &mut Registers) {
     let controller = CommandRingController::new();
 
     COMMAND_RING_CONTROLLER
@@ -19,7 +19,7 @@ pub fn init() {
         .get()
         .unwrap_or_else(|| unreachable!("Should be initialized"))
         .lock()
-        .init();
+        .init(regs);
 
     qemu_println!("Command ring is initialized");
 }
@@ -40,13 +40,11 @@ impl CommandRingController {
         }
     }
 
-    fn init(&mut self) {
-        registers::handle(|r| {
-            r.operational.crcr.update_volatile(|crcr| {
-                crcr.set_command_ring_pointer(self.ring.as_ref() as *const _ as u64);
-                crcr.set_ring_cycle_state();
-            });
-        })
+    fn init(&mut self, regs: &mut Registers) {
+        regs.operational.crcr.update_volatile(|crcr| {
+            crcr.set_command_ring_pointer(self.ring.as_ref() as *const _ as u64);
+            crcr.set_ring_cycle_state();
+        });
     }
 }
 

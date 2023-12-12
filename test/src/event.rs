@@ -1,5 +1,5 @@
-use crate::registers;
-use alloc::{boxed::Box, vec, vec::Vec};
+use crate::registers::Registers;
+use alloc::{vec, vec::Vec};
 use conquer_once::spin::OnceCell;
 use qemu_print::qemu_println;
 use spinning_top::Spinlock;
@@ -9,8 +9,8 @@ static EVENT_HANDLER: OnceCell<Spinlock<EventHandler>> = OnceCell::uninit();
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
-pub fn init() {
-    let handler = EventHandler::new();
+pub fn init(regs: &mut Registers) {
+    let handler = EventHandler::new(regs);
 
     EVENT_HANDLER
         .try_init_once(|| Spinlock::new(handler))
@@ -20,7 +20,7 @@ pub fn init() {
         .get()
         .unwrap_or_else(|| unreachable!("Should be initialized"))
         .lock()
-        .init();
+        .init(regs);
 
     qemu_println!("Event rings and segment tables are initialized");
 }
@@ -35,10 +35,10 @@ struct EventHandler {
     cycle_bit: bool,
 }
 impl EventHandler {
-    fn new() -> Self {
+    fn new(regs: &Registers) -> Self {
         Self {
-            segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings().into()],
-            rings: vec![EventRing::new(); number_of_rings().into()],
+            segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings(regs).into()],
+            rings: vec![EventRing::new(); number_of_rings(regs).into()],
 
             dequeue_ptr_segment: 0,
             dequeue_ptr_ring: 0,
@@ -47,21 +47,19 @@ impl EventHandler {
         }
     }
 
-    fn init(&mut self) {
-        self.register_dequeue_pointer();
+    fn init(&mut self, regs: &mut Registers) {
+        self.register_dequeue_pointer(regs);
 
         self.write_rings_addresses_in_table();
-        self.register_table_size();
-        self.enable_event_ring();
+        self.register_table_size(regs);
+        self.enable_event_ring(regs);
     }
 
-    fn register_dequeue_pointer(&self) {
-        registers::handle(|r| {
-            r.interrupter_register_set
-                .interrupter_mut(0)
-                .erdp
-                .update_volatile(|erdp| erdp.set_event_ring_dequeue_pointer(self.next_trb_addr()))
-        })
+    fn register_dequeue_pointer(&self, regs: &mut Registers) {
+        regs.interrupter_register_set
+            .interrupter_mut(0)
+            .erdp
+            .update_volatile(|erdp| erdp.set_event_ring_dequeue_pointer(self.next_trb_addr()))
     }
 
     fn write_rings_addresses_in_table(&mut self) {
@@ -73,24 +71,20 @@ impl EventHandler {
         }
     }
 
-    fn register_table_size(&self) {
-        registers::handle(|r| {
-            r.interrupter_register_set
-                .interrupter_mut(0)
-                .erstsz
-                .update_volatile(|erstsz| {
-                    erstsz.set(self.segment_table.len() as u16);
-                })
-        })
+    fn register_table_size(&self, regs: &mut Registers) {
+        regs.interrupter_register_set
+            .interrupter_mut(0)
+            .erstsz
+            .update_volatile(|erstsz| {
+                erstsz.set(self.segment_table.len() as u16);
+            })
     }
 
-    fn enable_event_ring(&self) {
-        registers::handle(|r| {
-            r.interrupter_register_set
-                .interrupter_mut(0)
-                .erstba
-                .update_volatile(|erstba| erstba.set(self.segment_table.as_ptr() as u64))
-        })
+    fn enable_event_ring(&self, regs: &mut Registers) {
+        regs.interrupter_register_set
+            .interrupter_mut(0)
+            .erstba
+            .update_volatile(|erstba| erstba.set(self.segment_table.as_ptr() as u64))
     }
 
     fn next_trb_addr(&self) -> u64 {
@@ -123,11 +117,9 @@ impl EventRing {
     }
 }
 
-fn number_of_rings() -> u16 {
-    registers::handle(|r| {
-        r.capability
-            .hcsparams2
-            .read_volatile()
-            .event_ring_segment_table_max()
-    })
+fn number_of_rings(regs: &Registers) -> u16 {
+    regs.capability
+        .hcsparams2
+        .read_volatile()
+        .event_ring_segment_table_max()
 }

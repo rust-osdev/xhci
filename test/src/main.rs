@@ -31,6 +31,9 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     dcbaa::init();
     scratchpat::init();
 
+    xhc::run();
+    xhc::ensure_no_error_occurs();
+
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();
 }

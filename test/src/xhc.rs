@@ -10,6 +10,18 @@ pub fn init() {
     qemu_println!("xHC is initialized.");
 }
 
+pub fn run() {
+    registers::handle(|r| {
+        let o = &mut r.operational;
+
+        o.usbcmd.update_volatile(|u| {
+            u.set_run_stop();
+        });
+
+        while o.usbsts.read_volatile().hc_halted() {}
+    });
+}
+
 pub fn ensure_no_error_occurs() {
     registers::handle(|r| {
         let s = r.operational.usbsts.read_volatile();

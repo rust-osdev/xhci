@@ -22,7 +22,8 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let (_, memory_map) = st.exit_boot_services(MemoryType::LOADER_DATA);
     allocator::init(memory_map);
 
-    let mut regs = registers::get_accessor();
+    // SAFETY: We are calling `get_accessor()` only once.
+    let mut regs = unsafe { registers::get_accessor() };
 
     xhc::init(&mut regs);
 

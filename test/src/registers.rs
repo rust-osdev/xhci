@@ -2,7 +2,10 @@ use crate::mapper::Mapper;
 
 pub type Registers = xhci::Registers<Mapper>;
 
-pub fn get_accessor() -> Registers {
+/// # Safety
+///
+/// Multiple returned values must not exist in the same scope.
+pub unsafe fn get_accessor() -> Registers {
     let xhc_config_space = crate::pci::iter_xhc().next().expect("xHC not found");
 
     let mmio_low = xhc_config_space.base_address_register(0);

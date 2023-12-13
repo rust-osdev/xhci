@@ -1,5 +1,7 @@
+use crate::mapper::Mapper;
 use crate::registers::Registers;
 use qemu_print::qemu_println;
+use xhci::registers::Operational;
 
 pub fn init(regs: &mut Registers) {
     qemu_println!("Initializing xHC...");
@@ -60,7 +62,7 @@ impl<'a> Initializer<'a> {
     }
 
     fn reset(&mut self) {
-        Resetter::new(self.regs).reset();
+        Resetter::new(&mut self.regs.operational).reset();
     }
 
     fn set_num_of_enabled_slots(&mut self) {
@@ -69,11 +71,11 @@ impl<'a> Initializer<'a> {
 }
 
 struct Resetter<'a> {
-    regs: &'a mut Registers,
+    op: &'a mut Operational<Mapper>,
 }
 impl<'a> Resetter<'a> {
-    fn new(regs: &'a mut Registers) -> Self {
-        Self { regs }
+    fn new(op: &'a mut Operational<Mapper>) -> Self {
+        Self { op }
     }
 
     fn reset(&mut self) {
@@ -83,29 +85,17 @@ impl<'a> Resetter<'a> {
     }
 
     fn start_resetting(&mut self) {
-        self.regs.operational.usbcmd.update_volatile(|u| {
+        self.op.usbcmd.update_volatile(|u| {
             u.set_host_controller_reset();
         });
     }
 
     fn wait_until_reset_completed(&self) {
-        while self
-            .regs
-            .operational
-            .usbcmd
-            .read_volatile()
-            .host_controller_reset()
-        {}
+        while self.op.usbcmd.read_volatile().host_controller_reset() {}
     }
 
     fn wait_until_ready(&self) {
-        while self
-            .regs
-            .operational
-            .usbsts
-            .read_volatile()
-            .controller_not_ready()
-        {}
+        while self.op.usbsts.read_volatile().controller_not_ready() {}
     }
 }
 

@@ -13,6 +13,7 @@ mod registers;
 mod scratchpat;
 mod xhc;
 
+use command_ring::CommandRingController;
 use event::EventHandler;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
@@ -29,7 +30,8 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     xhc::init(&mut regs);
 
     let mut event_handler = EventHandler::new(&mut regs);
-    command_ring::init(&mut regs);
+    let mut command_ring = CommandRingController::new(&mut regs);
+
     dcbaa::init(&mut regs);
     scratchpat::init(&regs);
 

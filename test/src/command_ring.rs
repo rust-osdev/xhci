@@ -1,43 +1,26 @@
 use crate::registers::Registers;
 use alloc::boxed::Box;
-use conquer_once::spin::OnceCell;
-use qemu_print::qemu_println;
-use spinning_top::Spinlock;
-
-static COMMAND_RING_CONTROLLER: OnceCell<Spinlock<CommandRingController>> = OnceCell::uninit();
 
 const NUM_OF_TRBS_IN_RING: usize = 10;
 
-pub fn init(regs: &mut Registers) {
-    let controller = CommandRingController::new();
-
-    COMMAND_RING_CONTROLLER
-        .try_init_once(|| Spinlock::new(controller))
-        .expect("CommandRingController::new() called more than once");
-
-    COMMAND_RING_CONTROLLER
-        .get()
-        .unwrap_or_else(|| unreachable!("Should be initialized"))
-        .lock()
-        .init(regs);
-
-    qemu_println!("Command ring is initialized");
-}
-
-struct CommandRingController {
+pub struct CommandRingController {
     ring: Box<CommandRing>,
 
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    fn new() -> Self {
-        Self {
+    pub fn new(regs: &mut Registers) -> Self {
+        let mut v = Self {
             ring: Box::new(CommandRing::new()),
 
             enqueue_ptr: 0,
             cycle_bit: true,
-        }
+        };
+
+        v.init(regs);
+
+        v
     }
 
     fn init(&mut self, regs: &mut Registers) {

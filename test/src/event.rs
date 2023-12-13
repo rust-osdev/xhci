@@ -5,27 +5,9 @@ use qemu_print::qemu_println;
 use spinning_top::Spinlock;
 use xhci::ring::trb;
 
-static EVENT_HANDLER: OnceCell<Spinlock<EventHandler>> = OnceCell::uninit();
-
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
-pub fn init(regs: &mut Registers) {
-    let handler = EventHandler::new(regs);
-
-    EVENT_HANDLER
-        .try_init_once(|| Spinlock::new(handler))
-        .expect("EventHandler::new() called more than once");
-
-    EVENT_HANDLER
-        .get()
-        .unwrap_or_else(|| unreachable!("Should be initialized"))
-        .lock()
-        .init(regs);
-
-    qemu_println!("Event rings and segment tables are initialized");
-}
-
-struct EventHandler {
+pub struct EventHandler {
     segment_table: Vec<EventRingSegmentTableEntry>,
     rings: Vec<EventRing>,
 
@@ -35,7 +17,7 @@ struct EventHandler {
     cycle_bit: bool,
 }
 impl EventHandler {
-    fn new(regs: &Registers) -> Self {
+    pub fn new(regs: &Registers) -> Self {
         Self {
             segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings(regs).into()],
             rings: vec![EventRing::new(); number_of_rings(regs).into()],
@@ -47,7 +29,7 @@ impl EventHandler {
         }
     }
 
-    fn init(&mut self, regs: &mut Registers) {
+    pub fn init(&mut self, regs: &mut Registers) {
         self.register_dequeue_pointer(regs);
 
         self.write_rings_addresses_in_table();

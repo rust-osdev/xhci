@@ -17,8 +17,8 @@ pub struct EventHandler {
     cycle_bit: bool,
 }
 impl EventHandler {
-    pub fn new(regs: &Registers) -> Self {
-        Self {
+    pub fn new(regs: &mut Registers) -> Self {
+        let mut v = Self {
             segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings(regs).into()],
             rings: vec![EventRing::new(); number_of_rings(regs).into()],
 
@@ -26,10 +26,14 @@ impl EventHandler {
             dequeue_ptr_ring: 0,
 
             cycle_bit: true,
-        }
+        };
+
+        v.init(regs);
+
+        v
     }
 
-    pub fn init(&mut self, regs: &mut Registers) {
+    fn init(&mut self, regs: &mut Registers) {
         self.register_dequeue_pointer(regs);
 
         self.write_rings_addresses_in_table();

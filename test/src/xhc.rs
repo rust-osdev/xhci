@@ -4,8 +4,7 @@ use qemu_print::qemu_println;
 pub fn init(regs: &mut Registers) {
     qemu_println!("Initializing xHC...");
 
-    stop_and_reset(regs);
-    set_num_of_enabled_slots(regs);
+    Initializer::new(regs).init();
 
     qemu_println!("xHC is initialized.");
 }
@@ -31,63 +30,80 @@ pub fn ensure_no_error_occurs(regs: &Registers) {
     assert!(!s.host_controller_error(), "An error occured on the xHC.");
 }
 
-fn stop_and_reset(regs: &mut Registers) {
-    stop(regs);
-    wait_until_halt(regs);
-    reset(regs);
+struct Initializer<'a> {
+    regs: &'a mut Registers,
 }
+impl<'a> Initializer<'a> {
+    fn new(regs: &'a mut Registers) -> Self {
+        Self { regs }
+    }
 
-fn stop(regs: &mut Registers) {
-    regs.operational.usbcmd.update_volatile(|u| {
-        u.clear_run_stop();
-    });
-}
+    fn init(&mut self) {
+        self.stop_and_reset();
+        self.set_num_of_enabled_slots();
+    }
 
-fn wait_until_halt(regs: &Registers) {
-    while !regs.operational.usbsts.read_volatile().hc_halted() {}
-}
+    fn stop_and_reset(&mut self) {
+        self.stop();
+        self.wait_until_halt();
+        self.reset();
+    }
 
-fn reset(regs: &mut Registers) {
-    start_resetting(regs);
-    wait_until_reset_completed(regs);
-    wait_until_ready(regs);
-}
+    fn reset(&mut self) {
+        self.start_resetting();
+        self.wait_until_reset_completed();
+        self.wait_until_ready();
+    }
 
-fn start_resetting(regs: &mut Registers) {
-    regs.operational.usbcmd.update_volatile(|u| {
-        u.set_host_controller_reset();
-    });
-}
+    fn start_resetting(&mut self) {
+        self.regs.operational.usbcmd.update_volatile(|u| {
+            u.set_host_controller_reset();
+        });
+    }
 
-fn wait_until_reset_completed(regs: &Registers) {
-    while regs
-        .operational
-        .usbcmd
-        .read_volatile()
-        .host_controller_reset()
-    {}
-}
+    fn wait_until_reset_completed(&mut self) {
+        while self
+            .regs
+            .operational
+            .usbcmd
+            .read_volatile()
+            .host_controller_reset()
+        {}
+    }
 
-fn wait_until_ready(regs: &Registers) {
-    while regs
-        .operational
-        .usbsts
-        .read_volatile()
-        .controller_not_ready()
-    {}
-}
+    fn wait_until_ready(&mut self) {
+        while self
+            .regs
+            .operational
+            .usbsts
+            .read_volatile()
+            .controller_not_ready()
+        {}
+    }
 
-fn set_num_of_enabled_slots(regs: &mut Registers) {
-    let n = num_of_device_slots(regs);
+    fn wait_until_halt(&mut self) {
+        while !self.regs.operational.usbsts.read_volatile().hc_halted() {}
+    }
 
-    regs.operational.config.update_volatile(|c| {
-        c.set_max_device_slots_enabled(n);
-    });
-}
+    fn set_num_of_enabled_slots(&mut self) {
+        let n = self.num_of_device_slots();
 
-fn num_of_device_slots(regs: &Registers) -> u8 {
-    regs.capability
-        .hcsparams1
-        .read_volatile()
-        .number_of_device_slots()
+        self.regs.operational.config.update_volatile(|c| {
+            c.set_max_device_slots_enabled(n);
+        });
+    }
+
+    fn stop(&mut self) {
+        self.regs.operational.usbcmd.update_volatile(|u| {
+            u.clear_run_stop();
+        });
+    }
+
+    fn num_of_device_slots(&self) -> u8 {
+        self.regs
+            .capability
+            .hcsparams1
+            .read_volatile()
+            .number_of_device_slots()
+    }
 }

@@ -9,6 +9,7 @@ test: $(IMG)
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_VARS.fd \
 		-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
 		-device qemu-xhci,id=xhci\
+		-device usb-mouse \
 		-serial stdio \
 		-no-reboot \
 		-display none \

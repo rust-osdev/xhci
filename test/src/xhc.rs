@@ -11,14 +11,12 @@ pub fn init(regs: &mut Registers) {
     qemu_println!("xHC is initialized.");
 }
 
-pub fn run(regs: &mut Registers) {
-    let o = &mut regs.operational;
-
-    o.usbcmd.update_volatile(|u| {
+pub fn run(op: &mut Operational<Mapper>) {
+    op.usbcmd.update_volatile(|u| {
         u.set_run_stop();
     });
 
-    while o.usbsts.read_volatile().hc_halted() {}
+    while op.usbsts.read_volatile().hc_halted() {}
 }
 
 pub fn ensure_no_error_occurs(regs: &Registers) {

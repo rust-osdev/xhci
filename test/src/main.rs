@@ -36,7 +36,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let mut dcbaa = DeviceContextBaseAddressArray::new(&mut regs);
     scratchpat::init(&regs);
 
-    xhc::run(&mut regs);
+    xhc::run(&mut regs.operational);
     xhc::ensure_no_error_occurs(&regs);
 
     let handler = qemu_exit::X86::new(0xf4, 33);

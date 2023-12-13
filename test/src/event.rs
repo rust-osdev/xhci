@@ -97,7 +97,7 @@ impl<'a> EventHandlerInitializer<'a> {
     }
 }
 
-#[repr(C, packed)]
+#[repr(C, align(64))]
 #[derive(Clone, Copy, Debug)]
 struct EventRingSegmentTableEntry {
     base_addr: u64,

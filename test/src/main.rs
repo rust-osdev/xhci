@@ -9,6 +9,7 @@ mod dcbaa;
 mod event;
 mod mapper;
 mod pci;
+mod ports;
 mod registers;
 mod scratchpat;
 mod xhc;
@@ -38,6 +39,8 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     xhc::run(&mut regs.operational);
     xhc::ensure_no_error_occurs(&regs.operational.usbsts.read_volatile());
+
+    ports::init_all_ports(&regs);
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -1,6 +1,7 @@
 use crate::mapper::Mapper;
 use crate::registers::Registers;
 use qemu_print::qemu_println;
+use xhci::registers::operational::UsbStatusRegister;
 use xhci::registers::Operational;
 
 pub fn init(regs: &mut Registers) {
@@ -19,9 +20,7 @@ pub fn run(op: &mut Operational<Mapper>) {
     while op.usbsts.read_volatile().hc_halted() {}
 }
 
-pub fn ensure_no_error_occurs(regs: &Registers) {
-    let s = regs.operational.usbsts.read_volatile();
-
+pub fn ensure_no_error_occurs(s: &UsbStatusRegister) {
     assert!(!s.hc_halted(), "HC is halted.");
     assert!(
         !s.host_system_error(),
@@ -69,9 +68,7 @@ impl<'a> Stopper<'a> {
         self.op.usbcmd.update_volatile(|u| {
             u.clear_run_stop();
         });
-    }
 
-    fn wait_until_halt(&mut self) {
         while !self.op.usbsts.read_volatile().hc_halted() {}
     }
 }

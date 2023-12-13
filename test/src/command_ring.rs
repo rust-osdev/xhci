@@ -1,7 +1,7 @@
 use crate::registers::Registers;
 use alloc::boxed::Box;
 
-const NUM_OF_TRBS_IN_RING: usize = 10;
+const NUM_OF_TRBS_IN_RING: usize = 16;
 
 pub struct CommandRingController {
     ring: Box<CommandRing>,

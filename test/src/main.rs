@@ -14,6 +14,7 @@ mod scratchpat;
 mod xhc;
 
 use command_ring::CommandRingController;
+use dcbaa::DeviceContextBaseAddressArray;
 use event::EventHandler;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
@@ -32,7 +33,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let mut event_handler = EventHandler::new(&mut regs);
     let mut command_ring = CommandRingController::new(&mut regs);
 
-    dcbaa::init(&mut regs);
+    let mut dcbaa = DeviceContextBaseAddressArray::new(&mut regs);
     scratchpat::init(&regs);
 
     xhc::run(&mut regs);

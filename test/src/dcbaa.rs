@@ -1,30 +1,15 @@
 use crate::registers::Registers;
 use alloc::vec;
 use alloc::vec::Vec;
-use conquer_once::spin::OnceCell;
-use qemu_print::qemu_println;
-use spinning_top::Spinlock;
 
-static DCBAA: OnceCell<Spinlock<DeviceContextBaseAddressArray>> = OnceCell::uninit();
-
-pub fn init(regs: &mut Registers) {
-    DCBAA
-        .try_init_once(|| Spinlock::new(DeviceContextBaseAddressArray::new(regs)))
-        .expect("DeviceContextBaseAddressArray::new() called more than once");
-
-    DCBAA
-        .get()
-        .unwrap_or_else(|| unreachable!("Should be initialized"))
-        .lock()
-        .init(regs);
-
-    qemu_println!("Device Context Base Address Array is initialized");
-}
-
-struct DeviceContextBaseAddressArray(Vec<RawDCBAA>);
+pub struct DeviceContextBaseAddressArray(Vec<RawDCBAA>);
 impl DeviceContextBaseAddressArray {
-    fn new(regs: &Registers) -> Self {
-        Self(vec![RawDCBAA::new(); number_of_slots(regs)])
+    pub fn new(regs: &mut Registers) -> Self {
+        let mut v = Self(vec![RawDCBAA::new(); number_of_slots(regs)]);
+
+        v.init(regs);
+
+        v
     }
 
     fn init(&mut self, regs: &mut Registers) {

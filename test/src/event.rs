@@ -34,48 +34,66 @@ impl EventHandler {
     }
 
     fn init(&mut self, regs: &mut Registers) {
-        self.register_dequeue_pointer(regs);
-
-        self.write_rings_addresses_in_table();
-        self.register_table_size(regs);
-        self.enable_event_ring(regs);
+        EventHandlerInitializer::new(self, regs).init();
     }
 
-    fn register_dequeue_pointer(&self, regs: &mut Registers) {
-        regs.interrupter_register_set
+    fn next_trb_addr(&self) -> u64 {
+        &self.segment_table[self.dequeue_ptr_segment as usize] as *const _ as u64
+            + self.dequeue_ptr_ring as u64 * trb::BYTES as u64
+    }
+}
+
+struct EventHandlerInitializer<'a> {
+    handler: &'a mut EventHandler,
+    regs: &'a mut Registers,
+}
+impl<'a> EventHandlerInitializer<'a> {
+    fn new(handler: &'a mut EventHandler, regs: &'a mut Registers) -> Self {
+        Self { handler, regs }
+    }
+
+    fn init(&mut self) {
+        self.register_dequeue_pointer();
+        self.write_rings_addresses_in_table();
+        self.register_table_size();
+        self.enable_event_ring();
+    }
+
+    fn register_dequeue_pointer(&mut self) {
+        self.regs
+            .interrupter_register_set
             .interrupter_mut(0)
             .erdp
-            .update_volatile(|erdp| erdp.set_event_ring_dequeue_pointer(self.next_trb_addr()))
+            .update_volatile(|erdp| {
+                erdp.set_event_ring_dequeue_pointer(self.handler.next_trb_addr())
+            })
     }
 
     fn write_rings_addresses_in_table(&mut self) {
-        let mut segment_table = self.segment_table.clone();
+        let mut segment_table = self.handler.segment_table.clone();
 
-        for (i, ring) in self.rings.iter().enumerate() {
+        for (i, ring) in self.handler.rings.iter().enumerate() {
             segment_table[i].base_addr = ring as *const _ as u64;
             segment_table[i].segment_size = NUM_OF_TRBS_IN_RING as _;
         }
     }
 
-    fn register_table_size(&self, regs: &mut Registers) {
-        regs.interrupter_register_set
+    fn register_table_size(&mut self) {
+        self.regs
+            .interrupter_register_set
             .interrupter_mut(0)
             .erstsz
             .update_volatile(|erstsz| {
-                erstsz.set(self.segment_table.len() as u16);
+                erstsz.set(self.handler.segment_table.len() as u16);
             })
     }
 
-    fn enable_event_ring(&self, regs: &mut Registers) {
-        regs.interrupter_register_set
+    fn enable_event_ring(&mut self) {
+        self.regs
+            .interrupter_register_set
             .interrupter_mut(0)
             .erstba
-            .update_volatile(|erstba| erstba.set(self.segment_table.as_ptr() as u64))
-    }
-
-    fn next_trb_addr(&self) -> u64 {
-        self.segment_table[self.dequeue_ptr_segment as usize].base_addr
-            + self.dequeue_ptr_ring as u64 * trb::BYTES as u64
+            .update_volatile(|erstba| erstba.set(self.handler.segment_table.as_ptr() as u64))
     }
 }
 

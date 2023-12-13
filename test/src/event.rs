@@ -18,9 +18,11 @@ pub struct EventHandler {
 }
 impl EventHandler {
     pub fn new(regs: &mut Registers) -> Self {
+        let number_of_rings = number_of_rings(regs);
+
         let mut v = Self {
-            segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings(regs).into()],
-            rings: vec![EventRing::new(); number_of_rings(regs).into()],
+            segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings.into()],
+            rings: vec![EventRing::new(); number_of_rings.into()],
 
             dequeue_ptr_segment: 0,
             dequeue_ptr_ring: 0,
@@ -70,7 +72,7 @@ impl<'a> EventHandlerInitializer<'a> {
     }
 
     fn write_rings_addresses_in_table(&mut self) {
-        let mut segment_table = self.handler.segment_table.clone();
+        let mut segment_table = &mut self.handler.segment_table;
 
         for (i, ring) in self.handler.rings.iter().enumerate() {
             segment_table[i].base_addr = ring as *const _ as u64;

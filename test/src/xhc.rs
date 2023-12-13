@@ -39,13 +39,9 @@ impl<'a> Initializer<'a> {
     }
 
     fn init(&mut self) {
-        self.stop_and_reset();
-        self.set_num_of_enabled_slots();
-    }
-
-    fn stop_and_reset(&mut self) {
         self.stop();
         self.reset();
+        self.set_num_of_enabled_slots();
     }
 
     fn stop(&mut self) {

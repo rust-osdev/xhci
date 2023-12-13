@@ -45,18 +45,11 @@ impl<'a> Initializer<'a> {
 
     fn stop_and_reset(&mut self) {
         self.stop();
-        self.wait_until_halt();
         self.reset();
     }
 
     fn stop(&mut self) {
-        self.regs.operational.usbcmd.update_volatile(|u| {
-            u.clear_run_stop();
-        });
-    }
-
-    fn wait_until_halt(&mut self) {
-        while !self.regs.operational.usbsts.read_volatile().hc_halted() {}
+        Stopper::new(&mut self.regs.operational).stop();
     }
 
     fn reset(&mut self) {
@@ -65,6 +58,25 @@ impl<'a> Initializer<'a> {
 
     fn set_num_of_enabled_slots(&mut self) {
         SlotNumberSetter::new(self.regs).set();
+    }
+}
+
+struct Stopper<'a> {
+    op: &'a mut Operational<Mapper>,
+}
+impl<'a> Stopper<'a> {
+    fn new(op: &'a mut Operational<Mapper>) -> Self {
+        Self { op }
+    }
+
+    fn stop(&mut self) {
+        self.op.usbcmd.update_volatile(|u| {
+            u.clear_run_stop();
+        });
+    }
+
+    fn wait_until_halt(&mut self) {
+        while !self.op.usbsts.read_volatile().hc_halted() {}
     }
 }
 

@@ -1,15 +1,20 @@
 use crate::registers::Registers;
+use alloc::boxed::Box;
 use alloc::{vec, vec::Vec};
-use conquer_once::spin::OnceCell;
+use bit_field::BitField;
 use qemu_print::qemu_println;
-use spinning_top::Spinlock;
-use xhci::ring::trb;
+use xhci::ring::trb::{self, event::CommandCompletion};
+use xhci::ring::trb::{command, event};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
 pub struct EventHandler {
     segment_table: Vec<EventRingSegmentTableEntry>,
     rings: Vec<EventRing>,
+
+    // Alas, we cannot use `HashMap` because it's not in `alloc` yet.
+    // See https://github.com/rust-lang/rust/issues/27242.
+    handlers: Vec<(u64, Box<dyn Fn(CommandCompletion) + 'static>)>,
 
     dequeue_ptr_segment: u64,
     dequeue_ptr_ring: u64,
@@ -23,6 +28,7 @@ impl EventHandler {
         let mut v = Self {
             segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings.into()],
             rings: vec![EventRing::new(); number_of_rings.into()],
+            handlers: Vec::new(),
 
             dequeue_ptr_segment: 0,
             dequeue_ptr_ring: 0,
@@ -35,12 +41,75 @@ impl EventHandler {
         v
     }
 
+    pub fn register_handler<'a>(
+        &mut self,
+        trb_addr: u64,
+        handler: impl Fn(CommandCompletion) + 'static,
+    ) {
+        self.handlers.push((trb_addr, Box::new(handler)));
+    }
+
+    pub fn process_trbs(&mut self) {
+        while !self.ring_is_empty() {
+            self.dequeue_and_process();
+        }
+    }
+
+    pub fn assert_all_commands_completed(&self) {
+        assert!(self.handlers.is_empty(), "Some commands are not completed");
+    }
+
     fn init(&mut self, regs: &mut Registers) {
         EventHandlerInitializer::new(self, regs).init();
     }
 
+    fn dequeue_and_process(&mut self) {
+        assert!(!self.ring_is_empty());
+
+        let t = self.rings[self.dequeue_ptr_segment as usize].0[self.dequeue_ptr_ring as usize];
+        let t = event::Allowed::try_from(t);
+
+        if let Ok(event::Allowed::CommandCompletion(t)) = t {
+            let idx = self
+                .handlers
+                .iter()
+                .position(|(trb_addr, _)| *trb_addr == t.command_trb_pointer())
+                .unwrap_or_else(|| panic!("No handler for {:?}", t));
+
+            let (_, handler) = self.handlers.remove(idx);
+
+            handler(t);
+        }
+
+        self.increment_ptr();
+    }
+
+    fn increment_ptr(&mut self) {
+        self.dequeue_ptr_ring += 1;
+
+        if self.dequeue_ptr_ring >= NUM_OF_TRBS_IN_RING as u64 {
+            self.dequeue_ptr_ring = 0;
+            self.dequeue_ptr_segment += 1;
+
+            if self.dequeue_ptr_segment >= self.segment_table.len() as u64 {
+                self.dequeue_ptr_segment = 0;
+                self.cycle_bit = !self.cycle_bit;
+            }
+        }
+    }
+
+    fn ring_is_empty(&self) -> bool {
+        self.cycle_bit_of_next_trb() != self.cycle_bit
+    }
+
+    fn cycle_bit_of_next_trb(&self) -> bool {
+        let t = self.rings[self.dequeue_ptr_segment as usize].0[self.dequeue_ptr_ring as usize];
+
+        t[3].get_bit(0)
+    }
+
     fn next_trb_addr(&self) -> u64 {
-        &self.segment_table[self.dequeue_ptr_segment as usize] as *const _ as u64
+        &self.rings[self.dequeue_ptr_segment as usize] as *const _ as u64
             + self.dequeue_ptr_ring as u64 * trb::BYTES as u64
     }
 }

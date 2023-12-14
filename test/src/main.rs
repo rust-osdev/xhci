@@ -40,7 +40,13 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     xhc::run(&mut regs.operational);
     xhc::ensure_no_error_occurs(&regs.operational.usbsts.read_volatile());
 
+    command_ring.send_nop(&mut regs, &mut event_handler);
+
+    event_handler.process_trbs();
+
     ports::init_all_ports(&mut regs);
+
+    event_handler.assert_all_commands_completed();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

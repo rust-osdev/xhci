@@ -1,6 +1,5 @@
 use crate::{event::EventHandler, registers::Registers};
 use alloc::boxed::Box;
-use qemu_print::qemu_println;
 use xhci::ring::trb::{
     self, command,
     event::{CommandCompletion, CompletionCode},
@@ -37,6 +36,53 @@ impl CommandRingController {
                 c.completion_code(),
                 Ok(CompletionCode::Success),
                 "No-op command failed: {:?}",
+                c
+            );
+        };
+
+        self.enqueue(regs, event_handler, trb, on_completion);
+    }
+
+    pub fn send_enable_slot(
+        &mut self,
+        regs: &mut Registers,
+        event_handler: &mut EventHandler,
+        after_enabling: impl Fn(u8) + 'static,
+    ) {
+        let trb = command::EnableSlot::new();
+        let trb = command::Allowed::EnableSlot(trb);
+
+        let on_completion = move |c: CommandCompletion| {
+            assert_eq!(
+                c.completion_code(),
+                Ok(CompletionCode::Success),
+                "Enable slot command failed: {:?}",
+                c
+            );
+
+            after_enabling(c.slot_id());
+        };
+
+        self.enqueue(regs, event_handler, trb, on_completion);
+    }
+
+    pub fn send_address_device(
+        &mut self,
+        regs: &mut Registers,
+        event_handler: &mut EventHandler,
+        input_cx_addr: u64,
+        slot: u8,
+    ) {
+        let trb = *command::AddressDevice::new()
+            .set_input_context_pointer(input_cx_addr)
+            .set_slot_id(slot);
+        let trb = command::Allowed::AddressDevice(trb);
+
+        let on_completion = |c: CommandCompletion| {
+            assert_eq!(
+                c.completion_code(),
+                Ok(CompletionCode::Success),
+                "Address device command failed: {:?}",
                 c
             );
         };

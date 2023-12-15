@@ -12,6 +12,7 @@ mod pci;
 mod ports;
 mod registers;
 mod scratchpat;
+mod transfer_ring;
 mod xhc;
 
 use command_ring::CommandRingController;
@@ -42,9 +43,9 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     command_ring.send_nop(&mut regs, &mut event_handler);
 
-    event_handler.process_trbs();
+    ports::init_all_ports(&mut regs, &mut event_handler, &mut command_ring);
 
-    ports::init_all_ports(&mut regs);
+    event_handler.process_trbs();
 
     event_handler.assert_all_commands_completed();
 

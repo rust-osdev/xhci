@@ -12,6 +12,10 @@ impl DeviceContextBaseAddressArray {
         v
     }
 
+    pub fn register_address(&mut self, port: u8, addr: u64) {
+        self.0[port as usize].0 = addr;
+    }
+
     fn init(&mut self, regs: &mut Registers) {
         self.register_address_with_register(regs);
     }

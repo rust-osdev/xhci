@@ -4,6 +4,9 @@ use x86_64::instructions::port::PortWrite;
 
 pub fn iter_xhc() -> impl Iterator<Item = ConfigSpace> {
     iter_devices().filter(|device| {
+        // The base class, sub class, and interface are defined in [1].
+        //
+        // [1] eXtensible Host Controller Interface for Universal Serial Bus (xHCI) Requirements Specification May 2019 Revision 1.2 Table 5-4
         device.base_class() == 0x0c && device.sub_class() == 0x03 && device.interface() == 0x30
     })
 }

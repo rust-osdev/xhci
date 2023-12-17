@@ -38,9 +38,20 @@ impl<'a> Initializer<'a> {
     }
 
     fn init(&mut self) {
+        self.wait_until_controller_is_ready();
         self.stop();
         self.reset();
         self.set_num_of_enabled_slots();
+    }
+
+    fn wait_until_controller_is_ready(&self) {
+        while self
+            .regs
+            .operational
+            .usbsts
+            .read_volatile()
+            .controller_not_ready()
+        {}
     }
 
     fn stop(&mut self) {

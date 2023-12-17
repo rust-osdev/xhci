@@ -2,7 +2,7 @@
 
 ## What is this?
 
-This is a tiny program to verify that the `xhci` crate defines data structures, register accessors, etc. correctly. It is a single UEFI binary, and when it runs, it does the following things:
+This is a tiny program to verify that the `xhci` crate defines data structures, register accessors, etc. correctly, and to demostrate how to use the crate. It is a single UEFI binary, and when it runs, it does the following things:
 
 - Find the xHCI controller.
 - Initialize the controller.

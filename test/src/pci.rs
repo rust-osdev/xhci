@@ -62,6 +62,10 @@ impl ConfigSpace {
         Self { address }
     }
 
+    // See [1] for the structure of the PCI configuration space for xHCI.
+    //
+    // [1]: eXtensible Host Controller Interface for Universal Serial Bus (xHCI) Requirements Specification May 2019 Revision 1.2 Figure 5-1.
+
     pub fn base_address_register(&self, index: u8) -> u32 {
         assert!(index < 6, "index must be less than 6");
 
@@ -121,11 +125,17 @@ impl ConfigSpaceReader {
     unsafe fn read(&self, offset: u8) -> u32 {
         assert!(offset < 32, "offset must be less than 32");
 
-        unsafe { PortWrite::write_to_port(Self::CONFIG_ADDRESS, self.as_u32(offset)) };
+        // The method of how to read values from the PCI configuration space is described in [1].
+        //
+        // [1]: https://wiki.osdev.org/PCI#Configuration_Space
+        unsafe { PortWrite::write_to_port(Self::CONFIG_ADDRESS, self.config_addr(offset)) };
         unsafe { PortRead::read_from_port(Self::CONFIG_DATA) }
     }
 
-    fn as_u32(&self, offset: u8) -> u32 {
+    // See [1] for the description of bits in the PCI configuration address.
+    //
+    // [1]: https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_.231
+    fn config_addr(&self, offset: u8) -> u32 {
         let mut result = 0;
 
         result.set_bits(2..=7, offset.into());

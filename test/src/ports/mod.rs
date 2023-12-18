@@ -1,20 +1,16 @@
 mod context;
 
 use self::context::Context;
-use crate::{
-    command_ring, dcbaa::DeviceContextBaseAddressArray, registers,
-    transfer_ring::TransferRingController,
-};
-use alloc::rc::Rc;
-use core::cell::RefCell;
+use crate::dcbaa;
+use crate::{command_ring, registers, transfer_ring::TransferRingController};
 use xhci::{context::EndpointType, registers::PortRegisterSet};
 
-pub fn init_all_ports(dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>) {
+pub fn init_all_ports() {
     let num_ports = num_ports();
 
     for port in 0..num_ports {
         if connected(port) {
-            init_port(dcbaa.clone(), port);
+            init_port(port);
         }
     }
 }
@@ -28,7 +24,7 @@ fn connected(port: u8) -> bool {
     })
 }
 
-fn init_port(dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>, port: u8) {
+fn init_port(port: u8) {
     Resetter::new(port).reset();
 
     let addr = command_ring::send_enable_slot();
@@ -82,21 +78,14 @@ impl SlotEnabler {
 struct StructureInitializer {
     port: u8,
     slot: u8,
-    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
     ring: TransferRingController,
     cx: Context,
 }
 impl StructureInitializer {
-    fn new(
-        port: u8,
-        slot: u8,
-        dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-        cx: Context,
-    ) -> Self {
+    fn new(port: u8, slot: u8, cx: Context) -> Self {
         Self {
             port,
             slot,
-            dcbaa,
             ring: TransferRingController::new(),
             cx,
         }
@@ -124,9 +113,7 @@ impl StructureInitializer {
     }
 
     fn register_with_dcbaa(&mut self) {
-        self.dcbaa
-            .borrow_mut()
-            .register_address(self.slot, self.cx.input.phys_addr());
+        dcbaa::register_address(self.port, self.cx.input.phys_addr());
     }
 
     fn issue_address_device_command(&mut self) {

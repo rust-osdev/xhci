@@ -26,11 +26,11 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     registers::init();
 
-    let dcbaa = xhc::init();
+    xhc::init();
 
     let nop_addr = command_ring::send_nop();
 
-    ports::init_all_ports(dcbaa);
+    ports::init_all_ports();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -3,7 +3,7 @@ mod context;
 use self::context::Context;
 use crate::{
     command_ring::CommandRingController, dcbaa::DeviceContextBaseAddressArray, event::EventHandler,
-    registers::Registers, transfer_ring::TransferRingController,
+    registers, transfer_ring::TransferRingController,
 };
 use alloc::rc::Rc;
 use core::cell::RefCell;
@@ -11,41 +11,35 @@ use qemu_print::qemu_println;
 use xhci::{context::EndpointType, registers::PortRegisterSet};
 
 pub fn init_all_ports(
-    regs: Rc<RefCell<Registers>>,
     event_handler: Rc<RefCell<EventHandler>>,
     cmd: Rc<RefCell<CommandRingController>>,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
 ) {
-    let num_ports = num_ports(&regs.borrow());
+    let num_ports = num_ports();
 
     for port in 0..num_ports {
-        if connected(&regs.borrow(), port) {
-            init_port(
-                regs.clone(),
-                event_handler.clone(),
-                cmd.clone(),
-                dcbaa.clone(),
-                port,
-            );
+        if connected(port) {
+            init_port(event_handler.clone(), cmd.clone(), dcbaa.clone(), port);
         }
     }
 }
 
-fn connected(regs: &Registers, port: u8) -> bool {
-    regs.port_register_set
-        .read_volatile_at(port.into())
-        .portsc
-        .current_connect_status()
+fn connected(port: u8) -> bool {
+    registers::handle(|r| {
+        r.port_register_set
+            .read_volatile_at(port.into())
+            .portsc
+            .current_connect_status()
+    })
 }
 
 fn init_port(
-    regs: Rc<RefCell<Registers>>,
     event_handler: Rc<RefCell<EventHandler>>,
     cmd: Rc<RefCell<CommandRingController>>,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
     port: u8,
 ) {
-    Resetter::new(&mut regs.borrow_mut(), port).reset();
+    Resetter::new(port).reset();
 
     let addr = cmd.borrow_mut().send_enable_slot();
 
@@ -62,29 +56,28 @@ fn init_port(
             qemu_println!("Slot enabled.");
 
             StructureInitializer::new(
-                regs.clone(),
                 port,
                 c.slot_id(),
                 dcbaa,
                 cmd.clone(),
                 event_handler.clone(),
-                Context::new(&regs.borrow()),
+                Context::new(),
             )
             .create()
         });
 }
 
-fn num_ports(regs: &Registers) -> u8 {
-    regs.capability.hcsparams1.read_volatile().number_of_ports()
+fn num_ports() -> u8 {
+    registers::handle(|r| r.capability.hcsparams1.read_volatile().number_of_ports())
 }
 
-struct Resetter<'a> {
-    regs: PortRegisterHandler<'a>,
+struct Resetter {
+    regs: PortRegisterHandler,
 }
-impl<'a> Resetter<'a> {
-    fn new(regs: &'a mut Registers, port_number: u8) -> Self {
+impl Resetter {
+    fn new(port_number: u8) -> Self {
         Self {
-            regs: PortRegisterHandler::new(regs, port_number),
+            regs: PortRegisterHandler::new(port_number),
         }
     }
 
@@ -109,21 +102,15 @@ impl<'a> Resetter<'a> {
 }
 
 struct SlotEnabler {
-    regs: Rc<RefCell<Registers>>,
     event_handler: Rc<RefCell<EventHandler>>,
     cmd: Rc<RefCell<CommandRingController>>,
 }
 impl SlotEnabler {
     fn new(
-        regs: Rc<RefCell<Registers>>,
         event_handler: Rc<RefCell<EventHandler>>,
         cmd: Rc<RefCell<CommandRingController>>,
     ) -> Self {
-        Self {
-            regs,
-            event_handler,
-            cmd,
-        }
+        Self { event_handler, cmd }
     }
 
     fn enable(&mut self) -> u64 {
@@ -132,7 +119,6 @@ impl SlotEnabler {
 }
 
 struct StructureInitializer {
-    regs: Rc<RefCell<Registers>>,
     port: u8,
     slot: u8,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
@@ -143,7 +129,6 @@ struct StructureInitializer {
 }
 impl StructureInitializer {
     fn new(
-        regs: Rc<RefCell<Registers>>,
         port: u8,
         slot: u8,
         dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
@@ -152,7 +137,6 @@ impl StructureInitializer {
         cx: Context,
     ) -> Self {
         Self {
-            regs,
             port,
             slot,
             dcbaa,
@@ -179,7 +163,7 @@ impl StructureInitializer {
             &mut self.cx,
             self.port,
             &self.ring,
-            PortRegisterHandler::new(&mut self.regs.borrow_mut(), self.port),
+            PortRegisterHandler::new(self.port),
         )
         .init();
     }
@@ -230,14 +214,14 @@ struct Ep0ContextInitializer<'a> {
     cx: &'a mut Context,
     port: u8,
     ring: &'a TransferRingController,
-    regs: PortRegisterHandler<'a>,
+    regs: PortRegisterHandler,
 }
 impl<'a> Ep0ContextInitializer<'a> {
     fn new(
         cx: &'a mut Context,
         port: u8,
         ring: &'a TransferRingController,
-        regs: PortRegisterHandler<'a>,
+        regs: PortRegisterHandler,
     ) -> Self {
         Self {
             cx,
@@ -269,27 +253,28 @@ impl<'a> Ep0ContextInitializer<'a> {
     }
 }
 
-struct PortRegisterHandler<'a> {
-    regs: &'a mut Registers,
+struct PortRegisterHandler {
     port_number: u8,
 }
-impl<'a> PortRegisterHandler<'a> {
-    fn new(regs: &'a mut Registers, port_number: u8) -> Self {
-        Self { regs, port_number }
+impl PortRegisterHandler {
+    fn new(port_number: u8) -> Self {
+        Self { port_number }
     }
 
     fn read(&self) -> PortRegisterSet {
-        self.regs
-            .port_register_set
-            .read_volatile_at(self.port_number.into())
+        registers::handle(|r| {
+            r.port_register_set
+                .read_volatile_at(self.port_number.into())
+        })
     }
 
     fn update<T>(&mut self, f: T)
     where
         T: FnOnce(&mut PortRegisterSet),
     {
-        self.regs
-            .port_register_set
-            .update_volatile_at(self.port_number.into(), f)
+        registers::handle(|r| {
+            r.port_register_set
+                .update_volatile_at(self.port_number.into(), f)
+        })
     }
 }

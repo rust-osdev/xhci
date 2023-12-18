@@ -1,9 +1,10 @@
-use crate::registers::Registers;
 use alloc::boxed::Box;
 use alloc::{vec, vec::Vec};
 use bit_field::BitField;
 use xhci::ring::trb::event;
 use xhci::ring::trb::{self, event::CommandCompletion};
+
+use crate::registers;
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
@@ -21,8 +22,8 @@ pub struct EventHandler {
     cycle_bit: bool,
 }
 impl EventHandler {
-    pub fn new(regs: &mut Registers) -> Self {
-        let number_of_rings = number_of_rings(regs);
+    pub fn new() -> Self {
+        let number_of_rings = number_of_rings();
 
         let mut v = Self {
             segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings.into()],
@@ -35,7 +36,7 @@ impl EventHandler {
             cycle_bit: true,
         };
 
-        v.init(regs);
+        v.init();
 
         v
     }
@@ -58,8 +59,8 @@ impl EventHandler {
         assert!(self.handlers.is_empty(), "Some commands are not completed");
     }
 
-    fn init(&mut self, regs: &mut Registers) {
-        EventHandlerInitializer::new(self, regs).init();
+    fn init(&mut self) {
+        EventHandlerInitializer::new(self).init();
     }
 
     fn dequeue_and_process(&mut self) {
@@ -115,11 +116,10 @@ impl EventHandler {
 
 struct EventHandlerInitializer<'a> {
     handler: &'a mut EventHandler,
-    regs: &'a mut Registers,
 }
 impl<'a> EventHandlerInitializer<'a> {
-    fn new(handler: &'a mut EventHandler, regs: &'a mut Registers) -> Self {
-        Self { handler, regs }
+    fn new(handler: &'a mut EventHandler) -> Self {
+        Self { handler }
     }
 
     fn init(&mut self) {
@@ -131,13 +131,14 @@ impl<'a> EventHandlerInitializer<'a> {
     }
 
     fn register_dequeue_pointer(&mut self) {
-        self.regs
-            .interrupter_register_set
-            .interrupter_mut(0)
-            .erdp
-            .update_volatile(|erdp| {
-                erdp.set_event_ring_dequeue_pointer(self.handler.next_trb_addr())
-            })
+        registers::handle(|r| {
+            r.interrupter_register_set
+                .interrupter_mut(0)
+                .erdp
+                .update_volatile(|erdp| {
+                    erdp.set_event_ring_dequeue_pointer(self.handler.next_trb_addr())
+                })
+        })
     }
 
     fn write_rings_addresses_in_table(&mut self) {
@@ -151,31 +152,34 @@ impl<'a> EventHandlerInitializer<'a> {
 
     // We use polling for simplicity.
     fn disable_interrupts(&mut self) {
-        self.regs
-            .interrupter_register_set
-            .interrupter_mut(0)
-            .iman
-            .update_volatile(|iman| {
-                iman.clear_interrupt_enable();
-            })
+        registers::handle(|r| {
+            r.interrupter_register_set
+                .interrupter_mut(0)
+                .iman
+                .update_volatile(|iman| {
+                    iman.clear_interrupt_enable();
+                })
+        })
     }
 
     fn register_table_size(&mut self) {
-        self.regs
-            .interrupter_register_set
-            .interrupter_mut(0)
-            .erstsz
-            .update_volatile(|erstsz| {
-                erstsz.set(self.handler.segment_table.len() as u16);
-            })
+        registers::handle(|r| {
+            r.interrupter_register_set
+                .interrupter_mut(0)
+                .erstsz
+                .update_volatile(|erstsz| {
+                    erstsz.set(self.handler.segment_table.len() as u16);
+                })
+        })
     }
 
     fn enable_event_ring(&mut self) {
-        self.regs
-            .interrupter_register_set
-            .interrupter_mut(0)
-            .erstba
-            .update_volatile(|erstba| erstba.set(self.handler.segment_table.as_ptr() as u64))
+        registers::handle(|r| {
+            r.interrupter_register_set
+                .interrupter_mut(0)
+                .erstba
+                .update_volatile(|erstba| erstba.set(self.handler.segment_table.as_ptr() as u64))
+        })
     }
 }
 
@@ -203,9 +207,11 @@ impl EventRing {
     }
 }
 
-fn number_of_rings(regs: &Registers) -> u16 {
-    regs.capability
-        .hcsparams2
-        .read_volatile()
-        .event_ring_segment_table_max()
+fn number_of_rings() -> u16 {
+    registers::handle(|r| {
+        r.capability
+            .hcsparams2
+            .read_volatile()
+            .event_ring_segment_table_max()
+    })
 }

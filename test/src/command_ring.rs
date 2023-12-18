@@ -1,24 +1,20 @@
-use crate::registers::Registers;
-use alloc::{boxed::Box, rc::Rc};
-use core::cell::RefCell;
+use alloc::boxed::Box;
 use xhci::ring::trb::{self, command};
+
+use crate::registers;
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
 pub struct CommandRingController {
     ring: Box<CommandRing>,
 
-    regs: Rc<RefCell<Registers>>,
-
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    pub fn new(regs: &Rc<RefCell<Registers>>) -> Self {
+    pub fn new() -> Self {
         let mut v = Self {
             ring: Box::new(CommandRing::new()),
-
-            regs: Rc::clone(regs),
 
             enqueue_ptr: 0,
             cycle_bit: true,
@@ -57,12 +53,12 @@ impl CommandRingController {
     }
 
     fn init(&mut self) {
-        let regs = &mut self.regs.borrow_mut();
-
-        regs.operational.crcr.update_volatile(|crcr| {
-            crcr.set_command_ring_pointer(self.ring.as_ref() as *const _ as u64);
-            crcr.set_ring_cycle_state();
-        });
+        registers::handle(|r| {
+            r.operational.crcr.update_volatile(|crcr| {
+                crcr.set_command_ring_pointer(self.ring.as_ref() as *const _ as u64);
+                crcr.set_ring_cycle_state();
+            });
+        })
     }
 }
 
@@ -119,11 +115,11 @@ impl<'a> Enqueuer<'a> {
     }
 
     fn notify_command_is_sent(&mut self) {
-        let regs = &mut self.controller.regs.borrow_mut();
-
-        regs.doorbell.update_volatile_at(0, |r| {
-            r.set_doorbell_target(0);
-        });
+        registers::handle(|r| {
+            r.doorbell.update_volatile_at(0, |r| {
+                r.set_doorbell_target(0);
+            });
+        })
     }
 
     fn can_enqueue_trbs(&self) -> bool {

@@ -1,13 +1,12 @@
-use bit_field::BitField;
-
 use crate::mapper::Mapper;
+use bit_field::BitField;
+use conquer_once::spin::OnceCell;
+use spinning_top::Spinlock;
+use xhci::Registers;
 
-pub type Registers = xhci::Registers<Mapper>;
+static REGISTERS: OnceCell<Spinlock<Registers<Mapper>>> = OnceCell::uninit();
 
-/// # Safety
-///
-/// Multiple returned values must not exist in the same scope.
-pub unsafe fn get_accessor() -> Registers {
+pub fn init() {
     let xhc_config_space = crate::pci::iter_xhc().next().expect("xHC not found");
 
     // See [1] for the structure of base address registers.
@@ -25,6 +24,19 @@ pub unsafe fn get_accessor() -> Registers {
 
     let mmio_base = (((mmio_high as u64) << 32) | (mmio_low as u64 & 0xffff_fff0)) as usize;
 
-    // SAFETY: The caller ensures only one instance is created in a scope.
-    unsafe { xhci::Registers::new(mmio_base, Mapper) }
+    REGISTERS.init_once(||
+        // SAFETY: The function will be called only once.
+        unsafe { Spinlock::new(xhci::Registers::new(mmio_base, Mapper) )});
+}
+
+// This function receives a closure instead of returning a lock guard to reduce
+// the possibility of deadlocks.
+pub fn handle<T>(f: impl FnOnce(&mut Registers<Mapper>) -> T) -> T {
+    let mut regs = REGISTERS
+        .try_get()
+        .expect("xHC not initialized")
+        .try_lock()
+        .expect("xHC is already locked");
+
+    f(&mut regs)
 }

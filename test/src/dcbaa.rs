@@ -1,13 +1,14 @@
-use crate::registers::Registers;
 use alloc::vec;
 use alloc::vec::Vec;
 
+use crate::registers;
+
 pub struct DeviceContextBaseAddressArray(Vec<RawDCBAA>);
 impl DeviceContextBaseAddressArray {
-    pub fn new(regs: &mut Registers) -> Self {
-        let mut v = Self(vec![RawDCBAA::new(); number_of_slots(regs)]);
+    pub fn new() -> Self {
+        let mut v = Self(vec![RawDCBAA::new(); number_of_slots()]);
 
-        v.init(regs);
+        v.init();
 
         v
     }
@@ -16,14 +17,16 @@ impl DeviceContextBaseAddressArray {
         self.0[port as usize].0 = addr;
     }
 
-    fn init(&mut self, regs: &mut Registers) {
-        self.register_address_with_register(regs);
+    fn init(&mut self) {
+        self.register_address_with_register();
     }
 
-    fn register_address_with_register(&self, regs: &mut Registers) {
-        regs.operational
-            .dcbaap
-            .update_volatile(|dcbaap| dcbaap.set(self.0.as_ptr() as u64));
+    fn register_address_with_register(&self) {
+        registers::handle(|r| {
+            r.operational
+                .dcbaap
+                .update_volatile(|dcbaap| dcbaap.set(self.0.as_ptr() as u64));
+        })
     }
 }
 
@@ -36,10 +39,12 @@ impl RawDCBAA {
     }
 }
 
-fn number_of_slots(regs: &Registers) -> usize {
-    regs.capability
-        .hcsparams1
-        .read_volatile()
-        .number_of_device_slots() as usize
-        + 1_usize
+fn number_of_slots() -> usize {
+    registers::handle(|r| {
+        r.capability
+            .hcsparams1
+            .read_volatile()
+            .number_of_device_slots() as usize
+            + 1_usize
+    })
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::registers::Registers;
+use crate::registers;
 
 use {
     alloc::boxed::Box,
@@ -15,10 +15,10 @@ pub struct Context {
     pub output: Box<Device>,
 }
 impl Context {
-    pub fn new(regs: &Registers) -> Self {
+    pub fn new() -> Self {
         Self {
-            input: Input::new(regs),
-            output: Device::new(regs).into(),
+            input: Input::new(),
+            output: Device::new().into(),
         }
     }
 }
@@ -49,8 +49,8 @@ impl Input {
         }
     }
 
-    fn new(regs: &Registers) -> Self {
-        if csz(regs) {
+    fn new() -> Self {
+        if csz() {
             Self::Byte64(Input64Byte::default().into())
         } else {
             Self::Byte32(Input32Byte::default().into())
@@ -63,8 +63,8 @@ pub enum Device {
     Byte32(Box<Device32Byte>),
 }
 impl Device {
-    fn new(regs: &Registers) -> Self {
-        if csz(regs) {
+    fn new() -> Self {
+        if csz() {
             Self::Byte64(Device64Byte::default().into())
         } else {
             Self::Byte32(Device32Byte::default().into())
@@ -72,6 +72,6 @@ impl Device {
     }
 }
 
-fn csz(regs: &Registers) -> bool {
-    regs.capability.hccparams1.read_volatile().context_size()
+fn csz() -> bool {
+    registers::handle(|r| r.capability.hccparams1.read_volatile().context_size())
 }

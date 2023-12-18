@@ -1,18 +1,42 @@
+use crate::command_ring::CommandRingController;
+use crate::dcbaa::DeviceContextBaseAddressArray;
+use crate::event::EventHandler;
 use crate::mapper::Mapper;
 use crate::registers::Registers;
+use crate::scratchpat;
+use alloc::rc::Rc;
+use core::cell::RefCell;
 use qemu_print::qemu_println;
 use xhci::registers::operational::UsbStatusRegister;
 use xhci::registers::Operational;
 
-pub fn init(regs: &mut Registers) {
+pub fn init(
+    regs: &Rc<RefCell<Registers>>,
+) -> (
+    Rc<RefCell<EventHandler>>,
+    CommandRingController,
+    DeviceContextBaseAddressArray,
+) {
     qemu_println!("Initializing xHC...");
 
-    Initializer::new(regs).init();
+    Initializer::new(&mut regs.borrow_mut()).init();
+
+    let event_handler = EventHandler::new(&mut regs.borrow_mut());
+    let event_handler = Rc::new(RefCell::new(event_handler));
+    let command_ring = CommandRingController::new(&regs, &event_handler);
+
+    let dcbaa = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
+    scratchpat::init(&regs.borrow());
+
+    run(&mut regs.borrow_mut().operational);
+    ensure_no_error_occurs(&regs.borrow().operational.usbsts.read_volatile());
 
     qemu_println!("xHC is initialized.");
+
+    (event_handler, command_ring, dcbaa)
 }
 
-pub fn run(op: &mut Operational<Mapper>) {
+fn run(op: &mut Operational<Mapper>) {
     op.usbcmd.update_volatile(|u| {
         u.set_run_stop();
     });
@@ -20,7 +44,7 @@ pub fn run(op: &mut Operational<Mapper>) {
     while op.usbsts.read_volatile().hc_halted() {}
 }
 
-pub fn ensure_no_error_occurs(s: &UsbStatusRegister) {
+fn ensure_no_error_occurs(s: &UsbStatusRegister) {
     assert!(!s.hc_halted(), "HC is halted.");
     assert!(
         !s.host_system_error(),

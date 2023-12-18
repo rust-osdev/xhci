@@ -18,9 +18,6 @@ mod xhc;
 use core::cell::RefCell;
 
 use alloc::rc::Rc;
-use command_ring::CommandRingController;
-use dcbaa::DeviceContextBaseAddressArray;
-use event::EventHandler;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
 use uefi::table::boot::MemoryType;
@@ -32,19 +29,9 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     // SAFETY: We are calling `get_accessor()` only once.
     let regs = unsafe { registers::get_accessor() };
-    let mut regs = Rc::new(RefCell::new(regs));
+    let regs = Rc::new(RefCell::new(regs));
 
-    xhc::init(&mut regs.borrow_mut());
-
-    let mut event_handler = EventHandler::new(&mut regs.borrow_mut());
-    let mut event_handler = Rc::new(RefCell::new(event_handler));
-    let mut command_ring = CommandRingController::new(&mut regs, &event_handler);
-
-    let _ = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
-    scratchpat::init(&regs.borrow());
-
-    xhc::run(&mut regs.borrow_mut().operational);
-    xhc::ensure_no_error_occurs(&regs.borrow().operational.usbsts.read_volatile());
+    let (event_handler, mut command_ring, _) = xhc::init(&regs);
 
     command_ring.send_nop();
 

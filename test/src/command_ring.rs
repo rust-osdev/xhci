@@ -1,7 +1,6 @@
-use core::cell::RefCell;
-
 use crate::{event::EventHandler, registers::Registers};
 use alloc::{boxed::Box, rc::Rc};
+use core::cell::RefCell;
 use xhci::ring::trb::{
     self, command,
     event::{CommandCompletion, CompletionCode},

@@ -3,6 +3,8 @@ EFI = ../target/x86_64-unknown-uefi/debug/xhci-test.efi
 
 .PHONY:	test clean
 
+all: $(IMG)
+
 test: $(IMG)
 	qemu-system-x86_64	\
 		-drive if=pflash,format=raw,readonly=on,file=OVMF_CODE.fd \

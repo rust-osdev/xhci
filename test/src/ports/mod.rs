@@ -29,12 +29,7 @@ fn connected(regs: &Registers, port: u8) -> bool {
         .current_connect_status()
 }
 
-fn init_port(
-    regs: &mut Registers,
-    event_handler: &mut EventHandler,
-    cmd: &mut CommandRingController,
-    port: u8,
-) {
+fn init_port(regs: &mut Registers, _: &mut EventHandler, _: &mut CommandRingController, port: u8) {
     Resetter::new(regs, port).reset();
     // SlotEnabler::new(regs, event_handler, cmd).enable(move |slot| {
     //     qemu_println!("Slot {} enabled", slot);

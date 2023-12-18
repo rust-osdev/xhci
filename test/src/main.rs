@@ -31,15 +31,15 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     allocator::init(memory_map);
 
     // SAFETY: We are calling `get_accessor()` only once.
-    let mut regs = unsafe { registers::get_accessor() };
-    let regs = Rc::new(RefCell::new(regs));
+    let regs = unsafe { registers::get_accessor() };
+    let mut regs = Rc::new(RefCell::new(regs));
 
     xhc::init(&mut regs.borrow_mut());
 
     let mut event_handler = EventHandler::new(&mut regs.borrow_mut());
-    let mut command_ring = CommandRingController::new(&mut regs.borrow_mut());
+    let mut command_ring = CommandRingController::new(&mut regs);
 
-    let mut dcbaa = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
+    let _ = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
     scratchpat::init(&regs.borrow());
 
     xhc::run(&mut regs.borrow_mut().operational);

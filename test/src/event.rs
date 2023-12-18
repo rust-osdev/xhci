@@ -140,7 +140,7 @@ impl<'a> EventHandlerInitializer<'a> {
     }
 
     fn write_rings_addresses_in_table(&mut self) {
-        let mut segment_table = &mut self.handler.segment_table;
+        let segment_table = &mut self.handler.segment_table;
 
         for (i, ring) in self.handler.rings.iter().enumerate() {
             segment_table[i].base_addr = ring as *const _ as u64;

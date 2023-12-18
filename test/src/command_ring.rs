@@ -1,5 +1,7 @@
+use core::cell::RefCell;
+
 use crate::{event::EventHandler, registers::Registers};
-use alloc::boxed::Box;
+use alloc::{boxed::Box, rc::Rc};
 use xhci::ring::trb::{
     self, command,
     event::{CommandCompletion, CompletionCode},
@@ -10,19 +12,23 @@ const NUM_OF_TRBS_IN_RING: usize = 16;
 pub struct CommandRingController {
     ring: Box<CommandRing>,
 
+    regs: Rc<RefCell<Registers>>,
+
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    pub fn new(regs: &mut Registers) -> Self {
+    pub fn new(regs: &Rc<RefCell<Registers>>) -> Self {
         let mut v = Self {
             ring: Box::new(CommandRing::new()),
+
+            regs: Rc::clone(regs),
 
             enqueue_ptr: 0,
             cycle_bit: true,
         };
 
-        v.init(regs);
+        v.init(&mut regs.borrow_mut());
 
         v
     }

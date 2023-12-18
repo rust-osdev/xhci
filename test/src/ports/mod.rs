@@ -14,12 +14,19 @@ pub fn init_all_ports(
     regs: Rc<RefCell<Registers>>,
     event_handler: Rc<RefCell<EventHandler>>,
     cmd: Rc<RefCell<CommandRingController>>,
+    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
 ) {
     let num_ports = num_ports(&regs.borrow());
 
     for port in 0..num_ports {
         if connected(&regs.borrow(), port) {
-            init_port(regs.clone(), event_handler.clone(), cmd.clone(), port);
+            init_port(
+                regs.clone(),
+                event_handler.clone(),
+                cmd.clone(),
+                dcbaa.clone(),
+                port,
+            );
         }
     }
 }
@@ -35,21 +42,36 @@ fn init_port(
     regs: Rc<RefCell<Registers>>,
     event_handler: Rc<RefCell<EventHandler>>,
     cmd: Rc<RefCell<CommandRingController>>,
+    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
     port: u8,
 ) {
     Resetter::new(&mut regs.borrow_mut(), port).reset();
 
     let addr = cmd.borrow_mut().send_enable_slot();
 
-    event_handler.borrow_mut().register_handler(addr, |c| {
-        assert_eq!(
-            c.completion_code(),
-            Ok(xhci::ring::trb::event::CompletionCode::Success),
-            "Enable slot failed."
-        );
+    event_handler
+        .clone()
+        .borrow_mut()
+        .register_handler(addr, move |c| {
+            assert_eq!(
+                c.completion_code(),
+                Ok(xhci::ring::trb::event::CompletionCode::Success),
+                "Enable slot failed."
+            );
 
-        qemu_println!("Slot enabled.");
-    });
+            qemu_println!("Slot enabled.");
+
+            StructureInitializer::new(
+                regs.clone(),
+                port,
+                c.slot_id(),
+                dcbaa,
+                cmd.clone(),
+                event_handler.clone(),
+                Context::new(&regs.borrow()),
+            )
+            .create()
+        });
 }
 
 fn num_ports(regs: &Registers) -> u8 {

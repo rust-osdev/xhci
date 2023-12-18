@@ -31,7 +31,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let regs = unsafe { registers::get_accessor() };
     let regs = Rc::new(RefCell::new(regs));
 
-    let (event_handler, command_ring, _) = xhc::init(&regs);
+    let (event_handler, command_ring, dcbaa) = xhc::init(&regs);
 
     let nop_addr = command_ring.borrow_mut().send_nop();
     event_handler.borrow_mut().register_handler(nop_addr, |c| {
@@ -42,7 +42,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
         );
     });
 
-    ports::init_all_ports(regs, event_handler.clone(), command_ring);
+    ports::init_all_ports(regs, event_handler.clone(), command_ring, dcbaa);
 
     event_handler.borrow_mut().process_trbs();
     event_handler.borrow_mut().assert_all_commands_completed();

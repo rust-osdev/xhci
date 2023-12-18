@@ -37,6 +37,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     xhc::init(&mut regs.borrow_mut());
 
     let mut event_handler = EventHandler::new(&mut regs.borrow_mut());
+    let mut event_handler = Rc::new(RefCell::new(event_handler));
     let mut command_ring = CommandRingController::new(&mut regs);
 
     let _ = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
@@ -45,17 +46,17 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     xhc::run(&mut regs.borrow_mut().operational);
     xhc::ensure_no_error_occurs(&regs.borrow().operational.usbsts.read_volatile());
 
-    command_ring.send_nop(&mut event_handler);
+    command_ring.send_nop(&mut event_handler.borrow_mut());
 
     ports::init_all_ports(
         &mut regs.borrow_mut(),
-        &mut event_handler,
+        &mut event_handler.borrow_mut(),
         &mut command_ring,
     );
 
-    event_handler.process_trbs();
+    event_handler.borrow_mut().process_trbs();
 
-    event_handler.assert_all_commands_completed();
+    event_handler.borrow_mut().assert_all_commands_completed();
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -15,6 +15,9 @@ mod scratchpat;
 mod transfer_ring;
 mod xhc;
 
+use core::cell::RefCell;
+
+use alloc::rc::Rc;
 use command_ring::CommandRingController;
 use dcbaa::DeviceContextBaseAddressArray;
 use event::EventHandler;
@@ -29,21 +32,26 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     // SAFETY: We are calling `get_accessor()` only once.
     let mut regs = unsafe { registers::get_accessor() };
+    let regs = Rc::new(RefCell::new(regs));
 
-    xhc::init(&mut regs);
+    xhc::init(&mut regs.borrow_mut());
 
-    let mut event_handler = EventHandler::new(&mut regs);
-    let mut command_ring = CommandRingController::new(&mut regs);
+    let mut event_handler = EventHandler::new(&mut regs.borrow_mut());
+    let mut command_ring = CommandRingController::new(&mut regs.borrow_mut());
 
-    let mut dcbaa = DeviceContextBaseAddressArray::new(&mut regs);
-    scratchpat::init(&regs);
+    let mut dcbaa = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
+    scratchpat::init(&regs.borrow());
 
-    xhc::run(&mut regs.operational);
-    xhc::ensure_no_error_occurs(&regs.operational.usbsts.read_volatile());
+    xhc::run(&mut regs.borrow_mut().operational);
+    xhc::ensure_no_error_occurs(&regs.borrow().operational.usbsts.read_volatile());
 
-    command_ring.send_nop(&mut regs, &mut event_handler);
+    command_ring.send_nop(&mut regs.borrow_mut(), &mut event_handler);
 
-    ports::init_all_ports(&mut regs, &mut event_handler, &mut command_ring);
+    ports::init_all_ports(
+        &mut regs.borrow_mut(),
+        &mut event_handler,
+        &mut command_ring,
+    );
 
     event_handler.process_trbs();
 

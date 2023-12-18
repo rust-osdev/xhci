@@ -6,7 +6,7 @@ use crate::{
     registers::Registers, transfer_ring::TransferRingController,
 };
 use qemu_print::qemu_println;
-use xhci::{context::EndpointType, registers::PortRegisterSet, ring::trb::event};
+use xhci::{context::EndpointType, registers::PortRegisterSet};
 
 pub fn init_all_ports(
     regs: &mut Registers,

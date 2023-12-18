@@ -2,9 +2,8 @@ use crate::registers::Registers;
 use alloc::boxed::Box;
 use alloc::{vec, vec::Vec};
 use bit_field::BitField;
-use qemu_print::qemu_println;
+use xhci::ring::trb::event;
 use xhci::ring::trb::{self, event::CommandCompletion};
-use xhci::ring::trb::{command, event};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 

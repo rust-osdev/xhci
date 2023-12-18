@@ -38,7 +38,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     let mut event_handler = EventHandler::new(&mut regs.borrow_mut());
     let mut event_handler = Rc::new(RefCell::new(event_handler));
-    let mut command_ring = CommandRingController::new(&mut regs);
+    let mut command_ring = CommandRingController::new(&mut regs, &event_handler);
 
     let _ = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
     scratchpat::init(&regs.borrow());

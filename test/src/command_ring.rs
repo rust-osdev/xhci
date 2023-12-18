@@ -12,16 +12,18 @@ const NUM_OF_TRBS_IN_RING: usize = 16;
 pub struct CommandRingController {
     ring: Box<CommandRing>,
 
+    event_handler: Rc<RefCell<EventHandler>>,
     regs: Rc<RefCell<Registers>>,
 
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    pub fn new(regs: &Rc<RefCell<Registers>>) -> Self {
+    pub fn new(regs: &Rc<RefCell<Registers>>, event_handler: &Rc<RefCell<EventHandler>>) -> Self {
         let mut v = Self {
             ring: Box::new(CommandRing::new()),
 
+            event_handler: Rc::clone(event_handler),
             regs: Rc::clone(regs),
 
             enqueue_ptr: 0,

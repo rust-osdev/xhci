@@ -18,7 +18,7 @@ pub fn init(
 ) -> (
     Rc<RefCell<EventHandler>>,
     Rc<RefCell<CommandRingController>>,
-    DeviceContextBaseAddressArray,
+    Rc<RefCell<DeviceContextBaseAddressArray>>,
 ) {
     qemu_println!("Initializing xHC...");
 
@@ -30,10 +30,11 @@ pub fn init(
     let event_handler = EventHandler::new(&mut regs.borrow_mut());
     let event_handler = Rc::new(RefCell::new(event_handler));
 
-    let command_ring = CommandRingController::new(&regs, &event_handler);
+    let command_ring = CommandRingController::new(&regs);
     let command_ring = Rc::new(RefCell::new(command_ring));
 
     let dcbaa = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
+    let dcbaa = Rc::new(RefCell::new(dcbaa));
     scratchpat::init(&regs.borrow());
 
     run(&mut regs.borrow_mut().operational);

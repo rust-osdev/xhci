@@ -5,19 +5,21 @@ use crate::{
     command_ring::CommandRingController, dcbaa::DeviceContextBaseAddressArray, event::EventHandler,
     registers::Registers, transfer_ring::TransferRingController,
 };
+use alloc::rc::Rc;
+use core::cell::RefCell;
 use qemu_print::qemu_println;
 use xhci::{context::EndpointType, registers::PortRegisterSet};
 
 pub fn init_all_ports(
-    regs: &mut Registers,
-    event_handler: &mut EventHandler,
-    cmd: &mut CommandRingController,
+    regs: Rc<RefCell<Registers>>,
+    event_handler: Rc<RefCell<EventHandler>>,
+    cmd: Rc<RefCell<CommandRingController>>,
 ) {
-    let num_ports = num_ports(regs);
+    let num_ports = num_ports(&regs.borrow());
 
     for port in 0..num_ports {
-        if connected(regs, port) {
-            init_port(regs, event_handler, cmd, port);
+        if connected(&regs.borrow(), port) {
+            init_port(regs.clone(), event_handler.clone(), cmd.clone(), port);
         }
     }
 }
@@ -29,21 +31,25 @@ fn connected(regs: &Registers, port: u8) -> bool {
         .current_connect_status()
 }
 
-fn init_port(regs: &mut Registers, _: &mut EventHandler, _: &mut CommandRingController, port: u8) {
-    Resetter::new(regs, port).reset();
-    // SlotEnabler::new(regs, event_handler, cmd).enable(move |slot| {
-    //     qemu_println!("Slot {} enabled", slot);
+fn init_port(
+    regs: Rc<RefCell<Registers>>,
+    event_handler: Rc<RefCell<EventHandler>>,
+    cmd: Rc<RefCell<CommandRingController>>,
+    port: u8,
+) {
+    Resetter::new(&mut regs.borrow_mut(), port).reset();
 
-    //     StructureCreator::new(
-    //         regs,
-    //         port,
-    //         slot,
-    //         &mut DeviceContextBaseAddressArray::new(regs),
-    //         cmd,
-    //         event_handler,
-    //     )
-    //     .create();
-    // });
+    let addr = cmd.borrow_mut().send_enable_slot();
+
+    event_handler.borrow_mut().register_handler(addr, |c| {
+        assert_eq!(
+            c.completion_code(),
+            Ok(xhci::ring::trb::event::CompletionCode::Success),
+            "Enable slot failed."
+        );
+
+        qemu_println!("Slot enabled.");
+    });
 }
 
 fn num_ports(regs: &Registers) -> u8 {
@@ -80,16 +86,16 @@ impl<'a> Resetter<'a> {
     }
 }
 
-struct SlotEnabler<'a> {
-    regs: &'a mut Registers,
-    event_handler: &'a mut EventHandler,
-    cmd: &'a mut CommandRingController,
+struct SlotEnabler {
+    regs: Rc<RefCell<Registers>>,
+    event_handler: Rc<RefCell<EventHandler>>,
+    cmd: Rc<RefCell<CommandRingController>>,
 }
-impl<'a> SlotEnabler<'a> {
+impl SlotEnabler {
     fn new(
-        regs: &'a mut Registers,
-        event_handler: &'a mut EventHandler,
-        cmd: &'a mut CommandRingController,
+        regs: Rc<RefCell<Registers>>,
+        event_handler: Rc<RefCell<EventHandler>>,
+        cmd: Rc<RefCell<CommandRingController>>,
     ) -> Self {
         Self {
             regs,
@@ -98,36 +104,31 @@ impl<'a> SlotEnabler<'a> {
         }
     }
 
-    fn enable(&mut self, on_completion: impl Fn(u8) + 'static) {
-        self.cmd.send_enable_slot(move |port_id| {
-            qemu_println!("Port {} enabled", port_id);
-
-            on_completion(port_id);
-        });
+    fn enable(&mut self) -> u64 {
+        self.cmd.borrow_mut().send_enable_slot()
     }
 }
 
-struct StructureCreator<'a> {
-    regs: &'a mut Registers,
+struct StructureInitializer {
+    regs: Rc<RefCell<Registers>>,
     port: u8,
     slot: u8,
-    dcbaa: &'a mut DeviceContextBaseAddressArray,
-    cmd: &'a mut CommandRingController,
-    event_handler: &'a mut EventHandler,
+    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
+    cmd: Rc<RefCell<CommandRingController>>,
+    event_handler: Rc<RefCell<EventHandler>>,
     ring: TransferRingController,
     cx: Context,
 }
-impl<'a> StructureCreator<'a> {
+impl StructureInitializer {
     fn new(
-        regs: &'a mut Registers,
+        regs: Rc<RefCell<Registers>>,
         port: u8,
         slot: u8,
-        dcbaa: &'a mut DeviceContextBaseAddressArray,
-        cmd: &'a mut CommandRingController,
-        event_handler: &'a mut EventHandler,
+        dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
+        cmd: Rc<RefCell<CommandRingController>>,
+        event_handler: Rc<RefCell<EventHandler>>,
+        cx: Context,
     ) -> Self {
-        let cx = Context::new(regs);
-
         Self {
             regs,
             port,
@@ -156,18 +157,20 @@ impl<'a> StructureCreator<'a> {
             &mut self.cx,
             self.port,
             &self.ring,
-            PortRegisterHandler::new(self.regs, self.port),
+            PortRegisterHandler::new(&mut self.regs.borrow_mut(), self.port),
         )
         .init();
     }
 
     fn register_with_dcbaa(&mut self) {
         self.dcbaa
+            .borrow_mut()
             .register_address(self.slot, self.cx.input.phys_addr());
     }
 
     fn issue_address_device_command(&mut self) {
         self.cmd
+            .borrow_mut()
             .send_address_device(self.cx.input.phys_addr(), self.slot);
     }
 }

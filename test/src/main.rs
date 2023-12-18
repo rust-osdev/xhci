@@ -15,12 +15,12 @@ mod scratchpat;
 mod transfer_ring;
 mod xhc;
 
-use core::cell::RefCell;
-
 use alloc::rc::Rc;
+use core::cell::RefCell;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
 use uefi::table::boot::MemoryType;
+use xhci::ring::trb::event::CompletionCode;
 
 #[uefi::entry]
 fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) -> uefi::Status {
@@ -33,14 +33,18 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     let (event_handler, command_ring, _) = xhc::init(&regs);
 
-    command_ring.borrow_mut().send_nop();
+    let nop_addr = command_ring.borrow_mut().send_nop();
+    event_handler.borrow_mut().register_handler(nop_addr, |c| {
+        assert_eq!(
+            c.completion_code(),
+            Ok(CompletionCode::Success),
+            "NOP failed."
+        );
+    });
 
-    ports::init_all_ports(
-        &mut regs.borrow_mut(),
-        &mut event_handler.borrow_mut(),
-        &mut command_ring.borrow_mut(),
-    );
+    ports::init_all_ports(regs, event_handler.clone(), command_ring);
 
+    event_handler.borrow_mut().process_trbs();
     event_handler.borrow_mut().assert_all_commands_completed();
 
     let handler = qemu_exit::X86::new(0xf4, 33);

@@ -1,28 +1,23 @@
-use crate::{event::EventHandler, registers::Registers};
+use crate::registers::Registers;
 use alloc::{boxed::Box, rc::Rc};
 use core::cell::RefCell;
-use xhci::ring::trb::{
-    self, command,
-    event::{CommandCompletion, CompletionCode},
-};
+use xhci::ring::trb::{self, command};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
 pub struct CommandRingController {
     ring: Box<CommandRing>,
 
-    event_handler: Rc<RefCell<EventHandler>>,
     regs: Rc<RefCell<Registers>>,
 
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    pub fn new(regs: &Rc<RefCell<Registers>>, event_handler: &Rc<RefCell<EventHandler>>) -> Self {
+    pub fn new(regs: &Rc<RefCell<Registers>>) -> Self {
         let mut v = Self {
             ring: Box::new(CommandRing::new()),
 
-            event_handler: Rc::clone(event_handler),
             regs: Rc::clone(regs),
 
             enqueue_ptr: 0,
@@ -34,66 +29,31 @@ impl CommandRingController {
         v
     }
 
-    pub fn send_nop(&mut self) {
+    pub fn send_nop(&mut self) -> u64 {
         let trb = command::Noop::new();
         let trb = command::Allowed::Noop(trb);
 
-        let on_completion = |c: CommandCompletion| {
-            assert_eq!(
-                c.completion_code(),
-                Ok(CompletionCode::Success),
-                "No-op command failed: {:?}",
-                c
-            );
-        };
-
-        self.enqueue(trb, on_completion);
+        self.enqueue(trb)
     }
 
-    pub fn send_enable_slot(&mut self, after_enabling: impl Fn(u8) + 'static) {
+    pub fn send_enable_slot(&mut self) -> u64 {
         let trb = command::EnableSlot::new();
         let trb = command::Allowed::EnableSlot(trb);
 
-        let on_completion = move |c: CommandCompletion| {
-            assert_eq!(
-                c.completion_code(),
-                Ok(CompletionCode::Success),
-                "Enable slot command failed: {:?}",
-                c
-            );
-
-            after_enabling(c.slot_id());
-        };
-
-        self.enqueue(trb, on_completion);
+        self.enqueue(trb)
     }
 
-    pub fn send_address_device(&mut self, input_cx_addr: u64, slot: u8) {
+    pub fn send_address_device(&mut self, input_cx_addr: u64, slot: u8) -> u64 {
         let trb = *command::AddressDevice::new()
             .set_input_context_pointer(input_cx_addr)
             .set_slot_id(slot);
         let trb = command::Allowed::AddressDevice(trb);
 
-        let on_completion = |c: CommandCompletion| {
-            assert_eq!(
-                c.completion_code(),
-                Ok(CompletionCode::Success),
-                "Address device command failed: {:?}",
-                c
-            );
-        };
-
-        self.enqueue(trb, on_completion);
+        self.enqueue(trb)
     }
 
-    fn enqueue(
-        &mut self,
-        trb: command::Allowed,
-        on_completion: impl Fn(CommandCompletion) + 'static,
-    ) {
-        Enqueuer::new(self).enqueue(trb, on_completion);
-
-        self.event_handler.borrow_mut().process_trbs();
+    fn enqueue<'a>(&'a mut self, trb: command::Allowed) -> u64 {
+        Enqueuer::new(self).enqueue(trb)
     }
 
     fn init(&mut self) {
@@ -114,16 +74,15 @@ impl<'a> Enqueuer<'a> {
         Self { controller }
     }
 
-    fn enqueue(
-        &mut self,
-        mut trb: command::Allowed,
-        on_completion: impl Fn(CommandCompletion) + 'static,
-    ) {
+    fn enqueue(&mut self, mut trb: command::Allowed) -> u64 {
+        let addr = self.written_trb_address();
+
         self.modify_cycle_bit(&mut trb);
         self.write_trb(trb);
-        self.register_handler(on_completion);
         self.increment_enqueue_ptr();
         self.notify_command_is_sent();
+
+        addr
     }
 
     fn enqueue_link(&mut self) {
@@ -145,15 +104,6 @@ impl<'a> Enqueuer<'a> {
 
     fn write_trb(&mut self, trb: command::Allowed) {
         self.controller.ring.0[self.controller.enqueue_ptr] = trb.into_raw();
-    }
-
-    fn register_handler(&mut self, on_completion: impl Fn(CommandCompletion) + 'static) {
-        let trb_addr = self.written_trb_address();
-        let event_handler = &mut self.controller.event_handler.borrow_mut();
-
-        event_handler.register_handler(trb_addr, move |c| {
-            on_completion(c);
-        });
     }
 
     fn written_trb_address(&self) -> u64 {

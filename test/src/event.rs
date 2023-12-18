@@ -13,7 +13,7 @@ pub struct EventHandler {
 
     // Alas, we cannot use `HashMap` because it's not in `alloc` yet.
     // See https://github.com/rust-lang/rust/issues/27242.
-    handlers: Vec<(u64, Box<dyn Fn(CommandCompletion) + 'static>)>,
+    handlers: Vec<(u64, Box<dyn FnOnce(CommandCompletion) + 'static>)>,
 
     dequeue_ptr_segment: u64,
     dequeue_ptr_ring: u64,
@@ -43,7 +43,7 @@ impl EventHandler {
     pub fn register_handler<'a>(
         &mut self,
         trb_addr: u64,
-        handler: impl Fn(CommandCompletion) + 'static,
+        handler: impl FnOnce(CommandCompletion) + 'static,
     ) {
         self.handlers.push((trb_addr, Box::new(handler)));
     }

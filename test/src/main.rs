@@ -46,7 +46,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     xhc::run(&mut regs.borrow_mut().operational);
     xhc::ensure_no_error_occurs(&regs.borrow().operational.usbsts.read_volatile());
 
-    command_ring.send_nop(&mut event_handler.borrow_mut());
+    command_ring.send_nop();
 
     ports::init_all_ports(
         &mut regs.borrow_mut(),

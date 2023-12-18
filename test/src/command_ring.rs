@@ -35,7 +35,7 @@ impl CommandRingController {
         v
     }
 
-    pub fn send_nop(&mut self, event_handler: &mut EventHandler) {
+    pub fn send_nop(&mut self) {
         let trb = command::Noop::new();
         let trb = command::Allowed::Noop(trb);
 
@@ -48,7 +48,7 @@ impl CommandRingController {
             );
         };
 
-        self.enqueue(event_handler, trb, on_completion);
+        self.enqueue(trb, on_completion);
     }
 
     pub fn send_enable_slot(
@@ -70,15 +70,10 @@ impl CommandRingController {
             after_enabling(c.slot_id());
         };
 
-        self.enqueue(event_handler, trb, on_completion);
+        self.enqueue(trb, on_completion);
     }
 
-    pub fn send_address_device(
-        &mut self,
-        event_handler: &mut EventHandler,
-        input_cx_addr: u64,
-        slot: u8,
-    ) {
+    pub fn send_address_device(&mut self, input_cx_addr: u64, slot: u8) {
         let trb = *command::AddressDevice::new()
             .set_input_context_pointer(input_cx_addr)
             .set_slot_id(slot);
@@ -93,16 +88,15 @@ impl CommandRingController {
             );
         };
 
-        self.enqueue(event_handler, trb, on_completion);
+        self.enqueue(trb, on_completion);
     }
 
     fn enqueue(
         &mut self,
-        event_handler: &mut EventHandler,
         trb: command::Allowed,
         on_completion: impl Fn(CommandCompletion) + 'static,
     ) {
-        Enqueuer::new(self, event_handler).enqueue(trb, on_completion);
+        Enqueuer::new(self).enqueue(trb, on_completion);
     }
 
     fn init(&mut self) {
@@ -117,14 +111,10 @@ impl CommandRingController {
 
 struct Enqueuer<'a> {
     controller: &'a mut CommandRingController,
-    event_handler: &'a mut EventHandler,
 }
 impl<'a> Enqueuer<'a> {
-    fn new(controller: &'a mut CommandRingController, event_handler: &'a mut EventHandler) -> Self {
-        Self {
-            controller,
-            event_handler,
-        }
+    fn new(controller: &'a mut CommandRingController) -> Self {
+        Self { controller }
     }
 
     fn enqueue(
@@ -162,8 +152,9 @@ impl<'a> Enqueuer<'a> {
 
     fn register_handler(&mut self, on_completion: impl Fn(CommandCompletion) + 'static) {
         let trb_addr = self.written_trb_address();
+        let event_handler = &mut self.controller.event_handler.borrow_mut();
 
-        self.event_handler.register_handler(trb_addr, move |c| {
+        event_handler.register_handler(trb_addr, move |c| {
             on_completion(c);
         });
     }

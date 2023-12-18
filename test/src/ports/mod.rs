@@ -169,7 +169,7 @@ impl<'a> StructureCreator<'a> {
 
     fn issue_address_device_command(&mut self) {
         self.cmd
-            .send_address_device(self.event_handler, self.cx.input.phys_addr(), self.slot);
+            .send_address_device(self.cx.input.phys_addr(), self.slot);
     }
 }
 

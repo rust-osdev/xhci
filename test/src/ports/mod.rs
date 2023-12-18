@@ -2,23 +2,19 @@ mod context;
 
 use self::context::Context;
 use crate::{
-    command_ring, dcbaa::DeviceContextBaseAddressArray, event::EventHandler, registers,
+    command_ring, dcbaa::DeviceContextBaseAddressArray, registers,
     transfer_ring::TransferRingController,
 };
 use alloc::rc::Rc;
 use core::cell::RefCell;
-use qemu_print::qemu_println;
 use xhci::{context::EndpointType, registers::PortRegisterSet};
 
-pub fn init_all_ports(
-    event_handler: Rc<RefCell<EventHandler>>,
-    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-) {
+pub fn init_all_ports(dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>) {
     let num_ports = num_ports();
 
     for port in 0..num_ports {
         if connected(port) {
-            init_port(event_handler.clone(), dcbaa.clone(), port);
+            init_port(dcbaa.clone(), port);
         }
     }
 }
@@ -32,36 +28,10 @@ fn connected(port: u8) -> bool {
     })
 }
 
-fn init_port(
-    event_handler: Rc<RefCell<EventHandler>>,
-    dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-    port: u8,
-) {
+fn init_port(dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>, port: u8) {
     Resetter::new(port).reset();
 
     let addr = command_ring::send_enable_slot();
-
-    event_handler
-        .clone()
-        .borrow_mut()
-        .register_handler(addr, move |c| {
-            assert_eq!(
-                c.completion_code(),
-                Ok(xhci::ring::trb::event::CompletionCode::Success),
-                "Enable slot failed."
-            );
-
-            qemu_println!("Slot enabled.");
-
-            StructureInitializer::new(
-                port,
-                c.slot_id(),
-                dcbaa,
-                event_handler.clone(),
-                Context::new(),
-            )
-            .create()
-        });
 }
 
 fn num_ports() -> u8 {
@@ -98,12 +68,10 @@ impl Resetter {
     }
 }
 
-struct SlotEnabler {
-    event_handler: Rc<RefCell<EventHandler>>,
-}
+struct SlotEnabler {}
 impl SlotEnabler {
-    fn new(event_handler: Rc<RefCell<EventHandler>>) -> Self {
-        Self { event_handler }
+    fn new() -> Self {
+        Self {}
     }
 
     fn enable(&mut self) -> u64 {
@@ -115,7 +83,6 @@ struct StructureInitializer {
     port: u8,
     slot: u8,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-    event_handler: Rc<RefCell<EventHandler>>,
     ring: TransferRingController,
     cx: Context,
 }
@@ -124,14 +91,12 @@ impl StructureInitializer {
         port: u8,
         slot: u8,
         dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-        event_handler: Rc<RefCell<EventHandler>>,
         cx: Context,
     ) -> Self {
         Self {
             port,
             slot,
             dcbaa,
-            event_handler,
             ring: TransferRingController::new(),
             cx,
         }

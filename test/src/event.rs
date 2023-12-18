@@ -1,20 +1,33 @@
-use alloc::boxed::Box;
+use crate::registers;
 use alloc::{vec, vec::Vec};
 use bit_field::BitField;
+use conquer_once::spin::OnceCell;
+use core::ops::DerefMut;
+use spinning_top::Spinlock;
 use xhci::ring::trb::event;
-use xhci::ring::trb::{self, event::CommandCompletion};
-
-use crate::registers;
+use xhci::ring::trb::{self};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
-pub struct EventHandler {
+static EVENT_HANDLER: OnceCell<Spinlock<EventHandler>> = OnceCell::uninit();
+
+pub fn init() {
+    EVENT_HANDLER.init_once(|| Spinlock::new(EventHandler::new()));
+
+    lock().init();
+}
+
+fn lock() -> impl DerefMut<Target = EventHandler> {
+    EVENT_HANDLER
+        .try_get()
+        .expect("Event handler not initialized")
+        .try_lock()
+        .expect("Event handler is already locked")
+}
+
+struct EventHandler {
     segment_table: Vec<EventRingSegmentTableEntry>,
     rings: Vec<EventRing>,
-
-    // Alas, we cannot use `HashMap` because it's not in `alloc` yet.
-    // See https://github.com/rust-lang/rust/issues/27242.
-    handlers: Vec<(u64, Box<dyn FnOnce(CommandCompletion) + 'static>)>,
 
     dequeue_ptr_segment: u64,
     dequeue_ptr_ring: u64,
@@ -22,66 +35,35 @@ pub struct EventHandler {
     cycle_bit: bool,
 }
 impl EventHandler {
-    pub fn new() -> Self {
+    fn new() -> Self {
         let number_of_rings = number_of_rings();
 
-        let mut v = Self {
+        Self {
             segment_table: vec![EventRingSegmentTableEntry::null(); number_of_rings.into()],
             rings: vec![EventRing::new(); number_of_rings.into()],
-            handlers: Vec::new(),
 
             dequeue_ptr_segment: 0,
             dequeue_ptr_ring: 0,
 
             cycle_bit: true,
-        };
-
-        v.init();
-
-        v
-    }
-
-    pub fn register_handler<'a>(
-        &mut self,
-        trb_addr: u64,
-        handler: impl FnOnce(CommandCompletion) + 'static,
-    ) {
-        self.handlers.push((trb_addr, Box::new(handler)));
-    }
-
-    pub fn process_trbs(&mut self) {
-        while !self.ring_is_empty() {
-            self.dequeue_and_process();
         }
-    }
-
-    pub fn assert_all_commands_completed(&self) {
-        assert!(self.handlers.is_empty(), "Some commands are not completed");
     }
 
     fn init(&mut self) {
         EventHandlerInitializer::new(self).init();
     }
 
-    fn dequeue_and_process(&mut self) {
-        assert!(!self.ring_is_empty());
+    pub fn dequeue(&mut self) -> Option<Result<event::Allowed, [u32; 4]>> {
+        if self.ring_is_empty() {
+            return None;
+        }
 
         let t = self.rings[self.dequeue_ptr_segment as usize].0[self.dequeue_ptr_ring as usize];
         let t = event::Allowed::try_from(t);
 
-        if let Ok(event::Allowed::CommandCompletion(t)) = t {
-            let idx = self
-                .handlers
-                .iter()
-                .position(|(trb_addr, _)| *trb_addr == t.command_trb_pointer())
-                .unwrap_or_else(|| panic!("No handler for {:?}", t));
-
-            let (_, handler) = self.handlers.remove(idx);
-
-            handler(t);
-        }
-
         self.increment_ptr();
+
+        Some(t)
     }
 
     fn increment_ptr(&mut self) {

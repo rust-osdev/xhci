@@ -1,6 +1,6 @@
 use crate::command_ring;
 use crate::dcbaa::DeviceContextBaseAddressArray;
-use crate::event::EventHandler;
+use crate::event;
 use crate::registers;
 use crate::scratchpat;
 use alloc::rc::Rc;
@@ -10,10 +10,7 @@ use qemu_print::qemu_println;
 /// Initializes the host controller according to 4.2 of xHCI spec.
 ///
 /// Note that we do not enable interrupts as it is optional and for simplicity.
-pub fn init() -> (
-    Rc<RefCell<EventHandler>>,
-    Rc<RefCell<DeviceContextBaseAddressArray>>,
-) {
+pub fn init() -> Rc<RefCell<DeviceContextBaseAddressArray>> {
     qemu_println!("Initializing xHC...");
 
     wait_until_controller_is_ready();
@@ -21,9 +18,7 @@ pub fn init() -> (
     reset();
     set_num_of_enabled_slots();
 
-    let event_handler = EventHandler::new();
-    let event_handler = Rc::new(RefCell::new(event_handler));
-
+    event::init();
     command_ring::init();
 
     let dcbaa = DeviceContextBaseAddressArray::new();
@@ -35,7 +30,7 @@ pub fn init() -> (
 
     qemu_println!("xHC is initialized.");
 
-    (event_handler, dcbaa)
+    dcbaa
 }
 
 fn run() {

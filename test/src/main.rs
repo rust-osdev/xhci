@@ -18,7 +18,6 @@ mod xhc;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
 use uefi::table::boot::MemoryType;
-use xhci::ring::trb::event::CompletionCode;
 
 #[uefi::entry]
 fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) -> uefi::Status {
@@ -27,21 +26,11 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     registers::init();
 
-    let (event_handler, dcbaa) = xhc::init();
+    let dcbaa = xhc::init();
 
     let nop_addr = command_ring::send_nop();
-    event_handler.borrow_mut().register_handler(nop_addr, |c| {
-        assert_eq!(
-            c.completion_code(),
-            Ok(CompletionCode::Success),
-            "NOP failed."
-        );
-    });
 
-    ports::init_all_ports(event_handler.clone(), dcbaa);
-
-    event_handler.borrow_mut().process_trbs();
-    event_handler.borrow_mut().assert_all_commands_completed();
+    ports::init_all_ports(dcbaa);
 
     let handler = qemu_exit::X86::new(0xf4, 33);
     handler.exit_success();

@@ -31,7 +31,7 @@ $(IMG): $(EFI) build
 	mmd -i $@ ::/efi/boot
 	mcopy -i $@ $(EFI) ::/efi/boot/bootx64.efi
 
-$(EFI): $(wildcard src/*.rs) Cargo.toml
+$(EFI): $(wildcard src/**/*.rs) Cargo.toml
 	cargo build
 
 build:

@@ -28,7 +28,7 @@ impl CommandRingController {
             cycle_bit: true,
         };
 
-        v.init(&mut regs.borrow_mut());
+        v.init();
 
         v
     }
@@ -106,7 +106,9 @@ impl CommandRingController {
         Enqueuer::new(self, regs, event_handler).enqueue(trb, on_completion);
     }
 
-    fn init(&mut self, regs: &mut Registers) {
+    fn init(&mut self) {
+        let regs = &mut self.regs.borrow_mut();
+
         regs.operational.crcr.update_volatile(|crcr| {
             crcr.set_command_ring_pointer(self.ring.as_ref() as *const _ as u64);
             crcr.set_ring_cycle_state();

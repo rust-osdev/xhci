@@ -100,7 +100,7 @@ impl<'a> SlotEnabler<'a> {
 
     fn enable(&mut self, on_completion: impl Fn(u8) + 'static) {
         self.cmd
-            .send_enable_slot(self.regs, self.event_handler, move |port_id| {
+            .send_enable_slot(self.event_handler, move |port_id| {
                 qemu_println!("Port {} enabled", port_id);
 
                 on_completion(port_id);
@@ -168,12 +168,8 @@ impl<'a> StructureCreator<'a> {
     }
 
     fn issue_address_device_command(&mut self) {
-        self.cmd.send_address_device(
-            self.regs,
-            self.event_handler,
-            self.cx.input.phys_addr(),
-            self.slot,
-        );
+        self.cmd
+            .send_address_device(self.event_handler, self.cx.input.phys_addr(), self.slot);
     }
 }
 

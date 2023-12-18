@@ -33,7 +33,7 @@ impl CommandRingController {
         v
     }
 
-    pub fn send_nop(&mut self, regs: &mut Registers, event_handler: &mut EventHandler) {
+    pub fn send_nop(&mut self, event_handler: &mut EventHandler) {
         let trb = command::Noop::new();
         let trb = command::Allowed::Noop(trb);
 
@@ -46,12 +46,11 @@ impl CommandRingController {
             );
         };
 
-        self.enqueue(regs, event_handler, trb, on_completion);
+        self.enqueue(event_handler, trb, on_completion);
     }
 
     pub fn send_enable_slot(
         &mut self,
-        regs: &mut Registers,
         event_handler: &mut EventHandler,
         after_enabling: impl Fn(u8) + 'static,
     ) {
@@ -69,12 +68,11 @@ impl CommandRingController {
             after_enabling(c.slot_id());
         };
 
-        self.enqueue(regs, event_handler, trb, on_completion);
+        self.enqueue(event_handler, trb, on_completion);
     }
 
     pub fn send_address_device(
         &mut self,
-        regs: &mut Registers,
         event_handler: &mut EventHandler,
         input_cx_addr: u64,
         slot: u8,
@@ -93,17 +91,16 @@ impl CommandRingController {
             );
         };
 
-        self.enqueue(regs, event_handler, trb, on_completion);
+        self.enqueue(event_handler, trb, on_completion);
     }
 
     fn enqueue(
         &mut self,
-        regs: &mut Registers,
         event_handler: &mut EventHandler,
         trb: command::Allowed,
         on_completion: impl Fn(CommandCompletion) + 'static,
     ) {
-        Enqueuer::new(self, regs, event_handler).enqueue(trb, on_completion);
+        Enqueuer::new(self, event_handler).enqueue(trb, on_completion);
     }
 
     fn init(&mut self) {
@@ -118,18 +115,12 @@ impl CommandRingController {
 
 struct Enqueuer<'a> {
     controller: &'a mut CommandRingController,
-    regs: &'a mut Registers,
     event_handler: &'a mut EventHandler,
 }
 impl<'a> Enqueuer<'a> {
-    fn new(
-        controller: &'a mut CommandRingController,
-        regs: &'a mut Registers,
-        event_handler: &'a mut EventHandler,
-    ) -> Self {
+    fn new(controller: &'a mut CommandRingController, event_handler: &'a mut EventHandler) -> Self {
         Self {
             controller,
-            regs,
             event_handler,
         }
     }
@@ -188,7 +179,9 @@ impl<'a> Enqueuer<'a> {
     }
 
     fn notify_command_is_sent(&mut self) {
-        self.regs.doorbell.update_volatile_at(0, |r| {
+        let regs = &mut self.controller.regs.borrow_mut();
+
+        regs.doorbell.update_volatile_at(0, |r| {
             r.set_doorbell_target(0);
         });
     }

@@ -15,7 +15,7 @@ You can use it as a reference for your own implementation, but note the followin
 - While this program is a single UEFI binary, usually a UEFI binary is used as a bootloader, and interacting with the xHCI controller is done by the OS kernel.
 - This program depends on the identity-mapping that is set up by the UEFI firmware, and thus, it uses Rust pointers as physical addresses directly.
 
-This program is designed based on [eXtensible Host Controller Interface for Universal Serial Bus (xHCI) Requirements Specification May 2019 Revision 1.2](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf).
+This program is designed based on [eXtensible Host Controller Interface for Universal Serial Bus (xHCI) Requirements Specification May 2019 Revision 1.2](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf). In the source code, "xHCI spec" refers to this document.
 
 ## Running this program
 

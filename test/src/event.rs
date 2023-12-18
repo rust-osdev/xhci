@@ -125,6 +125,7 @@ impl<'a> EventHandlerInitializer<'a> {
     fn init(&mut self) {
         self.register_dequeue_pointer();
         self.write_rings_addresses_in_table();
+        self.disable_interrupts();
         self.register_table_size();
         self.enable_event_ring();
     }
@@ -146,6 +147,17 @@ impl<'a> EventHandlerInitializer<'a> {
             segment_table[i].base_addr = ring as *const _ as u64;
             segment_table[i].segment_size = NUM_OF_TRBS_IN_RING as _;
         }
+    }
+
+    // We use polling for simplicity.
+    fn disable_interrupts(&mut self) {
+        self.regs
+            .interrupter_register_set
+            .interrupter_mut(0)
+            .iman
+            .update_volatile(|iman| {
+                iman.clear_interrupt_enable();
+            })
     }
 
     fn register_table_size(&mut self) {

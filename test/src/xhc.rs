@@ -10,6 +10,9 @@ use qemu_print::qemu_println;
 use xhci::registers::operational::UsbStatusRegister;
 use xhci::registers::Operational;
 
+/// Initializes the host controller according to 4.2 of xHCI spec.
+///
+/// Note that we do not enable interrupts as it is optional and for simplicity.
 pub fn init(
     regs: &Rc<RefCell<Registers>>,
 ) -> (
@@ -19,10 +22,14 @@ pub fn init(
 ) {
     qemu_println!("Initializing xHC...");
 
-    Initializer::new(&mut regs.borrow_mut()).init();
+    wait_until_controller_is_ready(&regs.borrow());
+    stop(&mut regs.borrow_mut());
+    reset(&mut regs.borrow_mut());
+    set_num_of_enabled_slots(&mut regs.borrow_mut());
 
     let event_handler = EventHandler::new(&mut regs.borrow_mut());
     let event_handler = Rc::new(RefCell::new(event_handler));
+
     let command_ring = CommandRingController::new(&regs, &event_handler);
 
     let dcbaa = DeviceContextBaseAddressArray::new(&mut regs.borrow_mut());
@@ -53,42 +60,25 @@ fn ensure_no_error_occurs(s: &UsbStatusRegister) {
     assert!(!s.host_controller_error(), "An error occured on the xHC.");
 }
 
-struct Initializer<'a> {
-    regs: &'a mut Registers,
+fn wait_until_controller_is_ready(regs: &Registers) {
+    while regs
+        .operational
+        .usbsts
+        .read_volatile()
+        .controller_not_ready()
+    {}
 }
-impl<'a> Initializer<'a> {
-    fn new(regs: &'a mut Registers) -> Self {
-        Self { regs }
-    }
 
-    fn init(&mut self) {
-        self.wait_until_controller_is_ready();
-        self.stop();
-        self.reset();
-        self.set_num_of_enabled_slots();
-    }
+fn stop(regs: &mut Registers) {
+    Stopper::new(&mut regs.operational).stop();
+}
 
-    fn wait_until_controller_is_ready(&self) {
-        while self
-            .regs
-            .operational
-            .usbsts
-            .read_volatile()
-            .controller_not_ready()
-        {}
-    }
+fn reset(regs: &mut Registers) {
+    Resetter::new(&mut regs.operational).reset();
+}
 
-    fn stop(&mut self) {
-        Stopper::new(&mut self.regs.operational).stop();
-    }
-
-    fn reset(&mut self) {
-        Resetter::new(&mut self.regs.operational).reset();
-    }
-
-    fn set_num_of_enabled_slots(&mut self) {
-        SlotNumberSetter::new(self.regs).set();
-    }
+fn set_num_of_enabled_slots(regs: &mut Registers) {
+    SlotNumberSetter::new(regs).set();
 }
 
 struct Stopper<'a> {

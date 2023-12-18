@@ -31,14 +31,14 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
     let regs = unsafe { registers::get_accessor() };
     let regs = Rc::new(RefCell::new(regs));
 
-    let (event_handler, mut command_ring, _) = xhc::init(&regs);
+    let (event_handler, command_ring, _) = xhc::init(&regs);
 
-    command_ring.send_nop();
+    command_ring.borrow_mut().send_nop();
 
     ports::init_all_ports(
         &mut regs.borrow_mut(),
         &mut event_handler.borrow_mut(),
-        &mut command_ring,
+        &mut command_ring.borrow_mut(),
     );
 
     event_handler.borrow_mut().assert_all_commands_completed();

@@ -92,6 +92,8 @@ impl CommandRingController {
         on_completion: impl Fn(CommandCompletion) + 'static,
     ) {
         Enqueuer::new(self).enqueue(trb, on_completion);
+
+        self.event_handler.borrow_mut().process_trbs();
     }
 
     fn init(&mut self) {

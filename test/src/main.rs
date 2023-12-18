@@ -41,8 +41,6 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
         &mut command_ring,
     );
 
-    event_handler.borrow_mut().process_trbs();
-
     event_handler.borrow_mut().assert_all_commands_completed();
 
     let handler = qemu_exit::X86::new(0xf4, 33);

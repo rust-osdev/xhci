@@ -1,28 +1,54 @@
-use alloc::boxed::Box;
-use xhci::ring::trb::{self, command};
-
 use crate::registers;
+use alloc::boxed::Box;
+use conquer_once::spin::OnceCell;
+use core::ops::DerefMut;
+use spinning_top::Spinlock;
+use xhci::ring::trb::{self, command};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
-pub struct CommandRingController {
+static COMMAND_RING_CONTROLLER: OnceCell<Spinlock<CommandRingController>> = OnceCell::uninit();
+
+pub fn init() {
+    COMMAND_RING_CONTROLLER.init_once(|| Spinlock::new(CommandRingController::new()));
+
+    lock().init();
+}
+
+pub fn send_nop() -> u64 {
+    lock().send_nop()
+}
+
+pub fn send_enable_slot() -> u64 {
+    lock().send_enable_slot()
+}
+
+pub fn send_address_device(input_cx_addr: u64, slot: u8) -> u64 {
+    lock().send_address_device(input_cx_addr, slot)
+}
+
+fn lock() -> impl DerefMut<Target = CommandRingController> {
+    COMMAND_RING_CONTROLLER
+        .try_get()
+        .expect("Command ring controller not initialized")
+        .try_lock()
+        .expect("Command ring controller is already locked")
+}
+
+struct CommandRingController {
     ring: Box<CommandRing>,
 
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
 impl CommandRingController {
-    pub fn new() -> Self {
-        let mut v = Self {
+    fn new() -> Self {
+        Self {
             ring: Box::new(CommandRing::new()),
 
             enqueue_ptr: 0,
             cycle_bit: true,
-        };
-
-        v.init();
-
-        v
+        }
     }
 
     pub fn send_nop(&mut self) -> u64 {

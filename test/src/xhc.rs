@@ -1,4 +1,4 @@
-use crate::command_ring::CommandRingController;
+use crate::command_ring;
 use crate::dcbaa::DeviceContextBaseAddressArray;
 use crate::event::EventHandler;
 use crate::registers;
@@ -12,7 +12,6 @@ use qemu_print::qemu_println;
 /// Note that we do not enable interrupts as it is optional and for simplicity.
 pub fn init() -> (
     Rc<RefCell<EventHandler>>,
-    Rc<RefCell<CommandRingController>>,
     Rc<RefCell<DeviceContextBaseAddressArray>>,
 ) {
     qemu_println!("Initializing xHC...");
@@ -25,8 +24,7 @@ pub fn init() -> (
     let event_handler = EventHandler::new();
     let event_handler = Rc::new(RefCell::new(event_handler));
 
-    let command_ring = CommandRingController::new();
-    let command_ring = Rc::new(RefCell::new(command_ring));
+    command_ring::init();
 
     let dcbaa = DeviceContextBaseAddressArray::new();
     let dcbaa = Rc::new(RefCell::new(dcbaa));
@@ -37,7 +35,7 @@ pub fn init() -> (
 
     qemu_println!("xHC is initialized.");
 
-    (event_handler, command_ring, dcbaa)
+    (event_handler, dcbaa)
 }
 
 fn run() {

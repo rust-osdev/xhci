@@ -27,9 +27,9 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
 
     registers::init();
 
-    let (event_handler, command_ring, dcbaa) = xhc::init();
+    let (event_handler, dcbaa) = xhc::init();
 
-    let nop_addr = command_ring.borrow_mut().send_nop();
+    let nop_addr = command_ring::send_nop();
     event_handler.borrow_mut().register_handler(nop_addr, |c| {
         assert_eq!(
             c.completion_code(),
@@ -38,7 +38,7 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
         );
     });
 
-    ports::init_all_ports(event_handler.clone(), command_ring, dcbaa);
+    ports::init_all_ports(event_handler.clone(), dcbaa);
 
     event_handler.borrow_mut().process_trbs();
     event_handler.borrow_mut().assert_all_commands_completed();

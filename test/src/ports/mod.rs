@@ -2,8 +2,8 @@ mod context;
 
 use self::context::Context;
 use crate::{
-    command_ring::CommandRingController, dcbaa::DeviceContextBaseAddressArray, event::EventHandler,
-    registers, transfer_ring::TransferRingController,
+    command_ring, dcbaa::DeviceContextBaseAddressArray, event::EventHandler, registers,
+    transfer_ring::TransferRingController,
 };
 use alloc::rc::Rc;
 use core::cell::RefCell;
@@ -12,14 +12,13 @@ use xhci::{context::EndpointType, registers::PortRegisterSet};
 
 pub fn init_all_ports(
     event_handler: Rc<RefCell<EventHandler>>,
-    cmd: Rc<RefCell<CommandRingController>>,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
 ) {
     let num_ports = num_ports();
 
     for port in 0..num_ports {
         if connected(port) {
-            init_port(event_handler.clone(), cmd.clone(), dcbaa.clone(), port);
+            init_port(event_handler.clone(), dcbaa.clone(), port);
         }
     }
 }
@@ -35,13 +34,12 @@ fn connected(port: u8) -> bool {
 
 fn init_port(
     event_handler: Rc<RefCell<EventHandler>>,
-    cmd: Rc<RefCell<CommandRingController>>,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
     port: u8,
 ) {
     Resetter::new(port).reset();
 
-    let addr = cmd.borrow_mut().send_enable_slot();
+    let addr = command_ring::send_enable_slot();
 
     event_handler
         .clone()
@@ -59,7 +57,6 @@ fn init_port(
                 port,
                 c.slot_id(),
                 dcbaa,
-                cmd.clone(),
                 event_handler.clone(),
                 Context::new(),
             )
@@ -103,18 +100,14 @@ impl Resetter {
 
 struct SlotEnabler {
     event_handler: Rc<RefCell<EventHandler>>,
-    cmd: Rc<RefCell<CommandRingController>>,
 }
 impl SlotEnabler {
-    fn new(
-        event_handler: Rc<RefCell<EventHandler>>,
-        cmd: Rc<RefCell<CommandRingController>>,
-    ) -> Self {
-        Self { event_handler, cmd }
+    fn new(event_handler: Rc<RefCell<EventHandler>>) -> Self {
+        Self { event_handler }
     }
 
     fn enable(&mut self) -> u64 {
-        self.cmd.borrow_mut().send_enable_slot()
+        command_ring::send_enable_slot()
     }
 }
 
@@ -122,7 +115,6 @@ struct StructureInitializer {
     port: u8,
     slot: u8,
     dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-    cmd: Rc<RefCell<CommandRingController>>,
     event_handler: Rc<RefCell<EventHandler>>,
     ring: TransferRingController,
     cx: Context,
@@ -132,7 +124,6 @@ impl StructureInitializer {
         port: u8,
         slot: u8,
         dcbaa: Rc<RefCell<DeviceContextBaseAddressArray>>,
-        cmd: Rc<RefCell<CommandRingController>>,
         event_handler: Rc<RefCell<EventHandler>>,
         cx: Context,
     ) -> Self {
@@ -140,7 +131,6 @@ impl StructureInitializer {
             port,
             slot,
             dcbaa,
-            cmd,
             event_handler,
             ring: TransferRingController::new(),
             cx,
@@ -175,9 +165,7 @@ impl StructureInitializer {
     }
 
     fn issue_address_device_command(&mut self) {
-        self.cmd
-            .borrow_mut()
-            .send_address_device(self.cx.input.phys_addr(), self.slot);
+        command_ring::send_address_device(self.cx.input.phys_addr(), self.slot);
     }
 }
 

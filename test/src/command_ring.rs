@@ -51,11 +51,7 @@ impl CommandRingController {
         self.enqueue(trb, on_completion);
     }
 
-    pub fn send_enable_slot(
-        &mut self,
-        event_handler: &mut EventHandler,
-        after_enabling: impl Fn(u8) + 'static,
-    ) {
+    pub fn send_enable_slot(&mut self, after_enabling: impl Fn(u8) + 'static) {
         let trb = command::EnableSlot::new();
         let trb = command::Allowed::EnableSlot(trb);
 

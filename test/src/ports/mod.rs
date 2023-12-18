@@ -99,12 +99,11 @@ impl<'a> SlotEnabler<'a> {
     }
 
     fn enable(&mut self, on_completion: impl Fn(u8) + 'static) {
-        self.cmd
-            .send_enable_slot(self.event_handler, move |port_id| {
-                qemu_println!("Port {} enabled", port_id);
+        self.cmd.send_enable_slot(move |port_id| {
+            qemu_println!("Port {} enabled", port_id);
 
-                on_completion(port_id);
-            });
+            on_completion(port_id);
+        });
     }
 }
 

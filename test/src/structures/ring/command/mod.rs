@@ -69,8 +69,6 @@ impl Raw {
     }
 
     fn write_trb(&mut self, trb: command::Allowed) {
-        // TODO: Write four 32-bit values. This way of writing is described in the spec, although
-        // I cannot find which section has the description.
         self.raw[self.enq_p] = trb.into_raw();
     }
 

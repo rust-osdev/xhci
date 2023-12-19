@@ -92,8 +92,10 @@ impl<T> Deref for PageBox<T> {
 impl<T> Deref for PageBox<[T]> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
+        let len = self.bytes().as_usize() / core::mem::size_of::<T>();
+
         // SAFETY: Safe as the address is well-aligned and the memory is allocated.
-        unsafe { slice::from_raw_parts(self.addr.as_ptr(), self.bytes().as_usize()) }
+        unsafe { slice::from_raw_parts(self.addr.as_ptr(), len) }
     }
 }
 impl<T> DerefMut for PageBox<T> {
@@ -104,8 +106,10 @@ impl<T> DerefMut for PageBox<T> {
 }
 impl<T> DerefMut for PageBox<[T]> {
     fn deref_mut(&mut self) -> &mut Self::Target {
+        let len = self.bytes().as_usize() / core::mem::size_of::<T>();
+
         // SAFETY: Safe as the address is well-aligned and the memory is allocated.
-        unsafe { slice::from_raw_parts_mut(self.addr.as_mut_ptr(), self.bytes().as_usize()) }
+        unsafe { slice::from_raw_parts_mut(self.addr.as_mut_ptr(), len) }
     }
 }
 impl<T> From<T> for PageBox<T> {

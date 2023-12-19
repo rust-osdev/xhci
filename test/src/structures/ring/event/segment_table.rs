@@ -2,6 +2,7 @@ use core::{
     ops::{Index, IndexMut},
     slice,
 };
+use qemu_print::qemu_println;
 use x86_64::PhysAddr;
 
 use crate::page_box::PageBox;
@@ -10,6 +11,7 @@ use crate::page_box::PageBox;
 pub struct SegmentTable(PageBox<[Entry]>);
 impl SegmentTable {
     pub fn new(len: usize) -> Self {
+        qemu_println!("SegmentTable::new({})", len);
         Self(PageBox::new_slice(Entry::null(), len))
     }
 

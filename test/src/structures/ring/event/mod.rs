@@ -10,6 +10,7 @@ use core::{
 };
 use futures_util::{stream::Stream, StreamExt};
 use log::{debug, info, warn};
+use qemu_print::qemu_println;
 use segment_table::SegmentTable;
 use spinning_top::Spinlock;
 use x86_64::{
@@ -242,6 +243,8 @@ impl<'a> SegTblInitializer<'a> {
     }
 
     fn register_tbl_sz(&mut self) {
+        qemu_println!("tbl_len: {}", self.tbl_len());
+
         registers::handle(|r| {
             let l = self.tbl_len();
 

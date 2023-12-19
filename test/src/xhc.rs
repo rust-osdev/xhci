@@ -1,14 +1,26 @@
 use super::structures::{extended_capabilities, registers};
+use crate::{
+    exchanger,
+    structures::{dcbaa, ring::event, scratchpad},
+};
 use xhci::extended_capabilities::ExtendedCapability;
 
 pub(super) fn exists() -> bool {
     super::iter_xhc().next().is_some()
 }
 
+/// Initializes the host controller according to 4.2 of the xHCI specification.
 pub(crate) fn init() {
-    get_ownership_from_bios();
     stop_and_reset();
     set_num_of_enabled_slots();
+
+    dcbaa::init();
+    scratchpad::init();
+    exchanger::command::init();
+    event::init();
+
+    run();
+    ensure_no_error_occurs();
 }
 
 pub(crate) fn run() {

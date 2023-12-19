@@ -5,7 +5,6 @@
 
 extern crate alloc;
 
-use alloc::sync::Arc;
 use futures_intrusive::sync::{GenericMutex, GenericMutexGuard};
 use multitask::{executor::Executor, task::Task};
 use pci::config::bar;
@@ -76,14 +75,6 @@ fn init_and_spawn_tasks() {
     xhc::get_ownership_from_bios();
 
     xhc::init();
-
-    dcbaa::init();
-    scratchpad::init();
-    exchanger::command::init();
-    event::init();
-
-    xhc::run();
-    xhc::ensure_no_error_occurs();
 
     spawn_tasks();
 }

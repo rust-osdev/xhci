@@ -40,6 +40,7 @@ mod xhc;
 
 #[uefi::entry]
 fn main(h: Handle, st: SystemTable<Boot>) -> uefi::Status {
+    init_logger();
     init();
 
     let mut executor = Executor::new();
@@ -105,4 +106,26 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     qemu_println!("{}", info);
 
     handler.exit_failure();
+}
+
+struct MyLogger;
+impl log::Log for MyLogger {
+    fn enabled(&self, _: &log::Metadata) -> bool {
+        true
+    }
+
+    fn log(&self, record: &log::Record) {
+        if self.enabled(record.metadata()) {
+            qemu_println!("[{}] {}", record.level(), record.args());
+        }
+    }
+
+    fn flush(&self) {}
+}
+
+static LOGGER: MyLogger = MyLogger;
+
+fn init_logger() {
+    log::set_logger(&LOGGER).unwrap();
+    log::set_max_level(log::LevelFilter::Info);
 }

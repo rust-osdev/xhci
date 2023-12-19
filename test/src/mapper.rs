@@ -8,5 +8,5 @@ impl xhci::accessor::Mapper for Mapper {
         NonZeroUsize::new(physical_address).expect("physical_address is zero")
     }
 
-    fn unmap(&mut self, _virtual_address: usize, _size: usize) {}
+    fn unmap(&mut self, _: usize, _: usize) {}
 }

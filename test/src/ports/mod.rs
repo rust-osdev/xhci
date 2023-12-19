@@ -10,6 +10,8 @@ use xhci::ring::trb::event::PortStatusChange;
 use xhci::{context::EndpointType, registers::PortRegisterSet};
 
 static ENABLING_SLOTS: Spinlock<Vec<u8>> = Spinlock::new(Vec::new());
+static PORTS_AND_SLOTS: Spinlock<Vec<(u8, u8)>> = Spinlock::new(Vec::new());
+static CONTEXTS: Spinlock<Vec<Context>> = Spinlock::new(Vec::new());
 
 pub fn init_all_ports() {
     let num_ports = num_ports();
@@ -35,6 +37,11 @@ pub fn process_trb(trb: &PortStatusChange) {
 pub fn init_structures(slot: u8) {
     let port = lock_enabling_slots().pop().expect("No enabling slots");
 
+    PORTS_AND_SLOTS
+        .try_lock()
+        .expect("Ports and slots is already locked")
+        .push((port, slot));
+
     init_structures_for_port(port, slot);
 }
 
@@ -42,6 +49,16 @@ pub fn init_structures_for_port(port: u8, slot: u8) {
     let mut cx = Context::new();
 
     StructureInitializer::new(port, slot, cx).create();
+}
+
+pub fn set_max_packet_size(slot: u8) {
+    let port = PORTS_AND_SLOTS
+        .try_lock()
+        .expect("Ports and slots is already locked")
+        .iter()
+        .find(|(_, s)| *s == slot)
+        .expect("No port for the slot")
+        .0;
 }
 
 fn lock_enabling_slots() -> impl DerefMut<Target = Vec<u8>> {
@@ -124,11 +141,16 @@ impl StructureInitializer {
         }
     }
 
-    fn create(&mut self) {
+    fn create(mut self) {
         self.init_input_context();
         self.init_ep0_context();
         self.register_with_dcbaa();
         self.issue_address_device_command();
+
+        CONTEXTS
+            .try_lock()
+            .expect("Contexts is already locked")
+            .push(self.cx);
     }
 
     fn init_input_context(&mut self) {

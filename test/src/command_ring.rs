@@ -40,7 +40,7 @@ pub fn process_trb(event_trb: &CommandCompletion) {
             ports::init_structures(event_trb.slot_id());
         }
         command::Allowed::AddressDevice(_) => {
-            ports::init_structures(event_trb.slot_id());
+            ports::set_max_packet_size(event_trb.slot_id());
         }
         _ => panic!("Unexpected command TRB: {:?}", trb),
     }

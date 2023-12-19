@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::{bar, Bar, RegisterIndex, Registers};
 use log::debug;

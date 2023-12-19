@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 pub(super) mod command_data_block;
 pub(super) mod response;

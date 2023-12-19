@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::mapper::Mapper;
 use conquer_once::spin::OnceCell;

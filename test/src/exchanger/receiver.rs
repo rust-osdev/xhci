@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use alloc::{collections::BTreeMap, sync::Arc};
 use conquer_once::spin::Lazy;

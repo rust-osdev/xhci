@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::receiver::{self, ReceiveFuture};
 use crate::structures::{descriptor, registers, ring::transfer};

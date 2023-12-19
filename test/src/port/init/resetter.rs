@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::slot_structures_initializer::SlotStructuresInitializer;
 use crate::structures::registers;

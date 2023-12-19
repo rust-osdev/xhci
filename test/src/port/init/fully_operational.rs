@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::endpoints_initializer::EndpointsInitializer;
 use crate::{

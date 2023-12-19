@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::structures::{extended_capabilities, registers};
 use xhci::extended_capabilities::ExtendedCapability;

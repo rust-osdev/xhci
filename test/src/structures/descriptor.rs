@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use bit_field::BitField;
 use core::{convert::TryInto, ptr};

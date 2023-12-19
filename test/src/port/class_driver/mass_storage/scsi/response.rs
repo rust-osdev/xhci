@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use byteorder::{BigEndian, ByteOrder};
 use core::fmt;

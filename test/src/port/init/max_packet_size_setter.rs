@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::{
     descriptor_fetcher::DescriptorFetcher, slot_structures_initializer::SlotStructuresInitializer,

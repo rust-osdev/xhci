@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{exchanger::transfer, structures::descriptor, transition_helper::BoxWrapper};
 use x86_64::PhysAddr;

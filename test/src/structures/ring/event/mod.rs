@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::CycleBit;
 use crate::{exchanger::receiver, port, structures::registers, transition_helper::BoxWrapper};

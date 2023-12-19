@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::{max_packet_size_setter::MaxPacketSizeSetter, resetter::Resetter};
 use crate::{

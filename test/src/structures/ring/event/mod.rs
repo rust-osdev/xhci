@@ -17,7 +17,10 @@ use x86_64::{
     structures::paging::{PageSize, Size4KiB},
     PhysAddr,
 };
-use xhci::ring::{trb, trb::event};
+use xhci::ring::{
+    trb,
+    trb::event::{self, CompletionCode},
+};
 
 mod segment_table;
 
@@ -43,10 +46,13 @@ pub(crate) async fn task() {
         .next()
         .await
     {
-        info!("TRB: {:?}", trb);
-        if let event::Allowed::CommandCompletion(_) = trb {
+        if let event::Allowed::CommandCompletion(x) = trb {
+            assert_eq!(x.completion_code(), Ok(CompletionCode::Success));
+
             receiver::receive(trb);
-        } else if let event::Allowed::TransferEvent(_) = trb {
+        } else if let event::Allowed::TransferEvent(x) = trb {
+            assert_eq!(x.completion_code(), Ok(CompletionCode::Success));
+
             receiver::receive(trb);
         } else if let event::Allowed::PortStatusChange(p) = trb {
             let _ = port::try_spawn(p.port_id());

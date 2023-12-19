@@ -243,8 +243,6 @@ impl<'a> SegTblInitializer<'a> {
     }
 
     fn register_tbl_sz(&mut self) {
-        qemu_println!("tbl_len: {}", self.tbl_len());
-
         registers::handle(|r| {
             let l = self.tbl_len();
 

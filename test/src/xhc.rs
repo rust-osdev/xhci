@@ -112,7 +112,9 @@ fn wait_until_ready() {
 }
 
 fn set_num_of_enabled_slots() {
-    let n = num_of_device_slots();
+    // We choose the maximum number of device slots for simplicity.
+    let n = num_of_max_device_slots();
+
     registers::handle(|r| {
         r.operational.config.update_volatile(|c| {
             c.set_max_device_slots_enabled(n);
@@ -120,7 +122,7 @@ fn set_num_of_enabled_slots() {
     })
 }
 
-fn num_of_device_slots() -> u8 {
+fn num_of_max_device_slots() -> u8 {
     registers::handle(|r| {
         r.capability
             .hcsparams1

@@ -72,6 +72,12 @@ fn init_and_spawn_tasks() {
     let mut event_ring = event::Ring::new();
     let command_ring = Arc::new(Spinlock::new(command::Ring::new()));
 
+    // In some cases, an OS may need to get ownership of the xHC from the BIOS.
+    // See 4.22.1 of xHCI spec.
+    //
+    // This is not necessary on QEMU, but this line is left for a reference.
+    xhc::get_ownership_from_bios();
+
     xhc::init();
 
     event_ring.init();

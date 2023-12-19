@@ -1,4 +1,3 @@
-
 use super::structures::{extended_capabilities, registers};
 use xhci::extended_capabilities::ExtendedCapability;
 
@@ -35,7 +34,7 @@ pub(crate) fn ensure_no_error_occurs() {
     });
 }
 
-fn get_ownership_from_bios() {
+pub(crate) fn get_ownership_from_bios() {
     if let Some(iter) = extended_capabilities::iter() {
         for c in iter.filter_map(Result::ok) {
             if let ExtendedCapability::UsbLegacySupport(mut u) = c {

@@ -17,6 +17,10 @@ pub fn init() {
     lock().init();
 }
 
+pub fn dequeue() -> Option<Result<event::Allowed, [u32; 4]>> {
+    lock().dequeue()
+}
+
 fn lock() -> impl DerefMut<Target = EventHandler> {
     EVENT_HANDLER
         .try_get()

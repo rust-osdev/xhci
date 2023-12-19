@@ -27,7 +27,7 @@ fn connected(port: u8) -> bool {
 fn init_port(port: u8) {
     Resetter::new(port).reset();
 
-    let addr = command_ring::send_enable_slot();
+    command_ring::send_enable_slot();
 }
 
 fn num_ports() -> u8 {
@@ -70,8 +70,8 @@ impl SlotEnabler {
         Self {}
     }
 
-    fn enable(&mut self) -> u64 {
-        command_ring::send_enable_slot()
+    fn enable(&mut self) {
+        command_ring::send_enable_slot();
     }
 }
 

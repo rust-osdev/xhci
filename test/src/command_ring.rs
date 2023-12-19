@@ -1,9 +1,12 @@
 use crate::registers;
-use alloc::boxed::Box;
+use alloc::{boxed::Box, vec::Vec};
 use conquer_once::spin::OnceCell;
-use core::ops::DerefMut;
+use core::ops::{DerefMut, Index};
 use spinning_top::Spinlock;
-use xhci::ring::trb::{self, command};
+use xhci::ring::trb::{
+    self, command,
+    event::{self, CommandCompletion, CompletionCode},
+};
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
 
@@ -15,15 +18,23 @@ pub fn init() {
     lock().init();
 }
 
-pub fn send_nop() -> u64 {
+pub fn assert_all_trbs_are_processed() {
+    lock().assert_all_trbs_are_processed();
+}
+
+pub fn process_trb(event_trb: &CommandCompletion) {
+    lock().process_trb(event_trb)
+}
+
+pub fn send_nop() {
     lock().send_nop()
 }
 
-pub fn send_enable_slot() -> u64 {
+pub fn send_enable_slot() {
     lock().send_enable_slot()
 }
 
-pub fn send_address_device(input_cx_addr: u64, slot: u8) -> u64 {
+pub fn send_address_device(input_cx_addr: u64, slot: u8) {
     lock().send_address_device(input_cx_addr, slot)
 }
 
@@ -38,6 +49,8 @@ fn lock() -> impl DerefMut<Target = CommandRingController> {
 struct CommandRingController {
     ring: Box<CommandRing>,
 
+    sent_trbs: Vec<(u64, command::Allowed)>,
+
     enqueue_ptr: usize,
     cycle_bit: bool,
 }
@@ -46,26 +59,54 @@ impl CommandRingController {
         Self {
             ring: Box::new(CommandRing::new()),
 
+            sent_trbs: Vec::new(),
+
             enqueue_ptr: 0,
             cycle_bit: true,
         }
     }
 
-    pub fn send_nop(&mut self) -> u64 {
+    fn assert_all_trbs_are_processed(&self) {
+        assert!(self.sent_trbs.is_empty(), "Some TRBs are not processed");
+    }
+
+    fn process_trb(&mut self, event_trb: &CommandCompletion) {
+        let command_trb_idx = self
+            .sent_trbs
+            .iter()
+            .position(|(addr, _)| *addr == event_trb.command_trb_pointer())
+            .expect("Command TRB not found");
+
+        let (_, command_trb) = self.sent_trbs.remove(command_trb_idx);
+
+        assert_eq!(
+            event_trb.completion_code(),
+            Ok(CompletionCode::Success),
+            "Event TRB has an error code: {:?}",
+            event_trb.completion_code()
+        );
+
+        match command_trb {
+            command::Allowed::Noop(_) => {}
+            _ => panic!("Unexpected command TRB: {:?}", command_trb),
+        }
+    }
+
+    fn send_nop(&mut self) {
         let trb = command::Noop::new();
         let trb = command::Allowed::Noop(trb);
 
         self.enqueue(trb)
     }
 
-    pub fn send_enable_slot(&mut self) -> u64 {
+    fn send_enable_slot(&mut self) {
         let trb = command::EnableSlot::new();
         let trb = command::Allowed::EnableSlot(trb);
 
         self.enqueue(trb)
     }
 
-    pub fn send_address_device(&mut self, input_cx_addr: u64, slot: u8) -> u64 {
+    fn send_address_device(&mut self, input_cx_addr: u64, slot: u8) {
         let trb = *command::AddressDevice::new()
             .set_input_context_pointer(input_cx_addr)
             .set_slot_id(slot);
@@ -74,7 +115,7 @@ impl CommandRingController {
         self.enqueue(trb)
     }
 
-    fn enqueue<'a>(&'a mut self, trb: command::Allowed) -> u64 {
+    fn enqueue(&mut self, trb: command::Allowed) {
         Enqueuer::new(self).enqueue(trb)
     }
 
@@ -96,15 +137,16 @@ impl<'a> Enqueuer<'a> {
         Self { controller }
     }
 
-    fn enqueue(&mut self, mut trb: command::Allowed) -> u64 {
-        let addr = self.written_trb_address();
-
+    fn enqueue(&mut self, mut trb: command::Allowed) {
         self.modify_cycle_bit(&mut trb);
         self.write_trb(trb);
+
+        let a = self.written_trb_address();
+
+        self.store_trb(a, trb);
+
         self.increment_enqueue_ptr();
         self.notify_command_is_sent();
-
-        addr
     }
 
     fn enqueue_link(&mut self) {
@@ -146,6 +188,10 @@ impl<'a> Enqueuer<'a> {
                 r.set_doorbell_target(0);
             });
         })
+    }
+
+    fn store_trb(&mut self, addr: u64, trb: command::Allowed) {
+        self.controller.sent_trbs.push((addr, trb));
     }
 
     fn can_enqueue_trbs(&self) -> bool {

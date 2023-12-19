@@ -44,6 +44,8 @@ fn main(h: Handle, st: SystemTable<Boot>) -> uefi::Status {
     logger::init();
     allocator::init(mmap);
 
+    assert!(xhc::exists(), "xHC does not exist.");
+
     init();
 
     let mut executor = Executor::new();
@@ -51,9 +53,7 @@ fn main(h: Handle, st: SystemTable<Boot>) -> uefi::Status {
 }
 
 pub(crate) fn init() {
-    if xhc::exists() {
-        init_and_spawn_tasks();
-    }
+    init_and_spawn_tasks();
 }
 
 fn init_statics() {

@@ -10,7 +10,7 @@ use x86_64::PhysAddr;
 static SCRATCHPAD: OnceCell<Scratchpad> = OnceCell::uninit();
 
 pub(crate) fn init() {
-    if Scratchpad::exists() {
+    if Scratchpad::needed() {
         init_static();
     }
 }
@@ -37,7 +37,7 @@ impl Scratchpad {
         }
     }
 
-    fn exists() -> bool {
+    fn needed() -> bool {
         Self::num_of_buffers() > 0
     }
 

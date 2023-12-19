@@ -1,5 +1,4 @@
-
-use crate::transition_helper::BoxWrapper;
+use crate::page_box::PageBox;
 
 use super::registers;
 use conquer_once::spin::Lazy;
@@ -19,11 +18,11 @@ pub(crate) fn register(port_id: usize, a: PhysAddr) {
 }
 
 pub(crate) struct DeviceContextBaseAddressArray {
-    arr: BoxWrapper<[PhysAddr]>,
+    arr: PageBox<[PhysAddr]>,
 }
 impl DeviceContextBaseAddressArray {
     fn new() -> Self {
-        let arr = BoxWrapper::new_slice(PhysAddr::zero(), Self::num_of_slots());
+        let arr = PageBox::new_slice(PhysAddr::zero(), Self::num_of_slots());
         Self { arr }
     }
 

@@ -1,8 +1,7 @@
-
 use crate::{
+    page_box::PageBox,
     port::init::fully_operational::FullyOperational,
     structures::descriptor::{Configuration, Descriptor},
-    transition_helper::BoxWrapper,
 };
 use alloc::vec::Vec;
 use log::info;
@@ -28,7 +27,7 @@ pub(in super::super) async fn task(eps: FullyOperational) {
 
 pub(crate) struct Mouse {
     ep: FullyOperational,
-    buf: BoxWrapper<[i8; 4]>,
+    buf: PageBox<[i8; 4]>,
 }
 impl Mouse {
     pub(super) fn new(ep: FullyOperational) -> Self {

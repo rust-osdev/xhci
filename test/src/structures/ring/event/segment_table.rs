@@ -1,17 +1,16 @@
-
 use core::{
     ops::{Index, IndexMut},
     slice,
 };
 use x86_64::PhysAddr;
 
-use crate::transition_helper::BoxWrapper;
+use crate::page_box::PageBox;
 
 #[derive(Debug)]
-pub struct SegmentTable(BoxWrapper<[Entry]>);
+pub struct SegmentTable(PageBox<[Entry]>);
 impl SegmentTable {
     pub fn new(len: usize) -> Self {
-        Self(BoxWrapper::new_slice(Entry::null(), len))
+        Self(PageBox::new_slice(Entry::null(), len))
     }
 
     pub fn phys_addr(&self) -> PhysAddr {

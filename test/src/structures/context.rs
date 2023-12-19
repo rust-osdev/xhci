@@ -1,5 +1,4 @@
-
-use crate::transition_helper::BoxWrapper;
+use crate::page_box::PageBox;
 
 use super::registers;
 use alloc::boxed::Box;
@@ -11,7 +10,7 @@ use xhci::context::{
 
 pub(crate) struct Context {
     pub(crate) input: Input,
-    pub(crate) output: BoxWrapper<Device>,
+    pub(crate) output: PageBox<Device>,
 }
 impl Default for Context {
     fn default() -> Self {
@@ -23,8 +22,8 @@ impl Default for Context {
 }
 
 pub(crate) enum Input {
-    Byte64(BoxWrapper<Input64Byte>),
-    Byte32(BoxWrapper<Input32Byte>),
+    Byte64(PageBox<Input64Byte>),
+    Byte32(PageBox<Input32Byte>),
 }
 impl Input {
     pub(crate) fn control_mut(&mut self) -> &mut dyn InputControlHandler {

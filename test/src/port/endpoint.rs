@@ -1,5 +1,4 @@
-
-use crate::{exchanger::transfer, structures::descriptor, transition_helper::BoxWrapper};
+use crate::{exchanger::transfer, page_box::PageBox, structures::descriptor};
 use x86_64::PhysAddr;
 use xhci::context::EndpointType;
 
@@ -21,7 +20,7 @@ impl Default {
             .await
     }
 
-    pub(super) async fn get_raw_configuration_descriptors(&mut self) -> BoxWrapper<[u8]> {
+    pub(super) async fn get_raw_configuration_descriptors(&mut self) -> PageBox<[u8]> {
         self.sender.get_configuration_descriptor().await
     }
 
@@ -59,7 +58,7 @@ impl NonDefault {
         self.desc.ty()
     }
 
-    pub(super) async fn issue_normal_trb<T: ?Sized>(&mut self, b: &BoxWrapper<T>) {
+    pub(super) async fn issue_normal_trb<T: ?Sized>(&mut self, b: &PageBox<T>) {
         self.sender.issue_normal_trb(b).await
     }
 }

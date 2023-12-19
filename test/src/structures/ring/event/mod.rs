@@ -1,5 +1,5 @@
 use super::CycleBit;
-use crate::{exchanger::receiver, port, structures::registers, transition_helper::BoxWrapper};
+use crate::{exchanger::receiver, page_box::PageBox, port, structures::registers};
 use alloc::vec::Vec;
 use bit_field::BitField;
 use conquer_once::spin::OnceCell;
@@ -115,7 +115,7 @@ impl Stream for Ring {
 }
 
 struct Raw {
-    rings: Vec<BoxWrapper<[[u32; 4]]>>,
+    rings: Vec<PageBox<[[u32; 4]]>>,
     c: CycleBit,
     deq_p_seg: usize,
     deq_p_trb: usize,
@@ -131,13 +131,10 @@ impl Raw {
         }
     }
 
-    fn new_rings() -> Vec<BoxWrapper<[[u32; 4]]>> {
+    fn new_rings() -> Vec<PageBox<[[u32; 4]]>> {
         let mut v = Vec::new();
         for _ in 0..Self::max_num_of_erst() {
-            v.push(BoxWrapper::new_slice(
-                [0; 4],
-                MAX_NUM_OF_TRB_IN_QUEUE.into(),
-            ));
+            v.push(PageBox::new_slice([0; 4], MAX_NUM_OF_TRB_IN_QUEUE.into()));
         }
 
         v
@@ -219,7 +216,7 @@ impl Raw {
     }
 
     fn head_addrs(&self) -> Vec<PhysAddr> {
-        self.rings.iter().map(BoxWrapper::phys_addr).collect()
+        self.rings.iter().map(PageBox::phys_addr).collect()
     }
 }
 

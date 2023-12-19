@@ -1,7 +1,6 @@
-
 use super::receiver::{self, ReceiveFuture};
+use crate::page_box::PageBox;
 use crate::structures::{descriptor, registers, ring::transfer};
-use crate::transition_helper::BoxWrapper;
 use alloc::{sync::Arc, vec::Vec};
 use core::convert::TryInto;
 use futures_util::task::AtomicWaker;
@@ -28,7 +27,7 @@ impl Sender {
     }
 
     pub(crate) async fn get_max_packet_size_from_device_descriptor(&mut self) -> u16 {
-        let b = BoxWrapper::from(descriptor::Device::default());
+        let b = PageBox::from(descriptor::Device::default());
 
         let setup = *transfer_trb::SetupStage::default()
             .set_transfer_type(TransferType::In)
@@ -94,8 +93,8 @@ impl Sender {
         self.issue_trbs(&[setup.into(), status.into()]).await;
     }
 
-    pub(crate) async fn get_configuration_descriptor(&mut self) -> BoxWrapper<[u8]> {
-        let b = BoxWrapper::new_slice(0, 4096);
+    pub(crate) async fn get_configuration_descriptor(&mut self) -> PageBox<[u8]> {
+        let b = PageBox::new_slice(0, 4096);
 
         let (setup, data, status) = Self::trbs_for_getting_descriptors(
             &b,
@@ -107,7 +106,7 @@ impl Sender {
         b
     }
 
-    pub(crate) async fn issue_normal_trb<T: ?Sized>(&mut self, b: &BoxWrapper<T>) {
+    pub(crate) async fn issue_normal_trb<T: ?Sized>(&mut self, b: &PageBox<T>) {
         let t = *Normal::default()
             .set_data_buffer_pointer(b.phys_addr().as_u64())
             .set_trb_transfer_length(b.bytes().as_usize().try_into().unwrap())
@@ -117,7 +116,7 @@ impl Sender {
     }
 
     fn trbs_for_getting_descriptors<T: ?Sized>(
-        b: &BoxWrapper<T>,
+        b: &PageBox<T>,
         t: DescTyIdx,
     ) -> (
         transfer_trb::Allowed,

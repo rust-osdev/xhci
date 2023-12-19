@@ -10,12 +10,8 @@ use multitask::{executor::Executor, task::Task};
 use pci::config::bar;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
-use spinning_top::{RawSpinlock, Spinlock};
-use structures::{
-    dcbaa, extended_capabilities, registers,
-    ring::{command, event},
-    scratchpad,
-};
+use spinning_top::RawSpinlock;
+use structures::{extended_capabilities, registers, ring::event};
 use uefi::{
     table::{boot::MemoryType, Boot, SystemTable},
     Handle,
@@ -30,10 +26,10 @@ mod exchanger;
 mod logger;
 mod mapper;
 mod multitask;
+mod page_box;
 mod pci;
 mod port;
 mod structures;
-mod transition_helper;
 mod xhc;
 
 #[uefi::entry]

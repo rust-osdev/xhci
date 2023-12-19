@@ -1,7 +1,6 @@
-
 use super::dcbaa;
+use crate::page_box::PageBox;
 use crate::registers;
-use crate::transition_helper::BoxWrapper;
 use alloc::vec::Vec;
 use conquer_once::spin::OnceCell;
 use core::convert::TryInto;
@@ -25,15 +24,15 @@ fn init_static() {
 }
 
 struct Scratchpad {
-    arr: BoxWrapper<[PhysAddr]>,
-    bufs: Vec<BoxWrapper<[u8]>>,
+    arr: PageBox<[PhysAddr]>,
+    bufs: Vec<PageBox<[u8]>>,
 }
 impl Scratchpad {
     fn new() -> Self {
         let len: usize = Self::num_of_buffers().try_into().unwrap();
 
         Self {
-            arr: BoxWrapper::new_slice(PhysAddr::zero(), len),
+            arr: PageBox::new_slice(PhysAddr::zero(), len),
             bufs: Vec::new(),
         }
     }
@@ -55,7 +54,7 @@ impl Scratchpad {
         for _ in 0..Self::num_of_buffers() {
             // Allocate the double size of memory, then register the aligned address with the
             // array.
-            let b = BoxWrapper::new_slice(0, Self::page_size().as_usize() * 2);
+            let b = PageBox::new_slice(0, Self::page_size().as_usize() * 2);
             self.bufs.push(b);
         }
     }

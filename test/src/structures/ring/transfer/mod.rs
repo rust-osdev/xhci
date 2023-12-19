@@ -1,6 +1,5 @@
-
 use super::CycleBit;
-use crate::transition_helper::BoxWrapper;
+use crate::page_box::PageBox;
 use alloc::vec::Vec;
 use trb::Link;
 use x86_64::PhysAddr;
@@ -26,14 +25,14 @@ impl Ring {
 }
 
 struct Raw {
-    ring: BoxWrapper<[[u32; 4]]>,
+    ring: PageBox<[[u32; 4]]>,
     enq_p: usize,
     c: CycleBit,
 }
 impl Raw {
     fn new() -> Self {
         Self {
-            ring: BoxWrapper::new_slice([0; 4], SIZE_OF_RING),
+            ring: PageBox::new_slice([0; 4], SIZE_OF_RING),
             enq_p: 0,
             c: CycleBit::new(true),
         }

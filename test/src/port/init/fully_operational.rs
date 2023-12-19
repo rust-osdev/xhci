@@ -1,12 +1,11 @@
-
 use super::endpoints_initializer::EndpointsInitializer;
 use crate::{
+    page_box::PageBox,
     port::{
         endpoint,
         endpoint::{Error, NonDefault},
     },
     structures::descriptor::Descriptor,
-    transition_helper::BoxWrapper,
 };
 use alloc::vec::Vec;
 use core::slice;
@@ -44,7 +43,7 @@ impl FullyOperational {
 
     pub(in super::super) async fn issue_normal_trb(
         &mut self,
-        b: &BoxWrapper<impl ?Sized>,
+        b: &PageBox<impl ?Sized>,
         ty: EndpointType,
     ) -> Result<(), Error> {
         for ep in &mut self.eps {

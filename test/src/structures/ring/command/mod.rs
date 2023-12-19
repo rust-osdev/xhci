@@ -1,6 +1,5 @@
-
 use super::CycleBit;
-use crate::{registers, transition_helper::BoxWrapper};
+use crate::{page_box::PageBox, registers};
 use trb::Link;
 use x86_64::{
     structures::paging::{PageSize, Size4KiB},
@@ -48,14 +47,14 @@ impl Default for Ring {
 }
 
 struct Raw {
-    raw: BoxWrapper<[[u32; 4]]>,
+    raw: PageBox<[[u32; 4]]>,
     enq_p: usize,
     c: CycleBit,
 }
 impl Raw {
     fn new() -> Self {
         Self {
-            raw: BoxWrapper::new_slice([0; 4], NUM_OF_TRBS),
+            raw: PageBox::new_slice([0; 4], NUM_OF_TRBS),
             enq_p: 0,
             c: CycleBit::new(true),
         }

@@ -1,8 +1,7 @@
-
 use crate::{
+    page_box::PageBox,
     port::init::fully_operational::FullyOperational,
     structures::descriptor::{Configuration, Descriptor},
-    transition_helper::BoxWrapper,
 };
 use alloc::{string::String, vec::Vec};
 use log::info;
@@ -29,7 +28,7 @@ pub(in crate::port) async fn task(eps: FullyOperational) {
 
 pub(crate) struct Keyboard {
     ep: FullyOperational,
-    buf: BoxWrapper<[u8; 8]>,
+    buf: PageBox<[u8; 8]>,
 }
 impl Keyboard {
     pub(in crate::port) fn new(ep: FullyOperational) -> Self {

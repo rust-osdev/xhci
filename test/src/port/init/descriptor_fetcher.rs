@@ -1,11 +1,10 @@
-
 use super::{
     endpoints_initializer::EndpointsInitializer, max_packet_size_setter::MaxPacketSizeSetter,
 };
 use crate::{
+    page_box::PageBox,
     port::endpoint,
     structures::{context::Context, descriptor, descriptor::Descriptor},
-    transition_helper::BoxWrapper,
 };
 use alloc::{sync::Arc, vec::Vec};
 use log::debug;
@@ -54,18 +53,18 @@ impl DescriptorFetcher {
         self.ep0
     }
 
-    async fn get_raw_descriptors(&mut self) -> BoxWrapper<[u8]> {
+    async fn get_raw_descriptors(&mut self) -> PageBox<[u8]> {
         self.ep0.get_raw_configuration_descriptors().await
     }
 }
 
 struct RawDescriptorParser {
-    raw: BoxWrapper<[u8]>,
+    raw: PageBox<[u8]>,
     current: usize,
     len: usize,
 }
 impl RawDescriptorParser {
-    fn new(raw: BoxWrapper<[u8]>) -> Self {
+    fn new(raw: PageBox<[u8]>) -> Self {
         let len = raw.len();
 
         Self {

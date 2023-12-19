@@ -1,4 +1,3 @@
-
 use super::{
     super::structures::ring::command,
     receiver::{self, ReceiveFuture},
@@ -15,9 +14,13 @@ use xhci::ring::trb::{command as command_trb, event};
 
 static SENDER: OnceCell<Futurelock<Sender>> = OnceCell::uninit();
 
-pub(crate) fn init(r: Arc<Spinlock<command::Ring>>) {
+pub(crate) fn init() {
+    let ring = Arc::new(Spinlock::new(command::Ring::new()));
+
+    ring.lock().init();
+
     SENDER
-        .try_init_once(|| Futurelock::new(Sender::new(r), true))
+        .try_init_once(|| Futurelock::new(Sender::new(ring), true))
         .expect("`Sender` is initialized more than once.")
 }
 

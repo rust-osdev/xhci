@@ -70,7 +70,6 @@ fn init_and_spawn_tasks() {
     init_statics();
 
     let mut event_ring = event::Ring::new();
-    let command_ring = Arc::new(Spinlock::new(command::Ring::new()));
 
     // In some cases, an OS may need to get ownership of the xHC from the BIOS.
     // See 4.22.1 of xHCI spec.
@@ -81,10 +80,9 @@ fn init_and_spawn_tasks() {
     xhc::init();
 
     event_ring.init();
-    command_ring.lock().init();
     dcbaa::init();
     scratchpad::init();
-    exchanger::command::init(command_ring);
+    exchanger::command::init();
 
     xhc::run();
     xhc::ensure_no_error_occurs();

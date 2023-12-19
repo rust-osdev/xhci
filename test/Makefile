@@ -32,7 +32,6 @@ $(IMG): $(EFI) build
 	mcopy -i $@ $(EFI) ::/efi/boot/bootx64.efi
 
 $(EFI): $(shell find src/) Cargo.toml
-	echo $^
 	cargo build
 
 build:

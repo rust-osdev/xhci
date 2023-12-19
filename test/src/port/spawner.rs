@@ -1,12 +1,9 @@
-
 use crate::multitask;
-use alloc::{vec, vec::Vec};
-use conquer_once::spin::Lazy;
+use alloc::collections::BTreeSet;
 use multitask::task::Task;
 use spinning_top::Spinlock;
 
-static SPAWN_STATUS: Lazy<Spinlock<Vec<bool>>> =
-    Lazy::new(|| Spinlock::new(vec![false; super::max_num().into()]));
+static SPAWN_STATUS: Spinlock<BTreeSet<usize>> = Spinlock::new(BTreeSet::new());
 
 pub(crate) fn spawn_all_connected_ports() {
     let n = super::max_num();
@@ -38,11 +35,11 @@ fn spawnable(p: u8) -> bool {
 }
 
 fn spawned(p: u8) -> bool {
-    SPAWN_STATUS.lock()[usize::from(p)]
+    SPAWN_STATUS.lock().contains(&p.into())
 }
 
 fn mark_as_spawned(p: u8) {
-    SPAWN_STATUS.lock()[usize::from(p)] = true;
+    SPAWN_STATUS.lock().insert(p.into());
 }
 
 #[derive(Debug)]

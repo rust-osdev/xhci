@@ -9,9 +9,7 @@ impl log::Log for MyLogger {
     }
 
     fn log(&self, record: &log::Record) {
-        if self.enabled(record.metadata()) {
-            qemu_println!("[{}] {}", record.level(), record.args());
-        }
+        qemu_println!("[{}] {}", record.level(), record.args());
     }
 
     fn flush(&self) {}

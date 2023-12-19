@@ -1,4 +1,3 @@
-
 use super::registers;
 use crate::mapper::Mapper;
 use conquer_once::spin::OnceCell;
@@ -10,6 +9,9 @@ use xhci::{extended_capabilities, ExtendedCapability};
 static EXTENDED_CAPABILITIES: OnceCell<Spinlock<Option<extended_capabilities::List<Mapper>>>> =
     OnceCell::uninit();
 
+/// # Safety
+///
+/// `mmio_base` must be the correct one.
 pub(crate) unsafe fn init(mmio_base: PhysAddr) {
     let hccparams1 = registers::handle(|r| r.capability.hccparams1.read_volatile());
 

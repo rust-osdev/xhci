@@ -1,4 +1,3 @@
-
 use crate::mapper::Mapper;
 use conquer_once::spin::OnceCell;
 use core::convert::TryInto;
@@ -8,6 +7,9 @@ use xhci::Registers;
 
 static REGISTERS: OnceCell<Spinlock<Registers<Mapper>>> = OnceCell::uninit();
 
+/// # Safety
+///
+/// `mmio_base` must be the correct one.
 pub(crate) unsafe fn init(mmio_base: PhysAddr) {
     let mmio_base: usize = mmio_base.as_u64().try_into().unwrap();
 

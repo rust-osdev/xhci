@@ -1,54 +1,101 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #![no_std]
 #![no_main]
+// A workaround for the `derive_builder` crate.
+#![allow(clippy::default_trait_access)]
 
 extern crate alloc;
 
-mod allocator;
-mod command_ring;
-mod dcbaa;
-mod event;
-mod mapper;
-mod pci;
-mod ports;
-mod registers;
-mod scratchpat;
-mod transfer_ring;
-mod xhc;
-
+use alloc::sync::Arc;
+use futures_intrusive::sync::{GenericMutex, GenericMutexGuard};
+use multitask::{executor::Executor, task::Task};
+use pci::config::bar;
 use qemu_exit::QEMUExit;
 use qemu_print::qemu_println;
-use uefi::table::boot::MemoryType;
+use spinning_top::{RawSpinlock, Spinlock};
+use structures::{
+    dcbaa, extended_capabilities, registers,
+    ring::{command, event},
+    scratchpad,
+};
+use uefi::{
+    table::{Boot, SystemTable},
+    Handle,
+};
+use x86_64::PhysAddr;
+
+pub(crate) type Futurelock<T> = GenericMutex<RawSpinlock, T>;
+pub(crate) type FuturelockGuard<'a, T> = GenericMutexGuard<'a, RawSpinlock, T>;
+
+mod allocator;
+mod exchanger;
+mod mapper;
+mod multitask;
+mod pci;
+mod port;
+mod structures;
+mod transition_helper;
+mod xhc;
 
 #[uefi::entry]
-fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) -> uefi::Status {
-    let (_, memory_map) = st.exit_boot_services(MemoryType::LOADER_DATA);
-    allocator::init(memory_map);
+fn main(h: Handle, st: SystemTable<Boot>) -> uefi::Status {
+    init();
 
-    registers::init();
+    let mut executor = Executor::new();
+    executor.run();
+}
+
+pub(crate) fn init() {
+    if xhc::exists() {
+        init_and_spawn_tasks();
+    }
+}
+
+fn init_statics() {
+    let a = iter_xhc().next().expect("xHC does not exist.");
+
+    // SAFETY: BAR 0 address is passed.
+    unsafe {
+        registers::init(a);
+        extended_capabilities::init(a);
+    }
+}
+
+fn init_and_spawn_tasks() {
+    init_statics();
+
+    let mut event_ring = event::Ring::new();
+    let command_ring = Arc::new(Spinlock::new(command::Ring::new()));
 
     xhc::init();
 
-    let nop_addr = command_ring::send_nop();
+    event_ring.init();
+    command_ring.lock().init();
+    dcbaa::init();
+    scratchpad::init();
+    exchanger::command::init(command_ring);
 
-    ports::init_all_ports();
+    xhc::run();
+    xhc::ensure_no_error_occurs();
 
-    while let Some(trb) = event::dequeue() {
-        match trb {
-            Ok(xhci::ring::trb::event::Allowed::CommandCompletion(x)) => {
-                command_ring::process_trb(&x);
-            }
-            Ok(xhci::ring::trb::event::Allowed::PortStatusChange(x)) => {
-                ports::process_trb(&x);
-            }
-            Ok(x) => panic!("Unhandled TRB: {:?}", x),
-            Err(x) => panic!("Unknown TRB: {:?}", x),
+    spawn_tasks(event_ring);
+}
+
+fn spawn_tasks(e: event::Ring) {
+    port::spawn_all_connected_port_tasks();
+
+    multitask::add(Task::new_poll(event::task(e)));
+}
+
+fn iter_xhc() -> impl Iterator<Item = PhysAddr> {
+    pci::iter_devices().filter_map(|device| {
+        if device.is_xhci() {
+            Some(device.base_address(bar::Index::new(0)))
+        } else {
+            None
         }
-    }
-
-    command_ring::assert_all_trbs_are_processed();
-
-    let handler = qemu_exit::X86::new(0xf4, 33);
-    handler.exit_success();
+    })
 }
 
 #[panic_handler]

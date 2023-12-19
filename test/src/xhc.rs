@@ -1,45 +1,29 @@
-use crate::command_ring;
-use crate::dcbaa;
-use crate::event;
-use crate::registers;
-use crate::scratchpat;
-use qemu_print::qemu_println;
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/// Initializes the host controller according to 4.2 of xHCI spec.
-///
-/// Note that we do not enable interrupts as it is optional and for simplicity.
-pub fn init() {
-    qemu_println!("Initializing xHC...");
+use super::structures::{extended_capabilities, registers};
+use xhci::extended_capabilities::ExtendedCapability;
 
-    wait_until_controller_is_ready();
-    stop();
-    reset();
-    set_num_of_enabled_slots();
-
-    event::init();
-    command_ring::init();
-    dcbaa::init();
-    scratchpat::init();
-
-    run();
-    ensure_no_error_occurs();
-
-    qemu_println!("xHC is initialized.");
+pub(super) fn exists() -> bool {
+    super::iter_xhc().next().is_some()
 }
 
-fn run() {
-    registers::handle(|r| {
-        let op = &mut r.operational;
+pub(crate) fn init() {
+    get_ownership_from_bios();
+    stop_and_reset();
+    set_num_of_enabled_slots();
+}
 
-        op.usbcmd.update_volatile(|u| {
+pub(crate) fn run() {
+    registers::handle(|r| {
+        let o = &mut r.operational;
+        o.usbcmd.update_volatile(|u| {
             u.set_run_stop();
         });
-
-        while op.usbsts.read_volatile().hc_halted() {}
+        while o.usbsts.read_volatile().hc_halted() {}
     });
 }
 
-fn ensure_no_error_occurs() {
+pub(crate) fn ensure_no_error_occurs() {
     registers::handle(|r| {
         let s = r.operational.usbsts.read_volatile();
 
@@ -49,107 +33,88 @@ fn ensure_no_error_occurs() {
             "An error occured on the host system."
         );
         assert!(!s.host_controller_error(), "An error occured on the xHC.");
+    });
+}
+
+fn get_ownership_from_bios() {
+    if let Some(iter) = extended_capabilities::iter() {
+        for c in iter.filter_map(Result::ok) {
+            if let ExtendedCapability::UsbLegacySupport(mut u) = c {
+                let l = &mut u.usblegsup;
+                l.update_volatile(|s| {
+                    s.set_hc_os_owned_semaphore();
+                });
+
+                while l.read_volatile().hc_bios_owned_semaphore()
+                    || !l.read_volatile().hc_os_owned_semaphore()
+                {}
+            }
+        }
+    }
+}
+
+fn stop_and_reset() {
+    stop();
+    wait_until_halt();
+    reset();
+}
+
+fn stop() {
+    registers::handle(|r| {
+        r.operational.usbcmd.update_volatile(|u| {
+            u.clear_run_stop();
+        });
     })
 }
 
-fn wait_until_controller_is_ready() {
+fn wait_until_halt() {
+    registers::handle(|r| while !r.operational.usbsts.read_volatile().hc_halted() {})
+}
+
+fn reset() {
+    start_resetting();
+    wait_until_reset_completed();
+    wait_until_ready();
+}
+
+fn start_resetting() {
+    registers::handle(|r| {
+        r.operational.usbcmd.update_volatile(|u| {
+            u.set_host_controller_reset();
+        })
+    })
+}
+
+fn wait_until_reset_completed() {
+    registers::handle(
+        |r| {
+            while r.operational.usbcmd.read_volatile().host_controller_reset() {}
+        },
+    )
+}
+
+fn wait_until_ready() {
     registers::handle(
         |r| {
             while r.operational.usbsts.read_volatile().controller_not_ready() {}
         },
-    );
-}
-
-fn stop() {
-    Stopper::new().stop();
-}
-
-fn reset() {
-    Resetter::new().reset();
+    )
 }
 
 fn set_num_of_enabled_slots() {
-    SlotNumberSetter::new().set();
+    let n = num_of_device_slots();
+    registers::handle(|r| {
+        r.operational.config.update_volatile(|c| {
+            c.set_max_device_slots_enabled(n);
+        });
+    })
 }
 
-struct Stopper {}
-impl Stopper {
-    fn new() -> Self {
-        Self {}
-    }
-
-    fn stop(&mut self) {
-        registers::handle(|r| {
-            let op = &mut r.operational;
-
-            op.usbcmd.update_volatile(|u| {
-                u.clear_run_stop();
-            });
-
-            while !op.usbsts.read_volatile().hc_halted() {}
-        })
-    }
-}
-
-struct Resetter {}
-impl Resetter {
-    fn new() -> Self {
-        Self {}
-    }
-
-    fn reset(&mut self) {
-        self.start_resetting();
-        self.wait_until_reset_completed();
-        self.wait_until_ready();
-    }
-
-    fn start_resetting(&mut self) {
-        registers::handle(|r| {
-            r.operational.usbcmd.update_volatile(|u| {
-                u.set_host_controller_reset();
-            });
-        })
-    }
-
-    fn wait_until_reset_completed(&self) {
-        registers::handle(
-            |r| {
-                while r.operational.usbcmd.read_volatile().host_controller_reset() {}
-            },
-        )
-    }
-
-    fn wait_until_ready(&self) {
-        registers::handle(
-            |r| {
-                while r.operational.usbsts.read_volatile().controller_not_ready() {}
-            },
-        )
-    }
-}
-
-struct SlotNumberSetter {}
-impl SlotNumberSetter {
-    fn new() -> Self {
-        Self {}
-    }
-
-    fn set(&mut self) {
-        let n = self.number_of_slots();
-
-        registers::handle(|r| {
-            r.operational.config.update_volatile(|c| {
-                c.set_max_device_slots_enabled(n);
-            });
-        })
-    }
-
-    fn number_of_slots(&self) -> u8 {
-        registers::handle(|r| {
-            r.capability
-                .hcsparams1
-                .read_volatile()
-                .number_of_device_slots()
-        })
-    }
+fn num_of_device_slots() -> u8 {
+    registers::handle(|r| {
+        r.capability
+            .hcsparams1
+            .read_volatile()
+            .number_of_device_slots()
+    })
 }

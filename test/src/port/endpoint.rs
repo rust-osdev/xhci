@@ -35,6 +35,10 @@ impl Default {
     pub(super) async fn set_boot_protocol(&mut self) {
         self.sender.set_boot_protocol().await;
     }
+
+    pub(super) async fn issue_nop_trb(&mut self) {
+        self.sender.issue_nop_trb().await;
+    }
 }
 
 pub(super) struct NonDefault {

@@ -1,4 +1,3 @@
-
 use super::structures::registers;
 use crate::multitask::{self, task::Task};
 use alloc::collections::VecDeque;
@@ -7,6 +6,7 @@ use core::{future::Future, pin::Pin, task::Poll};
 use futures_util::task::AtomicWaker;
 use init::fully_operational::FullyOperational;
 use log::{info, warn};
+use qemu_print::qemu_println;
 use spinning_top::Spinlock;
 
 mod class_driver;
@@ -52,22 +52,11 @@ pub(crate) fn try_spawn(port_idx: u8) -> Result<(), spawner::PortNotConnected> {
 }
 
 async fn main(port_number: u8) {
-    let fully_operational = init_port_and_slot_exclusively(port_number).await;
+    let mut fully_operational = init_port_and_slot_exclusively(port_number).await;
 
-    match fully_operational.ty() {
-        (3, 1, 2) => {
-            multitask::add(Task::new_poll(class_driver::mouse::task(fully_operational)));
-        }
-        (3, 1, 1) => {
-            multitask::add(Task::new_poll(class_driver::keyboard::task(
-                fully_operational,
-            )));
-        }
-        (8, _, _) => multitask::add(Task::new(class_driver::mass_storage::task(
-            fully_operational,
-        ))),
-        t => warn!("Unknown device: {:?}", t),
-    }
+    fully_operational.issue_nop_trb().await;
+
+    qemu_println!("Port {} is fully operational.", port_number);
 }
 
 async fn init_port_and_slot_exclusively(port_number: u8) -> FullyOperational {

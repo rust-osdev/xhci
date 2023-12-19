@@ -56,6 +56,10 @@ impl FullyOperational {
         Err(Error::NoSuchEndpoint(ty))
     }
 
+    pub(in super::super) async fn issue_nop_trb(&mut self) {
+        self.def_ep.issue_nop_trb().await;
+    }
+
     pub(in super::super) async fn set_configure(&mut self, config_val: u8) {
         self.def_ep.set_configuration(config_val).await;
     }

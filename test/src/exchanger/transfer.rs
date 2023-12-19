@@ -9,7 +9,7 @@ use spinning_top::Spinlock;
 use x86_64::PhysAddr;
 use xhci::ring::trb::{
     event, transfer as transfer_trb,
-    transfer::{Direction, Normal, TransferType},
+    transfer::{Direction, Noop, Normal, TransferType},
 };
 
 pub(crate) struct Sender {
@@ -112,6 +112,12 @@ impl Sender {
             .set_trb_transfer_length(b.bytes().as_usize().try_into().unwrap())
             .set_interrupt_on_completion();
         debug!("Normal TRB: {:X?}", t);
+        self.issue_trbs(&[t.into()]).await;
+    }
+
+    pub(crate) async fn issue_nop_trb(&mut self) {
+        let t = Noop::default();
+
         self.issue_trbs(&[t.into()]).await;
     }
 

@@ -23,6 +23,24 @@ pub struct PageBox<T: ?Sized> {
     _marker: PhantomData<T>,
 }
 impl<T: ?Sized> PageBox<T> {
+    pub fn from_layout_zeroed(layout: Layout) -> Self {
+        assert!(
+            layout.size() > 0,
+            "The size of the layout must be greater than 0."
+        );
+
+        let addr = unsafe { alloc::alloc::alloc(layout) };
+
+        // SAFETY: Safe as the address is well-aligned.
+        unsafe { core::ptr::write_bytes(addr as *mut u8, 0, layout.size()) };
+
+        Self {
+            addr: VirtAddr::new(addr as u64),
+            layout,
+            _marker: PhantomData,
+        }
+    }
+
     pub fn phys_addr(&self) -> PhysAddr {
         // We assume the identity mapping set up by UEFI firmware.
         PhysAddr::new(self.addr.as_u64())

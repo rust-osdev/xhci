@@ -3,6 +3,7 @@ use crate::page_box::PageBox;
 use crate::registers;
 use alloc::vec::Vec;
 use conquer_once::spin::OnceCell;
+use core::alloc::Layout;
 use core::convert::TryInto;
 use os_units::Bytes;
 use x86_64::PhysAddr;
@@ -51,10 +52,19 @@ impl Scratchpad {
     }
 
     fn allocate_buffers(&mut self) {
+        let layout =
+            Layout::from_size_align(Self::page_size().as_usize(), Self::page_size().as_usize());
+        let layout = layout.unwrap_or_else(|_| {
+            panic!(
+                "Failed to create a layout for {} bytes with {} bytes alignment",
+                Self::page_size().as_usize(),
+                Self::page_size().as_usize()
+            )
+        });
+
         for _ in 0..Self::num_of_buffers() {
-            // Allocate the double size of memory, then register the aligned address with the
-            // array.
-            let b = PageBox::new_slice(0, Self::page_size().as_usize() * 2);
+            let b = PageBox::from_layout_zeroed(layout);
+
             self.bufs.push(b);
         }
     }

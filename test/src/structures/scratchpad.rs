@@ -47,7 +47,7 @@ impl Scratchpad {
     }
 
     fn register_with_dcbaa(&self) {
-        dcbaa::register(0, self.arr.phys_addr());
+        dcbaa::register_device_context_addr(0, self.arr.phys_addr());
     }
 
     fn allocate_buffers(&mut self) {

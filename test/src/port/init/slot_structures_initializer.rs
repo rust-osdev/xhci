@@ -1,4 +1,3 @@
-
 use super::{max_packet_size_setter::MaxPacketSizeSetter, resetter::Resetter};
 use crate::{
     exchanger,
@@ -65,7 +64,7 @@ impl SlotStructuresInitializer {
 
     fn register_with_dcbaa(&self) {
         let a = self.cx.lock().output.phys_addr();
-        dcbaa::register(self.slot_number.into(), a);
+        dcbaa::register_device_context_addr(self.slot_number.into(), a);
     }
 
     async fn issue_address_device(&self) {

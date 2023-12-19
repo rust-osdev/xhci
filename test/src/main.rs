@@ -1,4 +1,3 @@
-
 #![no_std]
 #![no_main]
 // A workaround for the `derive_builder` crate.
@@ -19,7 +18,7 @@ use structures::{
     scratchpad,
 };
 use uefi::{
-    table::{Boot, SystemTable},
+    table::{boot::MemoryType, Boot, SystemTable},
     Handle,
 };
 use x86_64::PhysAddr;
@@ -40,7 +39,11 @@ mod xhc;
 
 #[uefi::entry]
 fn main(h: Handle, st: SystemTable<Boot>) -> uefi::Status {
+    let (_, mmap) = st.exit_boot_services(MemoryType::LOADER_DATA);
+
     logger::init();
+    allocator::init(mmap);
+
     init();
 
     let mut executor = Executor::new();

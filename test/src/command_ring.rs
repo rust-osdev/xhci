@@ -1,11 +1,12 @@
+use crate::ports;
 use crate::registers;
 use alloc::{boxed::Box, vec::Vec};
 use conquer_once::spin::OnceCell;
-use core::ops::{DerefMut, Index};
+use core::ops::DerefMut;
 use spinning_top::Spinlock;
 use xhci::ring::trb::{
     self, command,
-    event::{self, CommandCompletion, CompletionCode},
+    event::{CommandCompletion, CompletionCode},
 };
 
 const NUM_OF_TRBS_IN_RING: usize = 16;
@@ -15,35 +16,59 @@ static COMMAND_RING_CONTROLLER: OnceCell<Spinlock<CommandRingController>> = Once
 pub fn init() {
     COMMAND_RING_CONTROLLER.init_once(|| Spinlock::new(CommandRingController::new()));
 
-    lock().init();
+    try_lock()
+        .expect("Failed to lock command ring controller")
+        .init();
 }
 
 pub fn assert_all_trbs_are_processed() {
-    lock().assert_all_trbs_are_processed();
+    try_lock()
+        .expect("Failed to lock command ring controller")
+        .assert_all_trbs_are_processed()
 }
 
 pub fn process_trb(event_trb: &CommandCompletion) {
-    lock().process_trb(event_trb)
+    // Just pop a TRB, not to process it within the controller to prevent a
+    // deadlock.
+    let trb = try_lock()
+        .expect("Failed to lock command ring controller")
+        .pop_corresponding_trb(event_trb);
+
+    match trb {
+        command::Allowed::Noop(_) => {}
+        command::Allowed::EnableSlot(_) => {
+            ports::init_structures(event_trb.slot_id());
+        }
+        command::Allowed::AddressDevice(_) => {
+            ports::init_structures(event_trb.slot_id());
+        }
+        _ => panic!("Unexpected command TRB: {:?}", trb),
+    }
 }
 
 pub fn send_nop() {
-    lock().send_nop()
+    try_lock()
+        .expect("Failed to lock command ring controller")
+        .send_nop()
 }
 
 pub fn send_enable_slot() {
-    lock().send_enable_slot()
+    try_lock()
+        .expect("Failed to lock command ring controller")
+        .send_enable_slot()
 }
 
 pub fn send_address_device(input_cx_addr: u64, slot: u8) {
-    lock().send_address_device(input_cx_addr, slot)
+    try_lock()
+        .expect("Failed to lock command ring controller")
+        .send_address_device(input_cx_addr, slot)
 }
 
-fn lock() -> impl DerefMut<Target = CommandRingController> {
+fn try_lock() -> Option<impl DerefMut<Target = CommandRingController>> {
     COMMAND_RING_CONTROLLER
         .try_get()
         .expect("Command ring controller not initialized")
         .try_lock()
-        .expect("Command ring controller is already locked")
 }
 
 struct CommandRingController {
@@ -70,7 +95,7 @@ impl CommandRingController {
         assert!(self.sent_trbs.is_empty(), "Some TRBs are not processed");
     }
 
-    fn process_trb(&mut self, event_trb: &CommandCompletion) {
+    fn pop_corresponding_trb(&mut self, event_trb: &CommandCompletion) -> command::Allowed {
         let command_trb_idx = self
             .sent_trbs
             .iter()
@@ -82,14 +107,11 @@ impl CommandRingController {
         assert_eq!(
             event_trb.completion_code(),
             Ok(CompletionCode::Success),
-            "Event TRB has an error code: {:?}",
-            event_trb.completion_code()
+            "Event TRB in response to a command TRB is not successful: {:?}",
+            command_trb
         );
 
-        match command_trb {
-            command::Allowed::Noop(_) => {}
-            _ => panic!("Unexpected command TRB: {:?}", command_trb),
-        }
+        command_trb
     }
 
     fn send_nop(&mut self) {

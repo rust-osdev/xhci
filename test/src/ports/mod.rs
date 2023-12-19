@@ -3,16 +3,51 @@ mod context;
 use self::context::Context;
 use crate::dcbaa;
 use crate::{command_ring, registers, transfer_ring::TransferRingController};
+use alloc::vec::Vec;
+use core::ops::DerefMut;
+use spinning_top::Spinlock;
+use xhci::ring::trb::event::PortStatusChange;
 use xhci::{context::EndpointType, registers::PortRegisterSet};
+
+static ENABLING_SLOTS: Spinlock<Vec<u8>> = Spinlock::new(Vec::new());
 
 pub fn init_all_ports() {
     let num_ports = num_ports();
 
     for port in 0..num_ports {
         if connected(port) {
-            init_port(port);
+            reset_port(port);
+            command_ring::send_enable_slot();
+
+            lock_enabling_slots().push(port);
         }
     }
+}
+
+pub fn process_trb(trb: &PortStatusChange) {
+    PortRegisterHandler::new(trb.port_id()).update(|r| {
+        if r.portsc.current_connect_status() {
+            todo!()
+        }
+    });
+}
+
+pub fn init_structures(slot: u8) {
+    let port = lock_enabling_slots().pop().expect("No enabling slots");
+
+    init_structures_for_port(port, slot);
+}
+
+pub fn init_structures_for_port(port: u8, slot: u8) {
+    let mut cx = Context::new();
+
+    StructureInitializer::new(port, slot, cx).create();
+}
+
+fn lock_enabling_slots() -> impl DerefMut<Target = Vec<u8>> {
+    ENABLING_SLOTS
+        .try_lock()
+        .expect("Enabling slots is already locked")
 }
 
 fn connected(port: u8) -> bool {
@@ -24,10 +59,8 @@ fn connected(port: u8) -> bool {
     })
 }
 
-fn init_port(port: u8) {
+fn reset_port(port: u8) {
     Resetter::new(port).reset();
-
-    command_ring::send_enable_slot();
 }
 
 fn num_ports() -> u8 {
@@ -146,7 +179,9 @@ impl<'a> InputContextInitializer<'a> {
         let s = self.cx.input.device_mut().slot_mut();
 
         s.set_context_entries(1);
-        s.set_root_hub_port_number(self.port);
+
+        // Port ID starts from 1.
+        s.set_root_hub_port_number(self.port + 1);
     }
 }
 

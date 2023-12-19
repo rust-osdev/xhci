@@ -37,6 +37,9 @@ fn main(image: uefi::Handle, st: uefi::table::SystemTable<uefi::table::Boot>) ->
             Ok(xhci::ring::trb::event::Allowed::CommandCompletion(x)) => {
                 command_ring::process_trb(&x);
             }
+            Ok(xhci::ring::trb::event::Allowed::PortStatusChange(x)) => {
+                ports::process_trb(&x);
+            }
             Ok(x) => panic!("Unhandled TRB: {:?}", x),
             Err(x) => panic!("Unknown TRB: {:?}", x),
         }

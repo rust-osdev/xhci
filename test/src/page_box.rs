@@ -12,10 +12,10 @@ use x86_64::VirtAddr;
 
 /// A `Box`-like type that locates the inner value at a 4K bytes page boundary.
 ///
-/// xHCI specification prohibits some structures to cross the page boundary.
-/// Here, the size of a page is determined by Page Size Register (See 5.4.3 of
-/// the spec). However, the minimum size of a page is 4K bytes, meaning that
-/// keeping a structure within a 4K bytes page is always safe. It is very
+/// xHCI specification prohibits some structures from crossing the page
+/// boundary. Here, the size of a page is determined by Page Size Register (See
+/// 5.4.3 of the spec). However, the minimum size of a page is 4K bytes, meaning
+/// that keeping a structure within a 4K bytes page is always safe. It is very
 /// costly, but at least it works.
 pub struct PageBox<T: ?Sized> {
     addr: VirtAddr,

@@ -1,8 +1,8 @@
-
 use super::CycleBit;
 use crate::{exchanger::receiver, port, structures::registers, transition_helper::BoxWrapper};
 use alloc::vec::Vec;
 use bit_field::BitField;
+use conquer_once::spin::OnceCell;
 use core::{
     convert::TryInto,
     pin::Pin,
@@ -11,6 +11,7 @@ use core::{
 use futures_util::{stream::Stream, StreamExt};
 use log::{debug, info, warn};
 use segment_table::SegmentTable;
+use spinning_top::Spinlock;
 use x86_64::{
     structures::paging::{PageSize, Size4KiB},
     PhysAddr,
@@ -19,9 +20,28 @@ use xhci::ring::{trb, trb::event};
 
 mod segment_table;
 
-pub(crate) async fn task(mut ring: Ring) {
+static EVENT_RING: OnceCell<Spinlock<Ring>> = OnceCell::uninit();
+
+pub fn init() {
+    let ring = Spinlock::new(Ring::new());
+    ring.lock().init();
+
+    EVENT_RING
+        .try_init_once(|| ring)
+        .expect("`EVENT_RING` is initialized more than once.");
+}
+
+pub(crate) async fn task() {
     debug!("This is the Event ring task.");
-    while let Some(trb) = ring.next().await {
+
+    while let Some(trb) = EVENT_RING
+        .get()
+        .expect("The event ring is not initialized")
+        .try_lock()
+        .expect("Failed to lock the event ring.")
+        .next()
+        .await
+    {
         info!("TRB: {:?}", trb);
         if let event::Allowed::CommandCompletion(_) = trb {
             receiver::receive(trb);

@@ -69,8 +69,6 @@ fn init_statics() {
 fn init_and_spawn_tasks() {
     init_statics();
 
-    let mut event_ring = event::Ring::new();
-
     // In some cases, an OS may need to get ownership of the xHC from the BIOS.
     // See 4.22.1 of xHCI spec.
     //
@@ -79,21 +77,21 @@ fn init_and_spawn_tasks() {
 
     xhc::init();
 
-    event_ring.init();
     dcbaa::init();
     scratchpad::init();
     exchanger::command::init();
+    event::init();
 
     xhc::run();
     xhc::ensure_no_error_occurs();
 
-    spawn_tasks(event_ring);
+    spawn_tasks();
 }
 
-fn spawn_tasks(e: event::Ring) {
+fn spawn_tasks() {
     port::spawn_all_connected_port_tasks();
 
-    multitask::add(Task::new_poll(event::task(e)));
+    multitask::add(Task::new_poll(event::task()));
 }
 
 fn iter_xhc() -> impl Iterator<Item = PhysAddr> {

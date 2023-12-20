@@ -1,4 +1,3 @@
-
 use super::slot_structures_initializer::SlotStructuresInitializer;
 use crate::structures::registers;
 use xhci::registers::PortRegisterSet;

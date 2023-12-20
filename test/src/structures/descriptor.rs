@@ -1,4 +1,3 @@
-
 use bit_field::BitField;
 use core::{convert::TryInto, ptr};
 use num_derive::FromPrimitive;

@@ -1,4 +1,3 @@
-
 use super::{descriptor_fetcher::DescriptorFetcher, fully_operational::FullyOperational};
 use crate::{
     exchanger,

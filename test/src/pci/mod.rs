@@ -1,4 +1,3 @@
-
 pub(crate) mod config;
 
 use config::{Bus, Device};

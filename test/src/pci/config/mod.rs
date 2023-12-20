@@ -1,4 +1,3 @@
-
 pub(crate) mod bar;
 mod common;
 pub(crate) mod type_spec;

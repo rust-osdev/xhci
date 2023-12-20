@@ -1,4 +1,3 @@
-
 use super::RegisterIndex;
 use core::{
     convert::{From, TryFrom},

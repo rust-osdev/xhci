@@ -1,0 +1,31 @@
+[package]
+name = "xhci-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+accessor = "0.3.0"
+bit_field = "0.10.1"
+byteorder = { version = "1.4.3", default-features = false }
+conquer-once = { version = "0.3.2", default-features = false }
+crossbeam-queue = { version = "0.3.1", features = [
+    "alloc",
+], default-features = false }
+derive_builder = { version = "0.10.2", default-features = false }
+futures-intrusive = { version = "0.4.0", features = [
+    "alloc",
+], default-features = false }
+futures-util = { version = "0.3.15", features = [
+    "alloc",
+], default-features = false }
+linked_list_allocator = "0.10.5"
+log = "0.4.14"
+num-derive = "0.3.3"
+num-traits = { version = "0.2.14", default-features = false }
+os_units = "0.4.0"
+qemu-exit = "3.0.2"
+qemu_print = { version = "0.1.0", default-features = false, features = ["stable"] }
+spinning_top = { version = "0.2.4", features = ["nightly"] }
+uefi = "0.26.0"
+x86_64 = { version = "0.14.11", default-features = false }
+xhci = { version = "0.9.2", path = "../lib" }

@@ -227,6 +227,11 @@ pub trait InputControlHandler: AsRef<[u32]> + AsMut<[u32]> {
         self.as_mut()[1] = 1u32;
     }
 
+    /// clear all drop flag
+    fn clear_all_drop_flag(&mut self) {
+        self.as_mut()[0] = 0u32;
+    }
+
     rw_field_cx!([7](0..=7), configuration_value, "Configuration Value", u8);
     rw_field_cx!([7](8..=15), interface_number, "Interface Number", u8);
     rw_field_cx!([7](16..=23), alternate_setting, "Alternate Setting", u8);

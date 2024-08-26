@@ -77,6 +77,12 @@ impl<const N: usize> Input<N> {
             device: Device::new(),
         }
     }
+
+    /// copy output ctx to input
+    /// refer linux code
+    pub fn copy_from_output(&mut self, out_ctx: &Device<N>) {
+        self.device = out_ctx.clone()
+    }
 }
 impl<const N: usize> InputHandler for Input<N> {
     fn control(&self) -> &dyn InputControlHandler {

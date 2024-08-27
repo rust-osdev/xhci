@@ -299,6 +299,10 @@ impl<const N: usize> DeviceHandler for Device<N> {
 
         &mut self.endpoints[dci - 1]
     }
+
+    fn fill_endpoints_with_0(&mut self) {
+        self.endpoints.fill(Endpoint::new())
+    }
 }
 
 /// A trait to handle Device Context.
@@ -324,6 +328,9 @@ pub trait DeviceHandler {
     /// This method panics if `dci > 31 || dci == 0`. Call [`DeviceHandler::slot_mut`] if you want
     /// a mutable handler of Slot Context.
     fn endpoint_mut(&mut self, dci: usize) -> &mut dyn EndpointHandler;
+
+    /// fill all endpoints with 0
+    fn fill_endpoints_with_0(&mut self);
 }
 
 /// Slot Context.

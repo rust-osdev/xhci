@@ -76,7 +76,7 @@ where
     /// ```
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
         let capability = Capability::new(mmio_base, &mapper);
-        let doorbell = doorbell::Doorbell::new(mmio_base, &capability, mapper.clone());
+        let doorbell = Doorbell::new(mmio_base, &capability, mapper.clone());
         let operational =
             Operational::new(mmio_base, capability.caplength.read_volatile(), &mapper);
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());

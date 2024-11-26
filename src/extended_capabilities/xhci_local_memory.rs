@@ -2,7 +2,6 @@
 
 use super::ExtendedCapability;
 use accessor::{array, single, Mapper};
-use bit_field::BitField;
 use core::convert::TryInto;
 
 /// xHCI Local Memory Capability.
@@ -61,21 +60,12 @@ where
 #[derive(Copy, Clone)]
 pub struct Header([u32; 2]);
 impl Header {
-    /// Returns the Local Memory Enable bit.
-    #[must_use]
-    pub fn local_memory_enable(self) -> bool {
-        self.0[0].get_bit(16)
-    }
-
-    /// Sets the Local Memory Enable bit.
-    pub fn set_local_memory_enable(&mut self) {
-        self.0[0].set_bit(16, true);
-    }
-
-    /// Clears the Local Memory Enable bit.
-    pub fn clear_local_memory_enable(&mut self) {
-        self.0[0].set_bit(16, false);
-    }
+    rw_bit!(
+        pub, self,
+        self.0[0]; 16,
+        local_memory_enable,
+        "Local Memory Enable"
+    );
 
     fn size(self) -> u32 {
         self.0[1]

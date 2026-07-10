@@ -12,6 +12,9 @@
 ### Deprecated
 - `registers::doorbell::Register` in favor of `registers::doorbell::Doorbell`. ([#167])
 
+### Fixed
+- The USB legacy support control/status accessor now uses its correct offset.
+
 ## 0.9.2 - 2023-07-19
 ### Added
 - The sponsor button is now shown on the repository page on GitHub.

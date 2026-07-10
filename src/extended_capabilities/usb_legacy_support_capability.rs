@@ -31,7 +31,7 @@ where
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, m: M) -> Self {
         let usblegsup = single::ReadWrite::new(base, m.clone());
-        let usblegctlsts = single::ReadWrite::new(base, m);
+        let usblegctlsts = single::ReadWrite::new(base + 4, m);
 
         Self {
             usblegsup,
@@ -95,5 +95,35 @@ impl_debug_from_methods! {
         smi_on_os_ownership_change,
         smi_on_pci_command,
         smi_on_bar,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::num::NonZeroUsize;
+
+    #[derive(Clone, Copy)]
+    struct IdentityMapper;
+
+    impl Mapper for IdentityMapper {
+        unsafe fn map(&mut self, phys_start: usize, _bytes: usize) -> NonZeroUsize {
+            NonZeroUsize::new(phys_start).unwrap()
+        }
+
+        fn unmap(&mut self, _virt_start: usize, _bytes: usize) {}
+    }
+
+    #[test]
+    fn control_status_uses_the_second_dword() {
+        let mut registers = [0u32; 2];
+        let mut capability =
+            unsafe { UsbLegacySupport::new(registers.as_mut_ptr() as usize, IdentityMapper) };
+
+        capability.usblegctlsts.update_volatile(|register| {
+            register.set_usb_smi_enable();
+        });
+
+        assert_eq!(registers, [0, 1]);
     }
 }

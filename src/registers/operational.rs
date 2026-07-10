@@ -1,6 +1,7 @@
 //! Host Controller Operational Registers
 
 use super::capability::{Capability, CapabilityRegistersLength};
+use super::register64::{self, Access64};
 use accessor::array;
 use accessor::single;
 use accessor::Mapper;
@@ -27,9 +28,9 @@ where
     /// Device Notification Control
     pub dnctrl: single::ReadWrite<DeviceNotificationControl, M>,
     /// Command Ring Control Register
-    pub crcr: single::ReadWrite<CommandRingControlRegister, M>,
+    pub crcr: register64::ReadWrite<CommandRingControlRegister, M>,
     /// Device Context Base Address Array Pointer Register
-    pub dcbaap: single::ReadWrite<DeviceContextBaseAddressArrayPointerRegister, M>,
+    pub dcbaap: register64::ReadWrite<DeviceContextBaseAddressArrayPointerRegister, M>,
     /// Configure Register
     pub config: single::ReadWrite<ConfigureRegister, M>,
 }
@@ -52,6 +53,29 @@ where
     where
         M: Mapper,
     {
+        Self::new_with_64bit_access(mmio_base, caplength, mapper, Access64::Native)
+    }
+
+    /// Creates a new accessor with the selected access mode for 64-bit registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Operational Registers are accessed only
+    /// through this struct.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the base address of the Host Controller Operational Registers is not
+    /// aligned correctly.
+    pub unsafe fn new_with_64bit_access(
+        mmio_base: usize,
+        caplength: CapabilityRegistersLength,
+        mapper: &M,
+        access64: Access64,
+    ) -> Self
+    where
+        M: Mapper,
+    {
         let base = mmio_base + usize::from(caplength.get());
 
         macro_rules! m {
@@ -65,8 +89,8 @@ where
             usbsts: m!(0x04),
             pagesize: m!(0x08),
             dnctrl: m!(0x14),
-            crcr: m!(0x18),
-            dcbaap: m!(0x30),
+            crcr: register64::ReadWrite::new(base + 0x18, access64, mapper.clone()),
+            dcbaap: register64::ReadWrite::new(base + 0x30, access64, mapper.clone()),
             config: m!(0x38),
         }
     }
@@ -211,6 +235,16 @@ impl DeviceNotificationControl {
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct CommandRingControlRegister(u64);
+impl From<u64> for CommandRingControlRegister {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+impl From<CommandRingControlRegister> for u64 {
+    fn from(value: CommandRingControlRegister) -> Self {
+        value.0
+    }
+}
 impl CommandRingControlRegister {
     wo_bit!(0, ring_cycle_state, "Ring Cycle State");
     w1s_bit!(1, command_stop, "Command Stop");
@@ -242,6 +276,16 @@ impl_debug_from_methods! {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct DeviceContextBaseAddressArrayPointerRegister(u64);
+impl From<u64> for DeviceContextBaseAddressArrayPointerRegister {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+impl From<DeviceContextBaseAddressArrayPointerRegister> for u64 {
+    fn from(value: DeviceContextBaseAddressArrayPointerRegister) -> Self {
+        value.0
+    }
+}
 impl DeviceContextBaseAddressArrayPointerRegister {
     /// Returns the value of the Device Context Base Address Array Pointer.
     #[must_use]

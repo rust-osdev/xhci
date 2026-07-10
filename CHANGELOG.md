@@ -2,6 +2,7 @@
 
 ## Unreleased - ReleaseDate
 ### Added
+- Configurable native, low-high, or high-low access for 64-bit registers.
 - `registers::Doorbell` as an alias of `registers::doorbell::Doorbell`. ([#170])
 
 ### Changed

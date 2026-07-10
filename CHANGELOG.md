@@ -2,11 +2,13 @@
 
 ## Unreleased - ReleaseDate
 ### Added
+- Per-register Port Register Set handlers.
 - `set_0_*` methods for write-1-to-set register bits.
 - Configurable native, low-high, or high-low access for 64-bit registers.
 - `registers::Doorbell` as an alias of `registers::doorbell::Doorbell`. ([#170])
 
 ### Changed
+- `Registers::port_register_set` now uses per-register handlers instead of whole-structure array accesses.
 - `registers::Capability` now has read-only accessors instead of read-write ones. ([#167])
 - `registers::doorbell::Register` is renamed to `registers::doorbell::Doorbell`. The former still exists, but is deprecated now. ([#167])
 

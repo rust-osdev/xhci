@@ -3,6 +3,7 @@
 use super::capability::{Capability, CapabilityRegistersLength};
 use super::register64::{self, Access64};
 use accessor::array;
+use accessor::marker::{AccessorTypeSpecifier, ReadOnly, ReadWrite, Readable};
 use accessor::single;
 use accessor::Mapper;
 use bit_field::BitField;
@@ -67,6 +68,7 @@ where
     ///
     /// This method panics if the base address of the Host Controller Operational Registers is not
     /// aligned correctly.
+    #[allow(clippy::too_many_arguments)]
     pub unsafe fn new_with_64bit_access(
         mmio_base: usize,
         caplength: CapabilityRegistersLength,
@@ -379,6 +381,114 @@ impl PortRegisterSet {
     }
 }
 
+/// An accessor to the Port Register Set array.
+#[derive(Debug)]
+pub struct PortRegisterSetArray<M>
+where
+    M: Mapper + Clone,
+{
+    base: usize,
+    len: usize,
+    mapper: M,
+}
+
+impl<M> PortRegisterSetArray<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an accessor to the Port Register Set array.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Port Register Sets are accessed only through this accessor.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the base address is not aligned correctly.
+    pub unsafe fn new<M2>(mmio_base: usize, capability: &Capability<M2>, mapper: M) -> Self
+    where
+        M2: Mapper + Clone,
+    {
+        let base = mmio_base + usize::from(capability.caplength.read_volatile().get()) + 0x400;
+        assert_eq!(base % 0x10, 0, "base is not aligned");
+        Self {
+            base,
+            len: capability
+                .hcsparams1
+                .read_volatile()
+                .number_of_ports()
+                .into(),
+            mapper,
+        }
+    }
+
+    /// Returns the number of Port Register Sets.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Returns true if there are no Port Register Sets.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    /// Returns a read-only handler for a port.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index >= self.len()`.
+    pub fn port(&self, index: usize) -> Port<'_, M, ReadOnly> {
+        assert!(index < self.len, "index out of range");
+        unsafe { Port::new(self.base + index * 0x10, self.mapper.clone()) }
+    }
+
+    /// Returns a mutable handler for a port.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index >= self.len()`.
+    pub fn port_mut(&mut self, index: usize) -> Port<'_, M, ReadWrite> {
+        assert!(index < self.len, "index out of range");
+        unsafe { Port::new(self.base + index * 0x10, self.mapper.clone()) }
+    }
+}
+
+/// A handler for one Port Register Set.
+#[derive(Debug)]
+pub struct Port<'a, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Port Status and Control Register.
+    pub portsc: single::Generic<PortStatusAndControlRegister, M, A>,
+    /// Port Power Management Status and Control Register.
+    pub portpmsc: single::Generic<PortPowerManagementStatusAndControlRegister, M, A>,
+    /// Port Link Info Register.
+    pub portli: single::ReadOnly<PortLinkInfoRegister, M>,
+    /// Port Hardware LPM Control Register.
+    pub porthlpmc: single::Generic<PortHardwareLpmControlRegister, M, A>,
+    _marker: core::marker::PhantomData<&'a PortRegisterSetArray<M>>,
+}
+
+impl<M, A> Port<'_, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    unsafe fn new(base: usize, mapper: M) -> Self {
+        Self {
+            portsc: single::Generic::new(base, mapper.clone()),
+            portpmsc: single::Generic::new(base + 0x4, mapper.clone()),
+            portli: single::ReadOnly::new(base + 0x8, mapper.clone()),
+            porthlpmc: single::Generic::new(base + 0xc, mapper),
+            _marker: core::marker::PhantomData,
+        }
+    }
+}
+
 /// Port Status and Control Register
 #[repr(transparent)]
 #[derive(Copy, Clone)]
@@ -620,6 +730,18 @@ pub enum TestMode {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core::num::NonZeroUsize;
+
+    #[derive(Clone, Copy)]
+    struct IdentityMapper;
+
+    impl Mapper for IdentityMapper {
+        unsafe fn map(&mut self, phys_start: usize, _bytes: usize) -> NonZeroUsize {
+            NonZeroUsize::new(phys_start).unwrap()
+        }
+
+        fn unmap(&mut self, _virt_start: usize, _bytes: usize) {}
+    }
 
     #[test]
     fn set_0_prevents_write_one_to_set_actions() {
@@ -631,5 +753,26 @@ mod tests {
         port.set_0_port_reset().set_0_warm_port_reset();
         assert!(!port.port_reset());
         assert!(!port.warm_port_reset());
+    }
+
+    #[test]
+    fn port_handler_accesses_one_register_at_a_time() {
+        #[repr(align(16))]
+        struct Mmio([u32; 272]);
+
+        let mut mmio = Mmio([0; 272]);
+        mmio.0[0] = 0x20;
+        mmio.0[1] = 2 << 24;
+        let base = mmio.0.as_mut_ptr() as usize;
+        let mapper = IdentityMapper;
+        let capability = unsafe { Capability::new(base, &mapper) };
+        let mut ports = unsafe { PortRegisterSetArray::new(base, &capability, mapper) };
+
+        ports.port_mut(1).portsc.update_volatile(|portsc| {
+            portsc.set_port_power();
+        });
+
+        assert_eq!(mmio.0[268], 1 << 9);
+        assert_eq!(mmio.0[269..272], [0; 3]);
     }
 }

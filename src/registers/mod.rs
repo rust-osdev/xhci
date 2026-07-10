@@ -5,7 +5,7 @@ use accessor::Mapper;
 
 pub use capability::Capability;
 pub use doorbell::Doorbell;
-pub use operational::{Operational, PortRegisterSet};
+pub use operational::{Operational, Port, PortRegisterSet, PortRegisterSetArray};
 pub use register64::Access64;
 pub use runtime::InterrupterRegisterSet;
 pub use runtime::Runtime;
@@ -29,7 +29,7 @@ where
     /// Host Controller Operational Register
     pub operational: Operational<M>,
     /// Port Register Set Array
-    pub port_register_set: array::ReadWrite<PortRegisterSet, M>,
+    pub port_register_set: PortRegisterSetArray<M>,
     /// Runtime Registers
     pub runtime: Runtime<M>,
     /// Interrupter Register Set Array
@@ -98,7 +98,7 @@ where
             &mapper,
             access64,
         );
-        let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
+        let port_register_set = PortRegisterSetArray::new(mmio_base, &capability, mapper.clone());
         let runtime = Runtime::new(mmio_base, capability.rtsoff.read_volatile(), mapper.clone());
         let interrupter_register_set = InterrupterRegisterSet::new_with_64bit_access(
             mmio_base,

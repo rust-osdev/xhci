@@ -36,11 +36,12 @@ impl Doorbell {
         let base = mmio_base + usize::try_from(capability.dboff.read_volatile().get()).unwrap();
         array::ReadWrite::new(
             base,
-            capability
-                .hcsparams1
-                .read_volatile()
-                .number_of_device_slots()
-                .into(),
+            usize::from(
+                capability
+                    .hcsparams1
+                    .read_volatile()
+                    .number_of_device_slots(),
+            ) + 1,
             mapper,
         )
     }
@@ -52,3 +53,37 @@ impl_debug_from_methods!(Doorbell {
     doorbell_target,
     doorbell_stream_id,
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::num::NonZeroUsize;
+
+    #[derive(Clone, Copy)]
+    struct IdentityMapper;
+
+    impl Mapper for IdentityMapper {
+        unsafe fn map(&mut self, phys_start: usize, _bytes: usize) -> NonZeroUsize {
+            NonZeroUsize::new(phys_start).unwrap()
+        }
+
+        fn unmap(&mut self, _virt_start: usize, _bytes: usize) {}
+    }
+
+    #[test]
+    fn array_includes_the_host_controller_doorbell() {
+        let mut mmio = [0u32; 19];
+        mmio[1] = 2;
+        mmio[5] = 0x40;
+        let base = mmio.as_mut_ptr() as usize;
+        let mapper = IdentityMapper;
+        let capability = unsafe { Capability::new(base, &mapper) };
+        let mut doorbells = unsafe { Doorbell::new(base, &capability, mapper) };
+
+        doorbells.update_volatile_at(2, |doorbell| {
+            doorbell.set_doorbell_target(1);
+        });
+
+        assert_eq!(mmio[18], 1);
+    }
+}

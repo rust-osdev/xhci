@@ -13,6 +13,7 @@
 - `registers::doorbell::Register` in favor of `registers::doorbell::Doorbell`. ([#167])
 
 ### Fixed
+- The Doorbell Array now includes the Host Controller Doorbell.
 - The USB legacy support control/status accessor now uses its correct offset.
 
 ## 0.9.2 - 2023-07-19

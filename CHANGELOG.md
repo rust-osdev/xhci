@@ -2,6 +2,7 @@
 
 ## Unreleased - ReleaseDate
 ### Added
+- `set_0_*` methods for write-1-to-set register bits.
 - Configurable native, low-high, or high-low access for 64-bit registers.
 - `registers::Doorbell` as an alias of `registers::doorbell::Doorbell`. ([#170])
 

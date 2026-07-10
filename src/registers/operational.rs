@@ -616,3 +616,20 @@ pub enum TestMode {
     /// Port Test Control Error.
     PortTestControlError = 15,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn set_0_prevents_write_one_to_set_actions() {
+        let mut command = CommandRingControlRegister::from(1 << 1);
+        command.set_0_command_stop();
+        assert_eq!(u64::from(command) & (1 << 1), 0);
+
+        let mut port = PortStatusAndControlRegister((1 << 4) | (1 << 31));
+        port.set_0_port_reset().set_0_warm_port_reset();
+        assert!(!port.port_reset());
+        assert!(!port.warm_port_reset());
+    }
+}

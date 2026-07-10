@@ -159,24 +159,42 @@ macro_rules! rw1c_bit {
 macro_rules! w1s_bit {
     ([$offset:literal]($bit:literal),$method:ident,$name:literal) => {
         paste::paste! {
-            #[doc = "Sets the"]
+            #[doc = "Assigns 1 to the"]
             #[doc = $name]
-            #[doc = "bit."]
+            #[doc = "bit. On register write, this results in setting the bit."]
             pub fn [<set_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0[$offset].set_bit($bit,true);
+                self
+            }
+
+            #[doc = "Assigns 0 to the"]
+            #[doc = $name]
+            #[doc = "bit, preventing the bit from being set on write."]
+            pub fn [<set_0_ $method>](&mut self) -> &mut Self {
+                use bit_field::BitField;
+                self.0[$offset].set_bit($bit,false);
                 self
             }
         }
     };
     ($bit:literal,$method:ident,$name:literal) => {
         paste::paste! {
-            #[doc = "Sets the"]
+            #[doc = "Assigns 1 to the"]
             #[doc = $name]
-            #[doc = "bit."]
+            #[doc = "bit. On register write, this results in setting the bit."]
             pub fn [<set_ $method>](&mut self)->&mut Self{
                 use bit_field::BitField;
                 self.0.set_bit($bit,true);
+                self
+            }
+
+            #[doc = "Assigns 0 to the"]
+            #[doc = $name]
+            #[doc = "bit, preventing the bit from being set on write."]
+            pub fn [<set_0_ $method>](&mut self) -> &mut Self {
+                use bit_field::BitField;
+                self.0.set_bit($bit,false);
                 self
             }
         }

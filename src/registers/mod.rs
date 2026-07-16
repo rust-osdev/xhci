@@ -26,8 +26,8 @@ where
     pub doorbell: array::ReadWrite<Doorbell, M>,
     /// Host Controller Operational Register
     pub operational: Operational<M>,
-    /// Port Register Set Array
-    pub port_register_set: array::ReadWrite<PortRegisterSet, M>,
+    /// Port Register Sets
+    pub port_register_set: PortRegisterSet<M>,
     /// Runtime Registers
     pub runtime: Runtime<M>,
     /// Interrupter Register Set Array

@@ -1,12 +1,16 @@
 //! Host Controller Operational Registers
 
 use super::capability::{Capability, CapabilityRegistersLength};
-use accessor::array;
+use accessor::marker::AccessorTypeSpecifier;
+use accessor::marker::ReadOnly;
+use accessor::marker::ReadWrite;
+use accessor::marker::Readable;
 use accessor::single;
 use accessor::Mapper;
 use bit_field::BitField;
 use core::convert::TryFrom;
 use core::convert::TryInto;
+use core::marker::PhantomData;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -289,21 +293,22 @@ impl_debug_from_methods! {
     }
 }
 
-/// Port Register Set
-#[repr(C)]
-#[derive(Copy, Clone, Debug)]
-pub struct PortRegisterSet {
-    /// Port Status and Control Register
-    pub portsc: PortStatusAndControlRegister,
-    /// Port PM Status and Control Register
-    pub portpmsc: PortPowerManagementStatusAndControlRegister,
-    /// Port Link Info Register
-    pub portli: PortLinkInfoRegister,
-    /// Port Hardware LPM Control Register
-    pub porthlpmc: PortHardwareLpmControlRegister,
+/// Port Register Sets.
+#[derive(Debug)]
+pub struct PortRegisterSet<M>
+where
+    M: Mapper + Clone,
+{
+    base: usize,
+    len: usize,
+    mapper: M,
 }
-impl PortRegisterSet {
-    /// Creates a new accessor to the array of the Port Register Set.
+
+impl<M> PortRegisterSet<M>
+where
+    M: Mapper + Clone,
+{
+    /// Creates an accessor to the Port Register Sets.
     ///
     /// # Safety
     ///
@@ -313,25 +318,94 @@ impl PortRegisterSet {
     /// # Panics
     ///
     /// This method panics if the base address of the Port Register Sets is not aligned correctly.
-    pub unsafe fn new<M1, M2>(
-        mmio_base: usize,
-        capability: &Capability<M2>,
-        mapper: M1,
-    ) -> array::ReadWrite<Self, M1>
+    pub unsafe fn new<M2>(mmio_base: usize, capability: &Capability<M2>, mapper: M) -> Self
     where
-        M1: Mapper,
         M2: Mapper + Clone,
     {
         let base = mmio_base + usize::from(capability.caplength.read_volatile().get()) + 0x400;
-        array::ReadWrite::new(
-            base,
-            capability
-                .hcsparams1
-                .read_volatile()
-                .number_of_ports()
-                .into(),
-            mapper,
-        )
+        let len = capability
+            .hcsparams1
+            .read_volatile()
+            .number_of_ports()
+            .into();
+        assert!(base.is_multiple_of(4), "base is not aligned");
+        Self { base, len, mapper }
+    }
+
+    /// Returns the number of Port Register Sets.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Returns whether there are no Port Register Sets.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    /// Returns a read-only handler for a port.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index >= self.len()`.
+    pub fn port(&self, index: usize) -> Port<'_, M, ReadOnly> {
+        unsafe { Port::new(self, index) }
+    }
+
+    /// Returns a mutable handler for a port.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index >= self.len()`.
+    pub fn port_mut(&mut self, index: usize) -> Port<'_, M, ReadWrite> {
+        unsafe { Port::new(self, index) }
+    }
+}
+
+/// A handler for one Port Register Set.
+#[derive(Debug)]
+pub struct Port<'a, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Port Status and Control Register.
+    pub portsc: single::Generic<PortStatusAndControlRegister, M, A>,
+    /// Port Power Management Status and Control Register.
+    pub portpmsc: single::Generic<PortPowerManagementStatusAndControlRegister, M, A>,
+    /// Port Link Info Register.
+    pub portli: single::Generic<PortLinkInfoRegister, M, A>,
+    /// Port Hardware LPM Control Register.
+    pub porthlpmc: single::Generic<PortHardwareLpmControlRegister, M, A>,
+    _marker: PhantomData<&'a PortRegisterSet<M>>,
+}
+
+impl<'a, M, A> Port<'a, M, A>
+where
+    M: Mapper + Clone,
+    A: AccessorTypeSpecifier + Readable,
+{
+    /// Creates an accessor to one Port Register Set.
+    ///
+    /// # Safety
+    ///
+    /// Any mutable handler to `port_register_set` must be unique.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `index >= port_register_set.len()`.
+    unsafe fn new(port_register_set: &'a PortRegisterSet<M>, index: usize) -> Self {
+        assert!(index < port_register_set.len, "index out of range");
+        let base = port_register_set.base + index * 0x10;
+        let mapper = port_register_set.mapper.clone();
+        Self {
+            portsc: single::Generic::new(base, mapper.clone()),
+            portpmsc: single::Generic::new(base + 0x4, mapper.clone()),
+            portli: single::Generic::new(base + 0x8, mapper.clone()),
+            porthlpmc: single::Generic::new(base + 0xc, mapper),
+            _marker: PhantomData,
+        }
     }
 }
 
@@ -571,4 +645,53 @@ pub enum TestMode {
     ForceEnable = 5,
     /// Port Test Control Error.
     PortTestControlError = 15,
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate std;
+
+    use core::num::NonZeroUsize;
+    use std::{cell::RefCell, rc::Rc, vec::Vec};
+
+    use super::*;
+
+    #[test]
+    fn port_registers_are_mapped_as_individual_dwords() {
+        let mut registers = [0_u32; 4];
+        let base = registers.as_mut_ptr() as usize;
+        let mappings = Rc::new(RefCell::new(Vec::new()));
+        let mapper = RecordingMapper {
+            mappings: mappings.clone(),
+        };
+
+        let mut port_registers = PortRegisterSet {
+            base,
+            len: 1,
+            mapper,
+        };
+        port_registers.port_mut(0).portsc.update_volatile(|portsc| {
+            portsc.set_port_power();
+        });
+
+        assert_eq!(registers, [1 << 9, 0, 0, 0]);
+        assert_eq!(
+            *mappings.borrow(),
+            [(base, 4), (base + 4, 4), (base + 8, 4), (base + 12, 4)]
+        );
+    }
+
+    #[derive(Clone)]
+    struct RecordingMapper {
+        mappings: Rc<RefCell<Vec<(usize, usize)>>>,
+    }
+
+    impl Mapper for RecordingMapper {
+        unsafe fn map(&mut self, phys_start: usize, bytes: usize) -> NonZeroUsize {
+            self.mappings.borrow_mut().push((phys_start, bytes));
+            NonZeroUsize::new(phys_start).expect("test MMIO address must be non-zero")
+        }
+
+        fn unmap(&mut self, _virt_start: usize, _bytes: usize) {}
+    }
 }

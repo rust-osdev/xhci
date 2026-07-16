@@ -13,8 +13,8 @@ pub struct XhciSupportedProtocol<M>
 where
     M: Mapper + Clone,
 {
-    /// The first 16 bytes of xHCI Supported Protocol Capability.
-    pub header: single::ReadWrite<Header, M>,
+    /// The first four Dwords of xHCI Supported Protocol Capability.
+    pub header: HeaderAccessor<M>,
     /// Protocol Speed IDs.
     ///
     /// This field is `None` is `PSIC == 0`. Refer to 7.2.2.1.2 of the xHCI requirements
@@ -35,7 +35,7 @@ where
     ///
     /// This method panics if `base` is not aligned correctly.
     pub unsafe fn new(base: usize, mapper: M) -> Self {
-        let header: single::ReadWrite<Header, M> = single::ReadWrite::new(base, mapper.clone());
+        let header = HeaderAccessor::new(base, mapper.clone());
         let len = header.read_volatile().protocol_speed_id_count();
         let psis = if len > 0 {
             Some(array::ReadWrite::new(base + 0x10, len.into(), mapper))
@@ -44,6 +44,43 @@ where
         };
 
         Self { header, psis }
+    }
+}
+
+/// An accessor to the first four Dwords of xHCI Supported Protocol Capability.
+#[derive(Debug)]
+pub struct HeaderAccessor<M>
+where
+    M: Mapper + Clone,
+{
+    revision: single::ReadOnly<u32, M>,
+    name_string: single::ReadOnly<u32, M>,
+    compatible_ports: single::ReadOnly<u32, M>,
+    protocol_slot_type: single::ReadOnly<u32, M>,
+}
+
+impl<M> HeaderAccessor<M>
+where
+    M: Mapper + Clone,
+{
+    unsafe fn new(base: usize, mapper: M) -> Self {
+        Self {
+            revision: single::ReadOnly::new(base, mapper.clone()),
+            name_string: single::ReadOnly::new(base + 0x4, mapper.clone()),
+            compatible_ports: single::ReadOnly::new(base + 0x8, mapper.clone()),
+            protocol_slot_type: single::ReadOnly::new(base + 0xc, mapper),
+        }
+    }
+
+    /// Reads the Supported Protocol header one Dword at a time.
+    #[must_use]
+    pub fn read_volatile(&self) -> Header {
+        Header([
+            self.revision.read_volatile(),
+            self.name_string.read_volatile(),
+            self.compatible_ports.read_volatile(),
+            self.protocol_slot_type.read_volatile(),
+        ])
     }
 }
 impl<M> From<XhciSupportedProtocol<M>> for ExtendedCapability<M>
@@ -264,4 +301,52 @@ pub enum LinkProtocol {
     SuperSpeed = 0,
     /// Super Speed Plus
     SuperSpeedPlus = 1,
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate std;
+
+    use core::num::NonZeroUsize;
+    use std::{cell::RefCell, rc::Rc, vec::Vec};
+
+    use super::*;
+
+    #[test]
+    fn supported_protocol_header_is_mapped_as_individual_dwords() {
+        let mut registers = [0x0310_0002, 0x3342_5355, 0x0700_0402, 5];
+        let base = registers.as_mut_ptr() as usize;
+        let mappings = Rc::new(RefCell::new(Vec::new()));
+        let mapper = RecordingMapper {
+            mappings: mappings.clone(),
+        };
+
+        let protocol = unsafe { XhciSupportedProtocol::new(base, mapper) };
+        let header = protocol.header.read_volatile();
+
+        assert_eq!(header.minor_revision(), 0x10);
+        assert_eq!(header.major_revision(), 3);
+        assert_eq!(header.name_string(), 0x3342_5355);
+        assert_eq!(header.compatible_port_offset(), 2);
+        assert_eq!(header.compatible_port_count(), 4);
+        assert_eq!(header.protocol_slot_type(), 5);
+        assert_eq!(
+            *mappings.borrow(),
+            [(base, 4), (base + 4, 4), (base + 8, 4), (base + 12, 4)]
+        );
+    }
+
+    #[derive(Clone)]
+    struct RecordingMapper {
+        mappings: Rc<RefCell<Vec<(usize, usize)>>>,
+    }
+
+    impl Mapper for RecordingMapper {
+        unsafe fn map(&mut self, phys_start: usize, bytes: usize) -> NonZeroUsize {
+            self.mappings.borrow_mut().push((phys_start, bytes));
+            NonZeroUsize::new(phys_start).expect("test MMIO address must be non-zero")
+        }
+
+        fn unmap(&mut self, _virt_start: usize, _bytes: usize) {}
+    }
 }

@@ -7,6 +7,10 @@
 ### Changed
 - `registers::Capability` now has read-only accessors instead of read-write ones. ([#167])
 - `registers::doorbell::Register` is renamed to `registers::doorbell::Doorbell`. The former still exists, but is deprecated now. ([#167])
+- `registers::operational::PortRegisterSet` now provides `port` and `port_mut` handlers for accessing individual port registers. ([#158])
+
+### Fixed
+- Port Register Sets and Supported Protocol headers are accessed one Dword at a time to avoid widened MMIO transactions.
 
 ### Deprecated
 - `registers::doorbell::Register` in favor of `registers::doorbell::Doorbell`. ([#167])
@@ -206,3 +210,4 @@
 
 [#170]: https://github.com/rust-osdev/xhci/pull/170
 [#167]: https://github.com/rust-osdev/xhci/pull/167
+[#158]: https://github.com/rust-osdev/xhci/issues/158

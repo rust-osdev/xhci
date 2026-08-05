@@ -1,6 +1,7 @@
 //! Host Controller Runtime Registers.
 
 use super::capability::RuntimeRegisterSpaceOffset;
+use super::register64::{self, Access64};
 use accessor::marker::AccessorTypeSpecifier;
 use accessor::marker::ReadOnly;
 use accessor::marker::ReadWrite;
@@ -68,6 +69,7 @@ where
 {
     base: usize,
     mapper: M,
+    access64: Access64,
 }
 
 impl<M> InterrupterRegisterSet<M>
@@ -86,10 +88,35 @@ where
     /// This method panics if the base address of the Interrupter Register Sets is not aligned
     /// correctly.
     pub unsafe fn new(mmio_base: usize, rtoff: RuntimeRegisterSpaceOffset, mapper: M) -> Self {
+        Self::new_with_64bit_access(mmio_base, rtoff, mapper, Access64::Native)
+    }
+
+    /// Creates an accessor with the selected access mode for 64-bit registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the Host Controller Runtime Registers are accessed only through
+    /// this struct.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the base address of the Interrupter Register Sets is not aligned
+    /// correctly.
+    #[allow(clippy::too_many_arguments)]
+    pub unsafe fn new_with_64bit_access(
+        mmio_base: usize,
+        rtoff: RuntimeRegisterSpaceOffset,
+        mapper: M,
+        access64: Access64,
+    ) -> Self {
         let base = mmio_base + usize::try_from(rtoff.get()).unwrap() + 0x20;
         assert!(base % 0x20 == 0, "base is not aligned");
 
-        Self { base, mapper }
+        Self {
+            base,
+            mapper,
+            access64,
+        }
     }
 
     /// Returns a handler for an interrupter.
@@ -98,7 +125,8 @@ where
     ///
     /// This method panics if `index > 1023`.
     pub fn interrupter(&self, index: usize) -> Interrupter<'_, M, ReadOnly> {
-        unsafe { Interrupter::new(self.base, index, self.mapper.clone()) }
+        assert!(index < 1024, "index out of range");
+        unsafe { Interrupter::new(self.base + index * 0x20, self.mapper.clone(), self.access64) }
     }
 
     /// Returns a mutable handler for an interrupter.
@@ -107,7 +135,8 @@ where
     ///
     /// This method panics if `index > 1023`.
     pub fn interrupter_mut(&mut self, index: usize) -> Interrupter<'_, M, ReadWrite> {
-        unsafe { Interrupter::new(self.base, index, self.mapper.clone()) }
+        assert!(index < 1024, "index out of range");
+        unsafe { Interrupter::new(self.base + index * 0x20, self.mapper.clone(), self.access64) }
     }
 }
 
@@ -125,9 +154,9 @@ where
     /// Event Ring Segment Table Size Register
     pub erstsz: single::Generic<EventRingSegmentTableSizeRegister, M, A>,
     /// Event Ring Segment Table Base Address Register
-    pub erstba: single::Generic<EventRingSegmentTableBaseAddressRegister, M, A>,
+    pub erstba: register64::Generic<EventRingSegmentTableBaseAddressRegister, M, A>,
     /// Event Ring Dequeue Pointer Register
-    pub erdp: single::Generic<EventRingDequeuePointerRegister, M, A>,
+    pub erdp: register64::Generic<EventRingDequeuePointerRegister, M, A>,
     // Tie the lifetime of this Interrupter to the parent InterrupterRegisterSet.
     // This prevents multiple mutable handlers from being created.
     _marker: PhantomData<&'a InterrupterRegisterSet<M>>,
@@ -147,15 +176,13 @@ where
     /// # Panics
     ///
     /// This method panics if `index > 1023`.
-    unsafe fn new(interrupter_register_set_base: usize, index: usize, mapper: M) -> Self {
-        assert!(index < 1024, "index out of range");
-        let base = interrupter_register_set_base + index * 0x20;
+    unsafe fn new(base: usize, mapper: M, access64: Access64) -> Self {
         Self {
             iman: single::Generic::new(base, mapper.clone()),
             imod: single::Generic::new(base + 0x4, mapper.clone()),
             erstsz: single::Generic::new(base + 0x8, mapper.clone()),
-            erstba: single::Generic::new(base + 0x10, mapper.clone()),
-            erdp: single::Generic::new(base + 0x18, mapper),
+            erstba: register64::Generic::new(base + 0x10, access64, mapper.clone()),
+            erdp: register64::Generic::new(base + 0x18, access64, mapper),
             _marker: PhantomData,
         }
     }
@@ -222,6 +249,16 @@ impl EventRingSegmentTableSizeRegister {
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug)]
 pub struct EventRingSegmentTableBaseAddressRegister(u64);
+impl From<u64> for EventRingSegmentTableBaseAddressRegister {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+impl From<EventRingSegmentTableBaseAddressRegister> for u64 {
+    fn from(value: EventRingSegmentTableBaseAddressRegister) -> Self {
+        value.0
+    }
+}
 impl EventRingSegmentTableBaseAddressRegister {
     /// Returns the base address of the Event Ring Segment Table.
     #[must_use]
@@ -247,6 +284,16 @@ impl EventRingSegmentTableBaseAddressRegister {
 #[repr(transparent)]
 #[derive(Copy, Clone, Default)]
 pub struct EventRingDequeuePointerRegister(u64);
+impl From<u64> for EventRingDequeuePointerRegister {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+impl From<EventRingDequeuePointerRegister> for u64 {
+    fn from(value: EventRingDequeuePointerRegister) -> Self {
+        value.0
+    }
+}
 impl EventRingDequeuePointerRegister {
     rw_field!(
         0..=2,

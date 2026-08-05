@@ -6,12 +6,14 @@ use accessor::Mapper;
 pub use capability::Capability;
 pub use doorbell::Doorbell;
 pub use operational::{Operational, PortRegisterSet};
+pub use register64::Access64;
 pub use runtime::InterrupterRegisterSet;
 pub use runtime::Runtime;
 
 pub mod capability;
 pub mod doorbell;
 pub mod operational;
+pub mod register64;
 pub mod runtime;
 
 /// The access point to xHCI registers.
@@ -75,14 +77,35 @@ where
     /// let r = unsafe { xhci::Registers::new(MMIO_BASE, mapper) };
     /// ```
     pub unsafe fn new(mmio_base: usize, mapper: M) -> Self {
+        Self::new_with_64bit_access(mmio_base, mapper, Access64::Native)
+    }
+
+    /// Creates an instance of [`Registers`] with the selected access mode for 64-bit registers.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the xHCI registers are accessed only through this struct.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if `mmio_base` is not aligned correctly.
+    pub unsafe fn new_with_64bit_access(mmio_base: usize, mapper: M, access64: Access64) -> Self {
         let capability = Capability::new(mmio_base, &mapper);
         let doorbell = Doorbell::new(mmio_base, &capability, mapper.clone());
-        let operational =
-            Operational::new(mmio_base, capability.caplength.read_volatile(), &mapper);
+        let operational = Operational::new_with_64bit_access(
+            mmio_base,
+            capability.caplength.read_volatile(),
+            &mapper,
+            access64,
+        );
         let port_register_set = PortRegisterSet::new(mmio_base, &capability, mapper.clone());
         let runtime = Runtime::new(mmio_base, capability.rtsoff.read_volatile(), mapper.clone());
-        let interrupter_register_set =
-            InterrupterRegisterSet::new(mmio_base, capability.rtsoff.read_volatile(), mapper);
+        let interrupter_register_set = InterrupterRegisterSet::new_with_64bit_access(
+            mmio_base,
+            capability.rtsoff.read_volatile(),
+            mapper,
+            access64,
+        );
 
         Self {
             capability,
